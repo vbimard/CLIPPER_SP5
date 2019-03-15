@@ -625,37 +625,7 @@ namespace AlmaCamTrainingTest
 
         }
 
-        private void relanceenvoiecoupeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //IEntity TO_CUT_nesting;
-            IModelsRepository modelsRepository = new ModelsRepository();
-            _Context = modelsRepository.GetModelContext(Lst_Model.Text);
-
-            var doonaction = new Clipper_8_DoOnAction_AfterSendToWorkshop();
-            string stage = "_TO_CUT_NESTING";
-
-            //creation du fichier de sortie
-            //recupere les path
-            Clipper_Param.GetlistParam(_Context);
-            IEntitySelector nestingselector = null;
-
-            nestingselector = new EntitySelector();
-
-            //entity type pointe sur la list d'objet du model
-            nestingselector.Init(_Context, _Context.Kernel.GetEntityType(stage));
-            nestingselector.MultiSelect = true;
-
-
-            if (nestingselector.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                foreach (IEntity nesting in nestingselector.SelectedEntity)
-                {
-                    doonaction.Execute(nesting);
-
-                }
-            }
-              _Context = null; 
-        }
+       
 
         private void reinitialiserStockToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -724,6 +694,43 @@ namespace AlmaCamTrainingTest
 
         }
 
+
+
+
+        private void relanceenvoiecoupeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //IEntity TO_CUT_nesting;
+            IModelsRepository modelsRepository = new ModelsRepository();
+            _Context = modelsRepository.GetModelContext(Lst_Model.Text);
+
+            var doonaction = new Clipper_8_DoOnAction_AfterSendToWorkshop();
+            string stage = "_TO_CUT_NESTING";
+
+            //creation du fichier de sortie
+            //recupere les path
+            Clipper_Param.GetlistParam(_Context);
+            IEntitySelector nestingselector = null;
+
+            nestingselector = new EntitySelector();
+
+            //entity type pointe sur la list d'objet du model
+            nestingselector.Init(_Context, _Context.Kernel.GetEntityType(stage));
+            nestingselector.MultiSelect = true;
+
+
+            if (nestingselector.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                foreach (IEntity nesting in nestingselector.SelectedEntity)
+                {
+                    doonaction.Execute(nesting);
+
+                }
+            }
+            _Context = null;
+        }
+
+
+
         private void relanceClotureToolStripMenuItem2_Click(object sender, EventArgs e)
         {
             IModelsRepository modelsRepository = new ModelsRepository();
@@ -734,10 +741,7 @@ namespace AlmaCamTrainingTest
 
                    
             Cursor.Current = Cursors.WaitCursor;
-
-
-
-
+            
 
             List<IEntity> cutsheets = SimplifiedMethods.Get_Entity_Selector(_Context, "_CUT_SHEET");
             var doonaction = new Clipper_8_DoOnAction_After_Cutting_end();
@@ -752,6 +756,8 @@ namespace AlmaCamTrainingTest
             _Context = null; 
 
         }
+
+
 
         private void preparerLaBasePourClipperToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -775,14 +781,171 @@ namespace AlmaCamTrainingTest
                 File.WriteAllText(CommandCsPath, CustoFileCs.Item2);
                 
                 string cs = CustoFileCs.Item1;
-
+                SimplifiedMethods.NotifyMessage("Updating Database", CustoFileCs.Item1);
                 ModelManager modelManager = new ModelManager(modelsRepository);
                 modelManager.CustomizeModel(CommandCsPath, Lst_Model.Text, true);
-                 File.Delete(CommandCsPath);
+
+
+                File.Delete(CommandCsPath);
             }
-           
+
+            SimplifiedMethods.NotifyMessage("Updating Database", "Done");
+
+
+            ///update parameters
+            //chaine de connexion// sp5 //
+
+            //ouverture du context
+
+            IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
+            SimplifiedMethods.NotifyMessage("Updating Database", "Updating Parameters...");
+            Update_Clipper_Parameters(_Context);
+            Update_Clipper_Stock(_Context);
 
         }
+
+
+
+
+
+        public void Update_Clipper_Parameters(IContext _Context)
+        {
+
+
+            
+
+            ITransaction transaction = _Context.CreateTransaction();
+            IParameterValue parameterValue;
+            //
+            // create directory 
+
+            //update clipper parameters
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "MODEL_DM");
+            parameterValue.SetValue(@"0#_NAME#string;1#_MATERIAL#string;2#_LENGTH#double;3#_WIDTH#double;4#THICKNESS#double;5#QTY_TOT#integer;6#_REST_QUANTITY#integer;7#GISEMENT#string;8#NUMMAG#string;9#NUMMATLOT#string;10#NUMCERTIF#string;11#NUMLOT#string;12#NUMCOUL#string;13#IDCLIP#string;14#FILENAME#string");
+            parameterValue.Save(transaction);
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "ACTIVATE_OMISSION");
+            parameterValue.SetValue(true);
+            parameterValue.Save(transaction);
+
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "EXPLODE_MULTIPLICITY");
+            parameterValue.SetValue(true);
+            parameterValue.Save(transaction);
+
+
+            //update part export value
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_OF_PATH");
+            parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
+            parameterValue.Save(transaction);
+
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_DPR_DIRECTORY");
+            parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
+            parameterValue.Save(transaction);
+
+
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_GLOBAL_CONFIGURATION", "_MANAGE_PART_SET");
+            parameterValue.SetValue(false);
+            parameterValue.Save(transaction);
+
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_GLOBAL_CONFIGURATION", "_MANAGE_STOCK");
+            parameterValue.SetValue(true);
+            parameterValue.Save(transaction);
+
+            /*
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_GLOBAL_CONFIGURATION", "_WORKSHOP_OPTION");
+            parameterValue.SetValue(2);
+            parameterValue.Save(transaction);*/
+
+            //update part export value
+
+            //ouverture des imports 
+            string Import_Client = Properties.Resources.Import_client_1;
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("DATA_IMPORT", "IMPORT_DEFINITION");
+            parameterValue.SetValue(Import_Client);
+            parameterValue.Save(transaction);
+
+            string Import_Matiere = Properties.Resources.Import_Matiere_2;
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("DATA_IMPORT_2", "IMPORT_DEFINITION");
+            parameterValue.SetValue(Import_Matiere);
+            parameterValue.Save(transaction);
+
+            _Context = null;
+            transaction = null;
+
+
+
+
+
+        }
+
+
+        public void Update_Clipper_Stock(IContext _Context)
+        {
+
+            SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Ouverture de la base de " + Lst_Model.Text + " entités de stock.");
+
+            
+                                                                                   //set value 
+            IEntityList stocks = _Context.EntityManager.GetEntityList("_STOCK");
+            stocks.Fill(false);
+
+
+            SimplifiedMethods.NotifyMessage("Almacam_Clipper", "traitement de " + stocks.Count() + " entités de stock.");
+
+            Cursor.Current = Cursors.WaitCursor;
+
+            long position = 0;
+            int step = 1;
+            foreach (IEntity stock in stocks)
+            {
+                position++;
+
+                SimplifiedMethods.NotifyStatusMessage("", " Initialisation   en cours ...", stocks.Count(), position, ref step, 0);
+
+         
+                //les données seront settées par clipper
+
+
+                stock.SetFieldValue("AF_IS_OMMITED", false);
+                if (stock.GetFieldValueAsString("IDCLIP") == string.Empty)
+
+                {// non ttraite
+                    stock.SetFieldValue("IDCLIP", null);
+                 
+
+                }
+                //recuperation du champs filename de la tole dans le champs filename du stock
+                ///recupération du filename des sheet dans le stock
+                string filname = stock.GetFieldValueAsEntity("_SHEET").GetFieldValueAsString("FILENAME");
+
+                if (filname != string.Empty || filname != null)
+                {
+                    stock.SetFieldValue("FILENAME", filname);
+                    //Creating_emf;
+                    if (File.Exists(filname) == false)
+                    {
+                        //create emf //
+
+                    }
+                }
+
+
+
+
+                stock.Save();
+            }
+            SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Done.");
+            
+
+
+
+        }
+
+
 
         private void iMportChaierDaffaireToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -911,72 +1074,11 @@ namespace AlmaCamTrainingTest
 
             try
             {
-                SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Ouverture de la base de " + Lst_Model.Text + " entités de stock.");
-
                 //creation du model repository
                 IModelsRepository modelsRepository = new ModelsRepository();
                 IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
-                                                                                        //set value 
-                IEntityList stocks = _Context.EntityManager.GetEntityList("_STOCK");
-                stocks.Fill(false);
 
-
-                SimplifiedMethods.NotifyMessage("Almacam_Clipper", "traitement de " + stocks.Count() + " entités de stock.");
-
-                Cursor.Current = Cursors.WaitCursor;
-
-                long position = 0;
-                int step = 1;
-                foreach (IEntity stock in stocks)
-                {
-                    position++;
-
-                    SimplifiedMethods.NotifyStatusMessage("", " Initialisation   en cours ...", stocks.Count(), position,ref step, 0);
-
-                    /*
-                    if (stock.GetFieldValueAsLong("_QUANTITY") == 0 && stock.GetFieldValueAsLong("_BOOKED_QUANTITY") == 0)
-                    { stock.SetFieldValue("AF_IS_OMMITED", true); }
-                    else
-                    { stock.SetFieldValue("AF_IS_OMMITED", false); }
-                    */
-                    //les données seront settées par clipper
-
-
-                    stock.SetFieldValue("AF_IS_OMMITED", false);
-                    if (stock.GetFieldValueAsString("IDCLIP") == string.Empty)
-
-                    {// non ttraite
-                        stock.SetFieldValue("IDCLIP", null);
-                        //stock.SetFieldValue("AF_IS_OMMITED", true);
-
-                    }
-                    //recuperation du champs filename de la tole dans le champs filename du stock
-
-                    ///recupération du filename des sheet dans le stock
-                    string filname = stock.GetFieldValueAsEntity("_SHEET").GetFieldValueAsString("FILENAME");
-
-                    if (filname != string.Empty || filname != null)
-                    {
-                        stock.SetFieldValue("FILENAME", filname);
-                        //Creating_emf;
-                        if (File.Exists(filname) == false)
-                        {
-                            //create emf //
-
-                        }
-                    }
-
-
-
-
-                    stock.Save();
-                }
-                SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Operation terminée ");
-                // Execute your time-intensive hashing code here...
-
-                // Set cursor as default arrow
-                
-                //MessageBox.Show("Operation terminée");
+                Update_Clipper_Stock(_Context);
             }
 
             finally
@@ -1072,8 +1174,7 @@ namespace AlmaCamTrainingTest
 
             List<Tuple<string, string>> CustoFileCsList = new List<Tuple<string, string>>();
 
-            //CustoFileCsList.Add(new Tuple<string, string>("Entities", Properties.Resources.Entities3));
-            //CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources._event));
+           
             CustoFileCsList.Add(new Tuple<string, string>("Commandes", Properties.Resources.CommandesV2));
 
             foreach (Tuple<string, string> CustoFileCs in CustoFileCsList)
@@ -1117,6 +1218,15 @@ namespace AlmaCamTrainingTest
         private void ajouterLesChampsSpécifiquesToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void updateToSpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            IModelsRepository modelsRepository = new ModelsRepository();
+            IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
+            SimplifiedMethods.NotifyMessage("Updating Database", "Updating Parameters...");
+            Update_Clipper_Parameters(_Context);
+            SimplifiedMethods.NotifyMessage("Updating Database", "Done");
         }
     }
 

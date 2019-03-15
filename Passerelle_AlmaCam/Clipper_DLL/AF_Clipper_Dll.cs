@@ -6907,9 +6907,7 @@ namespace AF_Clipper_Dll
                     }
 
                     {
-                        //chargement de la liste des entity dans un dictionnaire
-                        //var stock_identifed_dictionnary = stocks_indentifie_en_cours.ToDictionary(keySelector => keySelector.Entity.GetFieldValueAsString("IDCLIP"));
-                        //on est obligé de gerer les doublons
+                        
                         var stock_identifed_dictionnary = new Dictionary<string, IEntity>();
 
 
@@ -6959,7 +6957,10 @@ namespace AF_Clipper_Dll
                                 //ici on travail les modifs.
                                 ///mise a jours
 
-                                Update_Stock_Item(stockentity, line_Dictionnary);
+                              
+                                //pour sp5 //
+
+                                Update_Stock_Item_Sp5(stockentity, line_Dictionnary);
                                 Alma_Log.Write_Log(methodename + PHASE + " " + line_Dictionnary["IDCLIP"] + ":-----> line " + ligneNumber + " STOCK UPDATED.");
                                 //stock = null;
                             }
@@ -7105,7 +7106,7 @@ namespace AF_Clipper_Dll
                                 // bool hasValue = chutes_cfao_non_identifiees_dictionnary.TryGetValue(filename, out stockentity);
                                 if (chutes_cfao_non_identifiees_dictionnary.TryGetValue(filename, out stockentity) == true)
                                 {   ///mise a jours
-                                    Update_Stock_Item(stockentity, line_Dictionnary);
+                                    Update_Stock_Item_Sp5(stockentity, line_Dictionnary);
 
                                 }
 
@@ -7212,7 +7213,7 @@ namespace AF_Clipper_Dll
                             {
                                 //Alma_Log.Write_Log(methodename + " CONFIRMATION:  AUCUNE TOLE trouver avec l'id" + idclip);
                                 //Alma_Log.Write_Log(methodename + " CREATION TOLE DE LA TOLE " + idclip);
-                                Create_Stock_Item(contextlocal, line_Dictionnary);
+                                Create_Stock_Item_Sp5(contextlocal, line_Dictionnary);
                                 Alma_Log.Write_Log(methodename + " TOLE CREEE " + idclip);
                             }
                             else {
@@ -7287,7 +7288,7 @@ namespace AF_Clipper_Dll
                                     //recuperation du stock
 
                                     //mise a jour des omission
-                                    SetOmitted(stockentity);
+                                    SetOmitted_Sp5(stockentity);
                                     Alma_Log.Write_Log(methodename + ": omission set " + idclip);
 
                                 }
@@ -7448,6 +7449,105 @@ namespace AF_Clipper_Dll
             }
         }
 
+
+
+
+
+        /// <summary>
+        /// met a jour les valeurs stock et sheet  dans le stock almacam
+        /// attention on ne met à jour que les chute tole qui n'ont pas de qtés reservées 
+        /// </summary>
+        /// <param name="contextlocal">contexte context</param>
+        /// <param name="sheet">ientity sheet  </param>
+        /// <param name="stock">inentity stock</param>
+        /// <param name="line_dictionnary">dictionnary linedisctionary</param>
+        /// <param name="type_tole">type tole  ou chute</param>
+        public void Update_Stock_Item_Sp5(IEntity stock, Dictionary<string, object> line_dictionnary)
+        {
+            try
+            {
+                IContext contextlocal = stock.Context;
+                foreach (var field in line_dictionnary)
+                {
+
+                    //on verifie que le champs existe bien avant de l'ecrire
+                    if (contextlocal.Kernel.GetEntityType("_STOCK").FieldList.ContainsKey(field.Key))
+                    {
+
+                        //traitement specifique
+
+                        switch (field.Key)
+                        {
+
+
+                            case "_WIDTH":
+                                //données de sheet pas de stock
+                                break;
+                            case "_LENGTH":
+                                break;
+                            case "_MATERIAL":
+                                break;
+                            case "NUMMATLOT":
+
+                                stock.SetFieldValue(field.Key, field.Value);
+                                stock.SetFieldValue("_HEAT_NUMBER", field.Value);
+
+                                break;
+
+
+                            case "_QUANTITY":
+
+                                //long clipperQty = 0;
+                                long Qty = 0;
+                                Qty = CaclulateSheetQuantity_Sp5(stock, line_dictionnary);
+                                stock.SetFieldValue(field.Key, Qty);
+                                //cas barou ou le client n'utilise pas les numéro de lot
+                                //permet de debloquer les clotures.
+                                //stock.SetFieldValue("_USED_QUANTITY", 0);
+                                break;
+
+                            case "_REST_QUANTITY":
+
+                                //long clipperQty = 0;
+                                long Rest_Qty = 0;
+                                Qty = CaclulateSheetQuantity_Sp5(stock, line_dictionnary);
+                                stock.SetFieldValue(field.Key, Rest_Qty);
+                                //cas barou ou le client n'utilise pas les numéro de lot
+                                //permet de debloquer les clotures.
+                                //stock.SetFieldValue("_USED_QUANTITY", 0);
+
+                                break;
+
+
+                            default:
+
+
+                                stock.SetFieldValue(field.Key, field.Value);
+
+
+                                break;
+                        }
+                    }
+                }
+
+
+                //on sauvegarde
+
+                //sheet.Save();
+                stock.Save();
+                //creation du nom auto d'almacam
+                CommonModelBuilder.ComputeSheetReference(stock.Context, stock.GetFieldValueAsEntity("_SHEET"));
+                stock.GetFieldValueAsEntity("_SHEET").Save();
+                stock = null;
+                Dispose();
+
+            }
+            catch (Exception ie)
+            {
+                MessageBox.Show(ie.Message);
+            }
+        }
+
         /// <summary>
         /// met a jour les valeurs stock et sheet  dans le stock almacam
         /// attention on ne met à jour que les chute tole qui n'ont pas de qtés reservées 
@@ -7525,7 +7625,7 @@ namespace AF_Clipper_Dll
          
                 newstock.SetFieldValue("_SHEET", newsheet);
                 newstock.Save();
-                Update_Stock_Item(newstock, line_Dictionnary);
+                Update_Stock_Item_Sp5(newstock, line_Dictionnary);
 
 
 
@@ -7545,7 +7645,106 @@ namespace AF_Clipper_Dll
         }
 
 
-       
+
+
+        /// <summary>
+        /// met a jour les valeurs stock et sheet  dans le stock almacam
+        /// attention on ne met à jour que les chute tole qui n'ont pas de qtés reservées 
+        /// </summary>
+        /// <param name="contextlocal">contexte context</param>
+        /// <param name="sheet">ientity sheet  </param>
+        /// <param name="stock">inentity stock</param>
+        /// <param name="line_dictionnary">dictionnary linedisctionary</param>
+        /// <param name="type_tole">type tole  ou chute</param>
+        public void Create_Stock_Item_Sp5(IContext contextlocal, Dictionary<string, object> line_Dictionnary)
+        {
+            string methodename = System.Reflection.MethodBase.GetCurrentMethod().Name;
+
+            try
+            {
+
+                string idclip = AF_ImportTools.SimplifiedMethods.GetDictionnaryValue(line_Dictionnary, "IDCLIP").ToString();
+                Alma_Log.Write_Log_Important(methodename + ": creating  stock for " + idclip);
+                //construction de la liste des sheet
+
+                IEntityList sheets_list = contextlocal.EntityManager.GetEntityList("_SHEET");
+                sheets_list.Fill(false);
+                //construction de la reference clip
+                string sheet_to_update_reference = string.Format("{0}*{1}*{2}*{3}",
+
+                       line_Dictionnary["_MATERIAL"].ToString().Replace('§', '*'),
+                       AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_LENGTH"]),
+                       AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_WIDTH"]),
+                       AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["THICKNESS"]));
+                //tole pleine ou chute
+                TypeTole type_tole = TypeTole.Tole;
+                if (line_Dictionnary.ContainsKey("FILENAME")) { type_tole = TypeTole.Chute; }
+
+                string nuance_name = null;
+                IEntity material;
+                nuance_name = line_Dictionnary["_MATERIAL"].ToString().Replace('§', '*');
+                string material_name = string.Format("{0} {1:0.00} mm", nuance_name, line_Dictionnary["THICKNESS"]);
+                //normaleement il n'ya pas besoin de condition car l'integrite et deja verifier dans checkdataintegrity
+                material = GetMaterialEntity(contextlocal, line_Dictionnary);
+                Alma_Log.Write_Log(methodename + ": material success !!    ");
+
+                ///le sheet existe t il?
+                ///
+                IEntity newsheet = null;
+                newsheet = AF_ImportTools.SimplifiedMethods.GetEntityFromFieldNameAsString(sheets_list, "_REFERENCE", sheet_to_update_reference.Trim());
+
+                //sinon creation d'un nouveau sheet
+
+
+                if (newsheet == null)
+                {
+                    ///creation des  ///
+                    newsheet = contextlocal.EntityManager.CreateEntity("_SHEET");
+                    newsheet.SetFieldValue("_REFERENCE", sheet_to_update_reference);
+                    newsheet.SetFieldValue("_MATERIAL", material);
+                    newsheet.SetFieldValue("_TYPE", (int)type_tole);
+
+                    //newsheet.SetFieldValue("_NAME", sheet_to_update_reference);
+                    double w = ((double)line_Dictionnary["_WIDTH"]);// SimplifiedMethods.GetDoubleInvariantCulture(line_Dictionnary["_WIDTH"].ToString());
+                    double l = ((double)line_Dictionnary["_LENGTH"]);//((double)line_Dictionnary["_WIDTH"]).ToString()
+                    newsheet.SetFieldValue("_WIDTH", w);
+                    newsheet.SetFieldValue("_LENGTH", l);
+                    newsheet.Complete = true;
+
+                    //creation du nom auto d'almacam
+                    CommonModelBuilder.ComputeSheetReference(newsheet.Context, newsheet);
+                    newsheet.Save();
+                }
+
+
+                ///creation de la chute
+                long sheetid = newsheet.Id;
+
+                IEntity newstock = contextlocal.EntityManager.CreateEntity("_STOCK");
+
+                newstock.SetFieldValue("_SHEET", newsheet);
+                newstock.Save();
+                Update_Stock_Item_Sp5(newstock, line_Dictionnary);
+
+
+
+
+                newstock = null;
+                newsheet = null;
+                material = null;
+                sheets_list = null;
+
+                Dispose();
+
+            }
+            catch (Exception ie)
+            {
+                MessageBox.Show(ie.Message);
+            }
+        }
+
+
+
         /// <summary>
         /// retourne la liste des chute ommise dans le fichier en comparant les toles de qté >0
         /// avec les toles envoyées par clipper
@@ -7683,6 +7882,69 @@ namespace AF_Clipper_Dll
 
 
         /// <summary>
+        /// calcul les quantité de tole
+        /// </summary>
+        /// <param name="clipperqty">qtés envoyées par clipper</param>
+        /// <param name="StockEntity">qtés envoyées </param>
+        /// <returns></returns>
+        public long CaclulateSheetQuantity_Sp5(IEntity StockEntity, Dictionary<string, object> Line_Dictionnary)
+        {
+            long initial = 0;
+            long booked = 0;
+            long used = 0;
+            long rest = 0;
+            long format_In_Production = 0;
+
+
+            //
+            try
+            {
+                long finalqty = 0;
+                long clipper_quantity = 0;
+                initial = StockEntity.GetFieldValueAsLong("_QUANTITY");
+                booked = StockEntity.GetFieldValueAsLong("_BOOKED_QUANTITY");
+                used = StockEntity.GetFieldValueAsLong("_USED_QUANTITY");
+                rest =  StockEntity.GetFieldValueAsLong("_REST_QUANTITY");
+
+                Alma_Log.Write_Log(" qté initiale=" + initial + " qté reservé=" + booked + " qté utilidee=" + used + " qté initiale" + "qté en prod" + format_In_Production);
+
+                //if (clipperqty - (initial - booked ) <= 0)
+                object o = AF_ImportTools.SimplifiedMethods.GetDictionnaryValue(Line_Dictionnary, "_QUANTITY");
+                if (o != null)
+                {
+                    clipper_quantity = Convert.ToInt64(o);
+                    //si pas de modificaitn autorisée on laisse la reste qty
+                    if (Is_Alterable_Qty(StockEntity, clipper_quantity) == false)
+                    //if (clipperqty - format_In_Production < 0)
+                    {   ////
+                        Alma_Log.Write_Log("qté calculée negative ou nulle : pas de modification du stock ");
+                        finalqty = rest;
+
+                    }
+                    else
+                    {
+
+                        finalqty = clipper_quantity;
+                    }
+                }
+                Alma_Log.Write_Log("qté calculée= " + finalqty);
+                return finalqty;
+
+
+            }
+            //
+            catch (Exception ie)
+            {
+
+                Alma_Log.Write_Log("Erreur sur le calcul des quatité msg : " + ie.Message);
+
+                return 0;
+            }
+            //
+        }
+
+
+        /// <summary>
         ///  cette methonde rend les tole omisses
         /// </summary>
         /// <param name="stock"></param>
@@ -7700,6 +7962,41 @@ namespace AF_Clipper_Dll
                 {
                     stock.SetFieldValue("AF_IS_OMMITED", true);
                     stock.SetFieldValue("_QUANTITY", 0);
+
+                    stock.Save();
+                    Alma_Log.Write_Log_Important(stock.GetFieldValueAsString("IDCLIP") + "-- OMITTED");
+                    rst = true;
+                }
+                //sinon do nothing
+                return rst;
+            }
+            catch (Exception ie)
+            {
+                System.Windows.Forms.MessageBox.Show(ie.Message, "erreur " + methodename);
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        ///  cette methonde rend les tole omisses
+        /// </summary>
+        /// <param name="stock"></param>
+        /// <param name="Line_Dictonnary"></param>
+        /// <returns>true/false si il y a eu la modification</returns>
+        public bool SetOmitted_Sp5(IEntity stock)
+        {
+            string methodename = MethodBase.GetCurrentMethod().Name;
+            try
+            {
+                bool rst = false;
+                //-100000 on lance une requete sur les tole en cours de production 
+                // on active l'omission uniquement si elle ne sont pas en prod. 
+                if (Is_Alterable_Qty(stock, -100000))
+                {
+                    stock.SetFieldValue("AF_IS_OMMITED", true);
+                   // stock.SetFieldValue("_QUANTITY", 0); plus utilisé depuis sp5
+                    stock.SetFieldValue("_REST_QUANTITY", 0);
 
                     stock.Save();
                     Alma_Log.Write_Log_Important(stock.GetFieldValueAsString("IDCLIP") + "-- OMITTED");
@@ -7774,6 +8071,12 @@ namespace AF_Clipper_Dll
             }
 
         }
+
+
+
+      
+
+
 
         /// <summary>
         /// renvoie l'entite matiere a partir du nom string 

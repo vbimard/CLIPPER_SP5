@@ -15,10 +15,6 @@ using Wpm.Implement.ComponentEditor;  // ouverture de fenetres de selection alma
 
 
 
-
-
-
-
 namespace Wpm.Implement.ModelSetting
 {
     public partial class ImportUserCommandType : ScriptModelCustomization, IScriptModelCustomization
@@ -261,8 +257,10 @@ namespace Wpm.Implement.ModelSetting
 							parameterDescription.Key = "MODEL_DM";
 							parameterDescription.Name = "Model Fichier de Stock";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
-							parameterDescription.DefaultValue = @"0#_NAME#string;1#_MATERIAL#string;2#_LENGTH#double;3#_WIDTH#double;4#THICKNESS#double;5#QTY_TOT#integer;6#_QUANTITY#integer;7#GISEMENT#string;8#NUMMAG#string;9#NUMMATLOT#string;10#NUMCERTIF#string;11#NUMLOT#string;12#NUMCOUL#string;13#IDCLIP#string;14#FILENAME#string";
-							commandTypeFactory.ParameterList.Add(parameterDescription);
+                        //parameterDescription.DefaultValue = @"0#_NAME#string;1#_MATERIAL#string;2#_LENGTH#double;3#_WIDTH#double;4#THICKNESS#double;5#QTY_TOT#integer;6#_QUANTITY#integer;7#GISEMENT#string;8#NUMMAG#string;9#NUMMATLOT#string;10#NUMCERTIF#string;11#NUMLOT#string;12#NUMCOUL#string;13#IDCLIP#string;14#FILENAME#string";
+                        //modification sp5
+                            parameterDescription.DefaultValue = @"0#_NAME#string;1#_MATERIAL#string;2#_LENGTH#double;3#_WIDTH#double;4#THICKNESS#double;5#QTY_TOT#integer;6#_REST_QUANTITY#integer;7#GISEMENT#string;8#NUMMAG#string;9#NUMMATLOT#string;10#NUMCERTIF#string;11#NUMLOT#string;12#NUMCOUL#string;13#IDCLIP#string;14#FILENAME#string";
+                            commandTypeFactory.ParameterList.Add(parameterDescription);
 							
 						}
 						{

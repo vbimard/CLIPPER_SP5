@@ -55,6 +55,7 @@
             this.ajouterLesEvenementsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ajouterLesCommandesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ajouerLesChampsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateToSpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -227,8 +228,10 @@
             // relanceenvoiecoupeToolStripMenuItem
             // 
             this.relanceenvoiecoupeToolStripMenuItem.Name = "relanceenvoiecoupeToolStripMenuItem";
+            this.relanceenvoiecoupeToolStripMenuItem.RightToLeftAutoMirrorImage = true;
             this.relanceenvoiecoupeToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.relanceenvoiecoupeToolStripMenuItem.Text = "Creation du retour GP";
+            this.relanceenvoiecoupeToolStripMenuItem.ToolTipText = "Relancer retour GP à partir des tôles à couper";
             this.relanceenvoiecoupeToolStripMenuItem.Click += new System.EventHandler(this.relanceenvoiecoupeToolStripMenuItem_Click);
             // 
             // relanceClotureToolStripMenuItem2
@@ -236,6 +239,7 @@
             this.relanceClotureToolStripMenuItem2.Name = "relanceClotureToolStripMenuItem2";
             this.relanceClotureToolStripMenuItem2.Size = new System.Drawing.Size(189, 22);
             this.relanceClotureToolStripMenuItem2.Text = "Relancer la Cloture";
+            this.relanceClotureToolStripMenuItem2.ToolTipText = " Relance Retour Gp à partir des tôles  coupées";
             this.relanceClotureToolStripMenuItem2.Click += new System.EventHandler(this.relanceClotureToolStripMenuItem2_Click);
             // 
             // remonteeDTToolStripMenuItem
@@ -252,7 +256,8 @@
             this.preparerLaBasePourClipperToolStripMenuItem,
             this.ajouterLesEvenementsToolStripMenuItem,
             this.ajouterLesCommandesToolStripMenuItem,
-            this.ajouerLesChampsToolStripMenuItem});
+            this.ajouerLesChampsToolStripMenuItem,
+            this.updateToSpToolStripMenuItem});
             this.integrationToolStripMenuItem.Name = "integrationToolStripMenuItem";
             this.integrationToolStripMenuItem.Size = new System.Drawing.Size(77, 20);
             this.integrationToolStripMenuItem.Text = "Integration";
@@ -261,39 +266,51 @@
             // initialiserStockToolStripMenuItem
             // 
             this.initialiserStockToolStripMenuItem.Name = "initialiserStockToolStripMenuItem";
-            this.initialiserStockToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
+            this.initialiserStockToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.initialiserStockToolStripMenuItem.Text = "Initialiser Stock";
+            this.initialiserStockToolStripMenuItem.ToolTipText = "Initialisation des nouveaux champs du  stock pour la passerelle";
             this.initialiserStockToolStripMenuItem.Click += new System.EventHandler(this.initialiserStockToolStripMenuItem_Click);
             // 
             // preparerLaBasePourClipperToolStripMenuItem
             // 
             this.preparerLaBasePourClipperToolStripMenuItem.AutoToolTip = true;
             this.preparerLaBasePourClipperToolStripMenuItem.Name = "preparerLaBasePourClipperToolStripMenuItem";
-            this.preparerLaBasePourClipperToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
-            this.preparerLaBasePourClipperToolStripMenuItem.Text = "Preparer la Base pour Clipper";
-            this.preparerLaBasePourClipperToolStripMenuItem.ToolTipText = "Integre les nouveaux champs par rapport a une base de reference";
+            this.preparerLaBasePourClipperToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.preparerLaBasePourClipperToolStripMenuItem.Text = "_Preparer la Base pour Clipper";
+            this.preparerLaBasePourClipperToolStripMenuItem.ToolTipText = "Preparatin complete de la base selectinnée pour la passerelle";
             this.preparerLaBasePourClipperToolStripMenuItem.Click += new System.EventHandler(this.preparerLaBasePourClipperToolStripMenuItem_Click);
             // 
             // ajouterLesEvenementsToolStripMenuItem
             // 
             this.ajouterLesEvenementsToolStripMenuItem.Name = "ajouterLesEvenementsToolStripMenuItem";
-            this.ajouterLesEvenementsToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
+            this.ajouterLesEvenementsToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.ajouterLesEvenementsToolStripMenuItem.Text = "Ajouter les Evenements";
+            this.ajouterLesEvenementsToolStripMenuItem.ToolTipText = "Paramétrage des evenements pour la passerelle";
             this.ajouterLesEvenementsToolStripMenuItem.Click += new System.EventHandler(this.ajouterLesEvenementsToolStripMenuItem_Click);
             // 
             // ajouterLesCommandesToolStripMenuItem
             // 
             this.ajouterLesCommandesToolStripMenuItem.Name = "ajouterLesCommandesToolStripMenuItem";
-            this.ajouterLesCommandesToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
+            this.ajouterLesCommandesToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.ajouterLesCommandesToolStripMenuItem.Text = "Ajouter les Commandes";
+            this.ajouterLesCommandesToolStripMenuItem.ToolTipText = "Ajout des commande spécifiques à la passerelle";
             this.ajouterLesCommandesToolStripMenuItem.Click += new System.EventHandler(this.ajouterLesCommandesToolStripMenuItem_Click);
             // 
             // ajouerLesChampsToolStripMenuItem
             // 
             this.ajouerLesChampsToolStripMenuItem.Name = "ajouerLesChampsToolStripMenuItem";
-            this.ajouerLesChampsToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
+            this.ajouerLesChampsToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.ajouerLesChampsToolStripMenuItem.Text = "Ajouter les Champs";
+            this.ajouerLesChampsToolStripMenuItem.ToolTipText = "Ajouter des champs pour la passeelle";
             this.ajouerLesChampsToolStripMenuItem.Click += new System.EventHandler(this.ajouerLesChampsToolStripMenuItem_Click);
+            // 
+            // updateToSpToolStripMenuItem
+            // 
+            this.updateToSpToolStripMenuItem.Name = "updateToSpToolStripMenuItem";
+            this.updateToSpToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.updateToSpToolStripMenuItem.Text = "Update Parameters";
+            this.updateToSpToolStripMenuItem.ToolTipText = "Miase a jours des parametres de la config. clipper";
+            this.updateToSpToolStripMenuItem.Click += new System.EventHandler(this.updateToSpToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -306,7 +323,7 @@
             // aboutToolStripMenuItem1
             // 
             this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem1.Text = "About";
             this.aboutToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem1_Click);
             // 
@@ -413,6 +430,7 @@
         private System.Windows.Forms.ToolStripMenuItem ajouterLesEvenementsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ajouterLesCommandesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ajouerLesChampsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem updateToSpToolStripMenuItem;
     }
 }
 

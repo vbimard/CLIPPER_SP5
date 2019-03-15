@@ -237,6 +237,14 @@
     <None Include="Resources\button9.BackgroundImage.png" />
     <None Include="Resources\DoOnAction_TO_CUT_NESTING.BackgroundImage.png" />
     <None Include="Resources\Icon.ico" />
+    <Content Include="Resources\Icone_Import.png" />
+    <Content Include="Resources\Icone_ImportCA.png" />
+    <Content Include="Resources\Icone_ImportFourn.png" />
+    <Content Include="Resources\Icone_ImportMatieres.png" />
+    <Content Include="Resources\Icone_ImportStock.png" />
+    <Content Include="Resources\Icone_Main.png" />
+    <None Include="Resources\Import-Matiere.txt" />
+    <None Include="Resources\import_client.txt" />
     <Content Include="update.ico" />
     <Content Include="Wpm_32513.ico" />
   </ItemGroup>

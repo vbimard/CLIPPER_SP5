@@ -112,13 +112,9 @@ namespace AlmaCamTrainingTest.Properties {
         ///
         ///
         ///
-        ///
-        ///
-        ///
-        ///
         ///namespace Wpm.Implement.ModelSetting
         ///{
-        ///    public partial class ImportUserCommandType : ScriptModelCustomization, ISc [le reste de la chaîne a été tronqué]&quot;;.
+        ///    public partial class ImportUserCommandType : ScriptModelCustomization, IScriptMode [le reste de la chaîne a été tronqué]&quot;;.
         /// </summary>
         public static string CommandesV2 {
             get {
@@ -169,6 +165,47 @@ namespace AlmaCamTrainingTest.Properties {
             get {
                 object obj = ResourceManager.GetObject("Icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à [SYS_USER]
+        ///OleDb=Provider=PCSOFT.HFSQL;Initial Catalog=CLIPPER_ALMA;User ID=admin;Password=&quot;&quot;;Data Source=localhost;
+        ///DbSql=SELECT CODEEMP,PRENOMEMP,NOMEMP,ADINTERNET,TEL,DATESO DESIGN FROM EMPLOYE WHERE DATESO=&apos;&apos;
+        ///EntityType=SYS_USER
+        ///ImportKey=USER_NAME
+        ///USER_NAME=0
+        ///FIRST_NAME=1
+        ///LAST_NAME=2
+        ///EMAIL=3
+        ///_PHONE=4
+        ///
+        ///[CENTRE_FRAIS]
+        ///OleDb=Provider=PCSOFT.HFSQL;Initial Catalog=CLIPPER_ALMA;User ID=admin;Password=&quot;&quot;;Data Source=localhost;
+        ///DbSql=SELECT COFRAIS, DESIGN, DATESO FROM CFRAIS WHERE DATESO=&apos;&apos;
+        ///Enti [le reste de la chaîne a été tronqué]&quot;;.
+        /// </summary>
+        public static string Import_client_1 {
+            get {
+                return ResourceManager.GetString("Import_client_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à [QUALITY]
+        ///OleDb=Provider=Microsoft.Jet.OLEDB.4.0;Data Source=&quot;C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Import_PrixMatieres\&quot;;Extended Properties=&quot;text;HDR=yes;FMT=Delimited&quot;
+        ///DbSql=SELECT A,B,C,D,E,F/1000 FROM [Export_Nuance_Etat.csv]
+        ///EntityType=_QUALITY
+        ///ImportKey=_NAME
+        ///_NAME=2
+        ///_DENSITY=5
+        ///[MATERIAL]
+        ///OleDb=Provider=Microsoft.Jet.OLEDB.4.0;Data Source=&quot;C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Import_PrixMatieres\&quot;;Extended Properties=&quot;text;HDR=yes;FMT=Delimited&quot;
+        ///DbSql=SELECT A,B,C,D,E,F,G/1000,H FROM [E [le reste de la chaîne a été tronqué]&quot;;.
+        /// </summary>
+        public static string Import_Matiere_2 {
+            get {
+                return ResourceManager.GetString("Import_Matiere_2", resourceCulture);
             }
         }
     }
