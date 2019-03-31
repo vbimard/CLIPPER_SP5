@@ -94,7 +94,7 @@ namespace AlmaCamTrainingTest
             //_Context = modelsRepository.GetModelContext(DbName);
             //int i = _Context.ModelsRepository.ModelList.Count();
             SimplifiedMethods.NotifyMessage("AlmaCam", " Selected " + DbName);
-            infosPasserelle = DbName + "-P." + AF_Clipper_Dll.Clipper_Param.GetClipperDllVersion() + "-CAM." + AF_Clipper_Dll.Clipper_Param.GetAlmaCAMCompatibleVerion();
+            infosPasserelle = DbName + "-P." + AF_Clipper_Dll.Clipper_Param.GetClipperDllVersion() + "-CAM." + AF_Clipper_Dll.Clipper_Param.GetAlmaCAMCompatibleVersion();
             this.Text = this.Name;
             this.InfosLabel.Text = infosPasserelle;
             this.Text = "Passerelle Clipper V8 validée pour : " + infosPasserelle;
@@ -783,7 +783,7 @@ namespace AlmaCamTrainingTest
                 string cs = CustoFileCs.Item1;
                 SimplifiedMethods.NotifyMessage("Updating Database", CustoFileCs.Item1);
                 ModelManager modelManager = new ModelManager(modelsRepository);
-                modelManager.CustomizeModel(CommandCsPath, Lst_Model.Text, true);
+                modelManager.CustomizeModel(CommandCsPath, Lst_Model.Text, false);
 
 
                 File.Delete(CommandCsPath);
@@ -798,9 +798,11 @@ namespace AlmaCamTrainingTest
             //ouverture du context
 
             IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
-            SimplifiedMethods.NotifyMessage("Updating Database", "Updating Parameters...");
+  
             Update_Clipper_Parameters(_Context);
             Update_Clipper_Stock(_Context);
+
+            MessageBox.Show("Database Prepared for clipper");
 
         }
 
@@ -812,29 +814,64 @@ namespace AlmaCamTrainingTest
         {
 
 
-            
 
+            SimplifiedMethods.NotifyMessage("Updating Database", "Updating Parameters...");
             ITransaction transaction = _Context.CreateTransaction();
             IParameterValue parameterValue;
             //
             // create directory 
 
             //update clipper parameters
-            parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "MODEL_DM");
-            parameterValue.SetValue(@"0#_NAME#string;1#_MATERIAL#string;2#_LENGTH#double;3#_WIDTH#double;4#THICKNESS#double;5#QTY_TOT#integer;6#_REST_QUANTITY#integer;7#GISEMENT#string;8#NUMMAG#string;9#NUMMATLOT#string;10#NUMCERTIF#string;11#NUMLOT#string;12#NUMCOUL#string;13#IDCLIP#string;14#FILENAME#string");
-            parameterValue.Save(transaction);
 
-            parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "ACTIVATE_OMISSION");
+
+            //parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "MODEL_CA");
+            if( _Context.ParameterSetManager.TryGetParameterValue("CLIP_CONFIGURATION", "MODEL_CA", out parameterValue))
+            { 
+            parameterValue.SetValue(@"0#_NAME#string;1#AFFAIRE#string;2#THICKNESS#string;3#_MATERIAL#string;4#CENTREFRAIS#string;5#TECHNOLOGIE#string;6#FAMILY#string;7#IDLNROUT#string;8#CENTREFRAISSUIV#string;9#_FIRM#string;10#_QUANTITY#integer;11#QUANTITY#double;12#ECOQTY#string;13#STARTDATE#date;14#ENDDATE#date;15#PLAN#string;16#FORMATCLIP#string;17#IDMAT#string;18#IDLNBOM#string;19#NUMMAG#string;20#FILENAME#string;21#_DESCRIPTION#string;22#_CLIENT_ORDER_NUMBER#string;23#DELAI_INT#date;24#EN_RANG#string;25#EN_PERE_PIECE#string;26#ID_PIECE_CFAO#string");
+            parameterValue.Save(transaction);
+            }
+
+            parameterValue= null;
+
+            if (_Context.ParameterSetManager.TryGetParameterValue("CLIP_CONFIGURATION", "MODEL_DM", out parameterValue))
+            {
+                //    parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "MODEL_DM");
+                parameterValue.SetValue(@"0#_NAME#string;1#_MATERIAL#string;2#_LENGTH#double;3#_WIDTH#double;4#THICKNESS#double;5#QTY_TOT#integer;6#_REST_QUANTITY#integer;7#GISEMENT#string;8#NUMMAG#string;9#NUMMATLOT#string;10#NUMCERTIF#string;11#NUMLOT#string;12#NUMCOUL#string;13#IDCLIP#string;14#FILENAME#string");
+                parameterValue.Save(transaction);
+            }
+
+            if (_Context.ParameterSetManager.TryGetParameterValue("CLIP_CONFIGURATION", "ACTIVATE_OMISSION", out parameterValue))
+            {
+                //parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "ACTIVATE_OMISSION");
+                parameterValue.SetValue(true);
+                parameterValue.Save(transaction);
+            }
+
+            if (_Context.ParameterSetManager.TryGetParameterValue("CLIP_CONFIGURATION", "EXPLODE_MULTIPLICITY", out parameterValue))
+            {
+                //parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "EXPLODE_MULTIPLICITY");
+                parameterValue.SetValue(true);
+                parameterValue.Save(transaction);
+            }
+
+
+            if (_Context.ParameterSetManager.TryGetParameterValue("_GLOBAL_CONFIGURATION", "_MANAGE_PART_SET", out parameterValue))
+            {
+                // parameterValue = _Context.ParameterSetManager.GetParameterValue("_GLOBAL_CONFIGURATION", "_MANAGE_PART_SET");
+                parameterValue.SetValue(false);
+                parameterValue.Save(transaction);
+            }
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_GLOBAL_CONFIGURATION", "_MANAGE_STOCK");
             parameterValue.SetValue(true);
             parameterValue.Save(transaction);
 
-
-            parameterValue = _Context.ParameterSetManager.GetParameterValue("CLIP_CONFIGURATION", "EXPLODE_MULTIPLICITY");
-            parameterValue.SetValue(true);
-            parameterValue.Save(transaction);
+            //update export
 
 
-            //update part export value
+
+
+
             parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_OF_PATH");
             parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
             parameterValue.Save(transaction);
@@ -844,21 +881,41 @@ namespace AlmaCamTrainingTest
             parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
             parameterValue.Save(transaction);
 
+            //
 
-
-            parameterValue = _Context.ParameterSetManager.GetParameterValue("_GLOBAL_CONFIGURATION", "_MANAGE_PART_SET");
-            parameterValue.SetValue(false);
-            parameterValue.Save(transaction);
-
-
-            parameterValue = _Context.ParameterSetManager.GetParameterValue("_GLOBAL_CONFIGURATION", "_MANAGE_STOCK");
-            parameterValue.SetValue(true);
-            parameterValue.Save(transaction);
-
-            /*
-            parameterValue = _Context.ParameterSetManager.GetParameterValue("_GLOBAL_CONFIGURATION", "_WORKSHOP_OPTION");
+            
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_GP_MODE");
             parameterValue.SetValue(2);
-            parameterValue.Save(transaction);*/
+            parameterValue.Save(transaction);
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_GP_TYPE");
+            parameterValue.SetValue(0);
+            parameterValue.Save(transaction);
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_CFAO_MODE");
+            parameterValue.SetValue(1);
+            parameterValue.Save(transaction);
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_CLIPPER_QUOTE_NUMBER_OFFSET");
+            parameterValue.SetValue(10000);
+            parameterValue.Save(transaction);
+                       
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_GP_EXPORTER_FILENAME");
+            parameterValue.SetValue("AF_Export_Devis_Clipper.dll");
+            parameterValue.Save(transaction);
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_GP_EXPORTER_NAMESPACE");
+            parameterValue.SetValue("AF_Export_Devis_Clipper");
+            parameterValue.Save(transaction);
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_GP_EXPORTER_CLASS");
+            parameterValue.SetValue("CreateTransFile");
+            parameterValue.Save(transaction);
+
+
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_GP_DIRECTORY");
+            parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
+            parameterValue.Save(transaction);
 
             //update part export value
 
@@ -872,6 +929,14 @@ namespace AlmaCamTrainingTest
             parameterValue = _Context.ParameterSetManager.GetParameterValue("DATA_IMPORT_2", "IMPORT_DEFINITION");
             parameterValue.SetValue(Import_Matiere);
             parameterValue.Save(transaction);
+
+            //creation des entités par defaut
+            SimplifiedMethods.NotifyMessage("Updating Defautl data", "Updating Parameters...");
+
+            IEntity firm = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_FIRM", "_NAME", "Alma");
+            //IEntity site = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_SITE", "_NAME", "AlmaFrance");//
+            IEntity CentreFrais = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_CENTRE_FRAIS", "_CODE", "Clip");
+
 
             _Context = null;
             transaction = null;
@@ -939,9 +1004,9 @@ namespace AlmaCamTrainingTest
                 stock.Save();
             }
             SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Done.");
-            
 
 
+            stocks = null;
 
         }
 
@@ -1079,6 +1144,11 @@ namespace AlmaCamTrainingTest
                 IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
 
                 Update_Clipper_Stock(_Context);
+
+                _Context = null;
+                MessageBox.Show("Mise à jour du stock terminé");
+
+
             }
 
             finally
@@ -1101,7 +1171,7 @@ namespace AlmaCamTrainingTest
             IModelsRepository modelsRepository = new ModelsRepository();
             IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
 
-            var Export_dt = new AF_Clipper_Dll.Clipper_8_Export_DT();
+            var Export_dt = new AF_Clipper_Dll.Clipper_8_Export_DT_Processor();
             Export_dt.Execute(_Context);
 
               _Context = null; 
@@ -1168,7 +1238,7 @@ namespace AlmaCamTrainingTest
 
         private void ajouterLesCommandesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //IList<CustomizedCommandItem> customizedItemList = GetCustomizedCommandTypeList(context);
+            
 
             IModelsRepository modelsRepository = new ModelsRepository();
 
@@ -1199,8 +1269,7 @@ namespace AlmaCamTrainingTest
             List<Tuple<string, string>> CustoFileCsList = new List<Tuple<string, string>>();
 
             CustoFileCsList.Add(new Tuple<string, string>("Entities", Properties.Resources.Entities3));
-            //CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources._event));
-            //CustoFileCsList.Add(new Tuple<string, string>("Commandes", Properties.Resources.CommandesV2));
+          
 
             foreach (Tuple<string, string> CustoFileCs in CustoFileCsList)
             {
@@ -1224,7 +1293,7 @@ namespace AlmaCamTrainingTest
         {
             IModelsRepository modelsRepository = new ModelsRepository();
             IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
-            SimplifiedMethods.NotifyMessage("Updating Database", "Updating Parameters...");
+            //SimplifiedMethods.NotifyMessage("Updating Database", "Updating Parameters...");
             Update_Clipper_Parameters(_Context);
             SimplifiedMethods.NotifyMessage("Updating Database", "Done");
         }
@@ -1260,7 +1329,6 @@ namespace AlmaCamTrainingTest
           
             IModelsRepository modelsRepository = new ModelsRepository();
             _HostContext = modelsRepository.GetModelContext("ModelsRepository");  //nom de la base;
-            //_HostContext = modelsRepository.GetModelContext("ModelsRepositoryAlmaCAM");  //nom de la base;
             _Context = context;
 
         }

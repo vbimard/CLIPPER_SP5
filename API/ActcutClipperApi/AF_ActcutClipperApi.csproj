@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\..\AlmaCAM\Bin\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\..\Program Files %28x86%29\Clip Industrie\CLIPPER 8\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -32,41 +32,42 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Actcut.ActcutModelManager, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Actcut.ActcutModelManager, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Actcut.ActcutModelManager.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Actcut.ActcutModelManagerUI, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Actcut.ActcutModelManagerUI, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Actcut.ActcutModelManagerUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Actcut.QuoteModel, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Actcut.QuoteModel, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Actcut.QuoteModel.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Actcut.QuoteModelManager, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Actcut.QuoteModelManager, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Actcut.QuoteModelManager.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Actcut.QuoteModelManagerUI, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Actcut.QuoteModelManagerUI, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Actcut.QuoteModelManagerUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="AF_ImportTools, Version=2.1.3.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="AF_ImportTools, Version=2.1.5.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\AF_ImportTools.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Alma.BaseUI, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Alma.BaseUI, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Alma.BaseUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Alma.NetKernel, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Alma.NetKernel, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Alma.NetKernel.dll</HintPath>
       <Private>False</Private>
@@ -79,17 +80,17 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Wpm.Implement.ComponentEditor, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Wpm.Implement.ComponentEditor, Version=2.1.5.38790, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Wpm.Implement.ComponentEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Wpm.Implement.Manager, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Wpm.Implement.Manager, Version=2.1.5.38790, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Wpm.Implement.Manager.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Wpm.Schema.Kernel, Version=2.1.5.64604, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Wpm.Schema.Kernel, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Wpm.Schema.Kernel.dll</HintPath>
       <Private>False</Private>
@@ -103,7 +104,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "C:\AlmaCAM\Bin\AF_Actcut.ActcutClipperApi.dll"  "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP4\AF_Actcut.ActcutClipperApi.dll"</PostBuildEvent>
+    <PostBuildEvent>copy "C:\AlmaCAM\Bin\AF_Actcut.ActcutClipperApi.dll"  "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_Actcut.ActcutClipperApi.dll"
+copy "C:\AlmaCAM\Bin\AF_Actcut.ActcutClipperApi.dll" "C:\Program Files (x86)\Clip Industrie\CLIPPER 8\AF_Actcut.ActcutClipperApi.dll"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -373,15 +373,49 @@ namespace AF_Export_Devis_Clipper
                 ///
                //   On recupere les parametres d'export'
 
-                string Export_GP_Directory = contextlocal.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_GP_DIRECTORY").GetValueAsString();
-                string Export_DPR_Directory = contextlocal.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_DPR_DIRECTORY").GetValueAsString();
+                //string Export_GP_Directory = contextlocal.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_GP_DIRECTORY").GetValueAsString();
+                //string Export_DPR_Directory = contextlocal.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_DPR_DIRECTORY").GetValueAsString();
+
+                //depuis 2.1.5
+                bool rst = false;
+                bool ActCut_Force_Export_Dpr = false;
+                IParameterValue iparametervalue;
+
+                string Export_GP_Directory = "";
+                string Export_DPR_Directory = "";
+                string ActCut_Force_Dpr_Directory = "";
+
+                rst = contextlocal.ParameterSetManager.TryGetParameterValue("_EXPORT", "_EXPORT_GP_DIRECTORY", out iparametervalue);
+                Export_GP_Directory = iparametervalue.GetValueAsString();
+
+                rst = contextlocal.ParameterSetManager.TryGetParameterValue("_EXPORT", "_ACTCUT_DPR_DIRECTORY", out iparametervalue);
+                Export_DPR_Directory = iparametervalue.GetValueAsString();
+                rst = contextlocal.ParameterSetManager.TryGetParameterValue("_EXPORT", "_ACTCUT_FORCE_EXPORT_DPR", out iparametervalue);
+
+                ActCut_Force_Export_Dpr = iparametervalue.GetValueAsBoolean();
+
+                if (ActCut_Force_Export_Dpr)
+                {
+
+                    rst = contextlocal.ParameterSetManager.TryGetParameterValue("_EXPORT", "_ACTCUT_FORCE_DPR_DIRECTORY", out iparametervalue);
+                    ActCut_Force_Dpr_Directory = iparametervalue.GetValueAsString();
+                    //on force ke exportdpr directory
+                    Export_DPR_Directory = iparametervalue.GetValueAsString(); 
+
+                }
+
+
+
 
                 if (string.IsNullOrEmpty(Export_GP_Directory)) { throw new UnvalidatedQuoteConfigurations("Le chemin d'export des devis n'est pas defini, l'export va etre annulé.");  }
                 else { _PathList.Add("Export_GP_Directory", Export_GP_Directory);  }
 
-                if (!string.IsNullOrEmpty(Export_DPR_Directory)) { _PathList.Add("Export_DPR_Directory", Export_DPR_Directory);  }
-                    
-       
+                if (string.IsNullOrEmpty(Export_DPR_Directory)) { throw new UnvalidatedQuoteConfigurations("Le chemin d'export des devis n'est pas defini, l'export va etre annulé."); }
+                { _PathList.Add("Export_DPR_Directory", Export_DPR_Directory);  }
+
+                if (!string.IsNullOrEmpty(Export_DPR_Directory)) { _PathList.Add(" ActCut_Force_Dpr_Directory", ActCut_Force_Dpr_Directory); }
+
+
 
                 return valid_context;
                 
@@ -1905,9 +1939,10 @@ namespace AF_Export_Devis_Clipper
                     /// <returns></returns>
                     private string GetEmfFile(IEntity partEntity, string empty_emfFile)
                     {
-                        try
+                        string emfFile = "";
+            try
                         {
-                            string emfFile = "";
+                            
 
                             //cas général
                             emfFile = partEntity.GetFieldValueAsString("_DPR_FILENAME") + ".emf";
@@ -2740,6 +2775,14 @@ namespace AF_Export_Devis_Clipper
                 //create dpr and directory
                 _PathList.TryGetValue("Export_DPR_Directory", out string dpr_directory);
                 _PathList.TryGetValue("Custom_Export_DPR_Directory", out string Custom_dpr_directory);
+                //depuis 2.1.sp5
+
+
+
+
+
+
+                ///
 
                 if (!string.IsNullOrEmpty(dpr_directory))
                 {
@@ -2924,7 +2967,7 @@ namespace AF_Export_Devis_Clipper
 
 
                 IAttachmentValueList quote_attachement_list = quoteEntity.GetFieldValue("_PROPOSAL") as IAttachmentValueList;
-            
+                //_quote_sent__proposal
                 if (quote_attachement_list.Count > 0)
                 {
 
@@ -2944,7 +2987,7 @@ namespace AF_Export_Devis_Clipper
 
                     }
                 }
-
+               
 
 
 

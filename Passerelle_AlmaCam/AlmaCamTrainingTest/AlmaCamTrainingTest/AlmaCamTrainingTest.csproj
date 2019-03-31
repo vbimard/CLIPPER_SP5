@@ -237,14 +237,15 @@
     <None Include="Resources\button9.BackgroundImage.png" />
     <None Include="Resources\DoOnAction_TO_CUT_NESTING.BackgroundImage.png" />
     <None Include="Resources\Icon.ico" />
+    <None Include="Resources\CLIP_CONFIGURATION.png" />
+    <None Include="Resources\CLIPPER_EXPORT_DT_DLL.png" />
     <Content Include="Resources\Icone_Import.png" />
-    <Content Include="Resources\Icone_ImportCA.png" />
-    <Content Include="Resources\Icone_ImportFourn.png" />
-    <Content Include="Resources\Icone_ImportMatieres.png" />
-    <Content Include="Resources\Icone_ImportStock.png" />
-    <Content Include="Resources\Icone_Main.png" />
     <None Include="Resources\Import-Matiere.txt" />
     <None Include="Resources\import_client.txt" />
+    <None Include="Resources\IMPORT_CLIPPER_FOURNITURES.png" />
+    <None Include="Resources\IMPORT_CLIPPER_MATERIAL.png" />
+    <None Include="Resources\IMPORT_OF.png" />
+    <None Include="Resources\IMPORT_STOCK.png" />
     <Content Include="update.ico" />
     <Content Include="Wpm_32513.ico" />
   </ItemGroup>
@@ -270,7 +271,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "C:\AlmaCAM\Bin\AF_Clipper.exe"
-copy "$(TargetPath)" "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP4\AF_Clipper.exe"
+copy "$(TargetPath)" "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_Clipper.exe"
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

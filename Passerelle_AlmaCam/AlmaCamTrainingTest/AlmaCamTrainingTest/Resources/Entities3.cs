@@ -26,7 +26,7 @@ namespace Wpm.Implement.ModelSetting
             var fielddesc = new NewField("FILENAME", "Clip filename",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.String,"");
 			sheet_Dictionnary.Add("FILENAME", fielddesc);
 			//centre frais//   
-		    fielddesc = new NewField("CENTREFRAIS_MACHINE", "Clip centre de frais",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.String,"");
+		    fielddesc = new NewField("CENTREFRAIS_MACHINE", "Clip centre de frais",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection, FieldDescriptionType.Lookup, "_CENTRE_FRAIS");
 			machine_Dictionnary.Add("CENTREFRAIS_MACHINE", fielddesc);
 			//stock//			
 			fielddesc = new NewField("FILENAME", "Clip Filename",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.String,"");
@@ -66,7 +66,7 @@ namespace Wpm.Implement.ModelSetting
 		    part2d_Dictionnary.Add("AF_PIECE_TOLERANCES", fielddesc);
             fielddesc = new NewField("AFFAIRE", "Clip affaire",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.String,"");
 		    part2d_Dictionnary.Add("AFFAIRE", fielddesc);
-			fielddesc = new NewField("REMONTER_DT", "Clip to cut sheet id",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.String,"");
+			fielddesc = new NewField("REMONTER_DT", "Clip to cut sheet id",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.Boolean,"");
             part2d_Dictionnary.Add("REMONTER_DT", fielddesc);
 			fielddesc = new NewField("FAMILY", "Clip famille",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.String,"");
             part2d_Dictionnary.Add("FAMILY", fielddesc);
@@ -96,7 +96,7 @@ namespace Wpm.Implement.ModelSetting
 		    part_to_produce_Dictionnary.Add("FAMILY", fielddesc);
 			fielddesc = new NewField("IDLNROUT", "Clip gamme",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.String,"");
 		    part_to_produce_Dictionnary.Add("IDLNROUT", fielddesc);
-			fielddesc = new NewField("CENTREFRAIS", "Clip centre fraise",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.Lookup,"_CENTRE_FRAIS");
+			fielddesc = new NewField("CENTREFRAIS", "Clip centre frais",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.Lookup,"_CENTRE_FRAIS");
 		    part_to_produce_Dictionnary.Add("CENTREFRAIS", fielddesc);
 		    fielddesc = new NewField("ECOQTY", "Clip ecoqty",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.String,"");
 		    part_to_produce_Dictionnary.Add("ECOQTY", fielddesc);

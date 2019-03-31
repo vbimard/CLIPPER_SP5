@@ -1117,7 +1117,7 @@ namespace AF_Clipper_Dll
         /// retourn la version compatible almacam indiquee dans les ressources almacam
         /// </summary>
         /// <returns></returns>
-        public static string GetAlmaCAMCompatibleVerion()
+        public static string GetAlmaCAMCompatibleVersion()
         {
             return Properties.Resources.Almcam_Version.ToString();
 
@@ -3012,9 +3012,14 @@ namespace AF_Clipper_Dll
 
                     foreach (IEntity machinable_part in select_machinable_part_list.SelectedEntity)
                     {
+
+                        //saisie du numro d'affaire
+                       
+                        //
                         IEntity stock = null;
                         IEntity sheet = null;
-                        //IEntity current_machine = null;
+                     
+
 
                         //IEntity to_produce_ref = null;
                         IMachineManager machinemanager = new MachineManager();
@@ -5232,9 +5237,9 @@ namespace AF_Clipper_Dll
             return base.Execute();
         }
     }
-    
 
-    public class Clipper_8_Export_DT : CommandProcessor
+
+    public class Clipper_8_Export_DT_Processor : CommandProcessor
     {
 
         public override bool Execute()
@@ -5259,8 +5264,8 @@ namespace AF_Clipper_Dll
 
 
 
+        
         }
-
 
         public bool Execute(IContext contextlocal)
         {
@@ -5268,9 +5273,9 @@ namespace AF_Clipper_Dll
 
             if (contextlocal != null)
             {
-                AF_Clipper_Dll.Clipper_RemonteeDt Remontee_Dt = new AF_Clipper_Dll.Clipper_RemonteeDt();
+                AF_Clipper_Dll.Clipper_8_RemonteeDt Remontee_Dt = new AF_Clipper_Dll.Clipper_8_RemonteeDt();
 
-                DialogResult result1 = MessageBox.Show("Voulez vous exporter les informations de gammes?", "WARNING !!!", MessageBoxButtons.YesNo);
+                DialogResult result1 = MessageBox.Show("Voulez vous exporter des pieces à produire ?", "WARNING !!!", MessageBoxButtons.YesNo);
 
                 if (result1 == DialogResult.No)
                 {
@@ -5290,8 +5295,34 @@ namespace AF_Clipper_Dll
             }
             return true;
 
+        }
+
+        
+
+    }
 
 
+    public class Clipper_8_Export_DT_Export_Piece_To_File_Processor : CommandProcessor
+    {
+
+        public override bool Execute()
+        {
+
+            try
+            {
+                Execute(Context);
+
+                return base.Execute();
+            }
+
+            catch (Exception ie)
+            {
+
+                MessageBox.Show(ie.Message);
+                return base.Execute();
+
+
+            }
 
 
 
@@ -5299,19 +5330,85 @@ namespace AF_Clipper_Dll
 
         }
 
+        public bool Execute(IContext contextlocal)
+        {
 
 
+            if (contextlocal != null)
+            {
+                AF_Clipper_Dll.Clipper_8_RemonteeDt Remontee_Dt = new AF_Clipper_Dll.Clipper_8_RemonteeDt();
+                   //export sur la base des peices 2d (pas de numero de gamme associé)
+                    Remontee_Dt.Export_Piece_To_File(contextlocal, false);
+            }
+            return true;
 
-
+        }
 
 
 
     }
 
+    public class Clipper_8_Export_Part_To_Produce_To_File_Processor : CommandProcessor
+    {
+
+        public override bool Execute()
+        {
+
+            try
+            {
+                Execute(Context);
+
+                return base.Execute();
+            }
+
+            catch (Exception ie)
+            {
+
+                MessageBox.Show(ie.Message);
+                return base.Execute();
+
+
+            }
 
 
 
+
+
+        }
+
+        public bool Execute(IContext contextlocal)
+        {
+
+
+            if (contextlocal != null)
+            {
+                AF_Clipper_Dll.Clipper_8_RemonteeDt Remontee_Dt = new AF_Clipper_Dll.Clipper_8_RemonteeDt();
+
+                
+                    Remontee_Dt.Export_Part_To_Produce_To_File(contextlocal, true);
+
+            }
+            return true;
+
+        }
+
+
+
+    }
     #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     #region cahieraffaire
 
@@ -6320,13 +6417,7 @@ namespace AF_Clipper_Dll
                     Data_Model.setFieldDictionnary(DataModelString);
                     Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ": reading data model :success !! ");
                     ///remplissage des machines et verification de la presence du centre de frais demandé par clipper
-                    ///plus utile
-                    //IEntityList machine_liste = contextlocal.EntityManager.GetEntityList("_CUT_MACHINE_TYPE");
-                    //machine_liste.Fill(false);
-
-                    //recuperation de la machine clipper
-                    //IEntity Clipper_Machine = null;
-                    //IEntity Clipper_Centre_Frais = null;
+                   
                     //recuperation de la machine clipper et construction de la liste machine
                     Get_Clipper_Machine(contextlocal, out IEntity Clipper_Machine, out IEntity Clipper_Centre_Frais, out Dictionary<string, string> CentreFrais_Dictionnary);
 
@@ -6509,7 +6600,24 @@ namespace AF_Clipper_Dll
                 else { result = false; }
                 ///////////////////////////////////////////////////////////////////////////
                 //les quantités negatives sont interdites
+                //comptatibilité sp4
                 currenfieldsname = "_QUANTITY";
+                if (line_dictionnary.ContainsKey(currenfieldsname)  )
+                {
+                    if ((int)line_dictionnary[currenfieldsname] < 0)
+                    {
+                        Alma_Log.Error(line_dictionnary["_NAME"] + ":_QUANTITY non detecté sur la ligne a importée, line ignored", MethodBase.GetCurrentMethod().Name);
+                        Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ":" + line_dictionnary["_NAME"] + ":_QUANTITY non detecté sur la ligne a importée, line ignored"); result = false;
+                    }
+                }
+                else if(line_dictionnary.ContainsKey("_REST_QUANTITY"))
+                {
+                    result = true;
+                }
+                else { result = false; }
+                ///////////////////////////////////////////////////////////////////////////
+                //les quantités negatives sont interdites
+                currenfieldsname = "_REST_QUANTITY";
                 if (line_dictionnary.ContainsKey(currenfieldsname))
                 {
                     if ((int)line_dictionnary[currenfieldsname] < 0)
@@ -7499,7 +7607,8 @@ namespace AF_Clipper_Dll
 
                                 //long clipperQty = 0;
                                 long Qty = 0;
-                                Qty = CaclulateSheetQuantity_Sp5(stock, line_dictionnary);
+
+                                Qty = CaclulateSheetQuantity(stock, line_dictionnary);
                                 stock.SetFieldValue(field.Key, Qty);
                                 //cas barou ou le client n'utilise pas les numéro de lot
                                 //permet de debloquer les clotures.
@@ -7510,7 +7619,7 @@ namespace AF_Clipper_Dll
 
                                 //long clipperQty = 0;
                                 long Rest_Qty = 0;
-                                Qty = CaclulateSheetQuantity_Sp5(stock, line_dictionnary);
+                                Rest_Qty = CaclulateSheetQuantity_Sp5(stock, line_dictionnary);
                                 stock.SetFieldValue(field.Key, Rest_Qty);
                                 //cas barou ou le client n'utilise pas les numéro de lot
                                 //permet de debloquer les clotures.
@@ -7670,12 +7779,20 @@ namespace AF_Clipper_Dll
                 IEntityList sheets_list = contextlocal.EntityManager.GetEntityList("_SHEET");
                 sheets_list.Fill(false);
                 //construction de la reference clip
+                
                 string sheet_to_update_reference = string.Format("{0}*{1}*{2}*{3}",
 
                        line_Dictionnary["_MATERIAL"].ToString().Replace('§', '*'),
                        AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_LENGTH"]),
                        AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_WIDTH"]),
-                       AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["THICKNESS"]));
+                       AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["THICKNESS"])); 
+                       /*
+                string sheet_to_update_reference=StockManager.getStandardSheetReference(line_Dictionnary["_MATERIAL"].ToString().Replace('§', '*'),
+                    AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_LENGTH"])), 
+                    AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_WIDTH"])),
+                AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["THICKNESS"])
+                */
+
                 //tole pleine ou chute
                 TypeTole type_tole = TypeTole.Tole;
                 if (line_Dictionnary.ContainsKey("FILENAME")) { type_tole = TypeTole.Chute; }
@@ -7909,7 +8026,7 @@ namespace AF_Clipper_Dll
                 Alma_Log.Write_Log(" qté initiale=" + initial + " qté reservé=" + booked + " qté utilidee=" + used + " qté initiale" + "qté en prod" + format_In_Production);
 
                 //if (clipperqty - (initial - booked ) <= 0)
-                object o = AF_ImportTools.SimplifiedMethods.GetDictionnaryValue(Line_Dictionnary, "_QUANTITY");
+                object o = AF_ImportTools.SimplifiedMethods.GetDictionnaryValue(Line_Dictionnary, "_REST_QUANTITY");
                 if (o != null)
                 {
                     clipper_quantity = Convert.ToInt64(o);
@@ -8332,12 +8449,12 @@ namespace AF_Clipper_Dll
                                     HEADER[iheader++] = SimplifiedMethods.NumberToString(tole.Thickness, format);//epaisseur
                                     HEADER[iheader++] = SimplifiedMethods.EmptyString(tole.GradeName);//matiere
                                     HEADER[iheader++] = "1"; //mutliplicité forcée a 1 pour le moment
-                                    HEADER[iheader++] = String.Format(format, (Nesting_Sheet_loadingTimeInit / 60));//temps de chargement
+                                    HEADER[iheader++] = SimplifiedMethods.NumberToString((Nesting_TotalTime / 60), format); //SimplifiedMethods.NumberToString((tole.Calculus_GPAO_Parts_Total_Time/ 60),format);//temps de chargement// multiplicité toujour a 1
                                     HEADER[iheader++] = SimplifiedMethods.EmptyString(Nesting_CentreFrais_Machine);//centre de frais
                                     HEADER[iheader++] = "";
                                     HEADER[iheader++] = SimplifiedMethods.EmptyString(Nesting_Emf_File);//emf
                                     HEADER[iheader++] = SimplifiedMethods.EmptyString(NUMMATLOT);   //numero de lot
-                                    HEADER[iheader++] = SimplifiedMethods.NumberToString((Nesting_Sheet_loadingTimeEnd / 60), format);//temps de dechargement
+                                    HEADER[iheader++] = SimplifiedMethods.NumberToString(((Nesting_Sheet_loadingTimeEnd+ Nesting_Sheet_loadingTimeInit) / 60), format);//temps de dechargement // multiplicité toujour a 1
                                     HEADER[iheader++] = "";
 
                                     headerline = SimplifiedMethods.WriteTableToLine(HEADER, iheader, Separator);
@@ -8363,7 +8480,11 @@ namespace AF_Clipper_Dll
                                         PART[ipart++] = SimplifiedMethods.NumberToString(part.Width, format); //largeur
                                         PART[ipart++] = SimplifiedMethods.NumberToString(partweightcoef, format);//poids ratio
                                         PART[ipart++] = SimplifiedMethods.NumberToString(part.Weight * 0.001, format);//poids reel en kg
-                                        PART[ipart++] = SimplifiedMethods.NumberToString(Part_Cutting_Time_Ratio, format);//temps de coupe
+                                        //PART[ipart++] = SimplifiedMethods.NumberToString(Part_Cutting_Time_Ratio, format);//poids ratio
+                                        //correctif sur erreur li le raion des temps de coupe est le meme que celui des poids
+                                        double ratio =  (part.Weight * part.Nested_Quantity)/ Nesting__Gpao_Parts_Total_Weight;
+                                        PART[ipart++] = SimplifiedMethods.NumberToString(ratio, format);//temps de coupe
+
 
                                         partline = SimplifiedMethods.WriteTableToLine(PART, ipart, Separator);
                                         DETAIL.Add(partline);
@@ -8683,9 +8804,9 @@ namespace AF_Clipper_Dll
 
             //IEntityList machineList = Command.WorkOnEntityList; 
 
-            //ecriture du fichier
-
-            using (StreamWriter csvfile = new StreamWriter(CsvExportPath, true))
+           
+            
+                using (StreamWriter csvfile = new StreamWriter(CsvExportPath, true))
             {
 
 
@@ -8745,7 +8866,7 @@ namespace AF_Clipper_Dll
                             //double xdim = selected_reference.GetFieldValueAsDouble("_DIMENS1");
                             //double ydim = selected_reference.GetFieldValueAsDouble("_DIMENS2");
                             double xdim = part_infos.Width;
-                            double ydim = part_infos.Height * 10E-3;
+                            double ydim = part_infos.Height ;
                             //double poids = selected_reference.GetFieldValueAsDouble("_WEIGHT") * 10E-3;
                             double poids = part_infos.Weight;
 
@@ -8868,23 +8989,14 @@ namespace AF_Clipper_Dll
             IEntitySelector select_machinable_part_list = new EntitySelector();
             IEntitySelector select_preparation_list = new EntitySelector();
 
-            //IEntity clipper_machine = null;
-            //IEntity centre_frais_clipper = null;
+            
 
             Dictionary<string, string> centre_frais_dictionnary = null;
             centre_frais_dictionnary = new Dictionary<string, string>();
             //machine clipper
             Get_Clipper_Machine(contextlocal, out IEntity clipper_machine, out IEntity centre_frais_clipper, out centre_frais_dictionnary);
 
-            //on retourne les pieces marquées "sansdt"
-            /*
-            IEntityList sans_dt_filter = contextlocal.EntityManager.GetEntityList("_REFERENCE", "REMONTER_DT", ConditionOperator.Equal, true);
-            sans_dt_filter.Fill(false);
-
-
-            IDynamicExtendedEntityList references_sansdt = contextlocal.EntityManager.GetDynamicExtendedEntityList("_REFERENCE", sans_dt_filter);
-            references_sansdt.Fill(false);
-            */
+           
 
 
             IEntityList sans_dt_filter = contextlocal.EntityManager.GetEntityList("_MACHINABLE_PART", "_ESTIMATION_IS_VALID", ConditionOperator.Equal, true);
@@ -8896,11 +9008,15 @@ namespace AF_Clipper_Dll
 
 
             // select_reference_list.Init(contextlocal, references_sansdt);
+            select_machinable_part_list.AllowSaveView=true;
             select_machinable_part_list.Init(contextlocal, machinableparts);
             select_machinable_part_list.MultiSelect = true;
+            //
+            MessageBox.Show("Seules les preparations valides pour l'export seront visibles", "Export Pieces 2d ", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             //GetPartinfos_FromMachinablePart
-
+            //ecriture du fichier remplacement
+            File_Tools.replaceFile(CsvExportPath, false);
 
             using (StreamWriter csvfile = new StreamWriter(CsvExportPath, true))
             {
@@ -8923,152 +9039,214 @@ namespace AF_Clipper_Dll
                         //reference non vide et integrité
                         if (machinable_part != null && CheckDataIntegrity(contextlocal, machinable_part) == true)
                         {
+                            //
 
-                            //creation d'un part info
+                            //IEntity current_machine = null;
+                            string strresult = "";
+                            bool result = false;
+                            long affaire;
+                            string name = machinable_part.GetFieldValueAsEntity("IMPLEMENT__PREPARATION").GetFieldValueAsString("_NAME");
                             IEntity reference = machinable_part.GetImplementEntity("_PREPARATION").GetFieldValueAsEntity("_REFERENCE");
-                            AF_ImportTools.PartInfo part_infos = new PartInfo();
-                            part_infos.GetPartinfos_FromMachinablePart(ref contextlocal, machinable_part);
 
+                            SimplifiedMethods.InputBox("Saissisez le numéro d'affaire", "Piece :" + name, ref strresult);
 
-                            //pour facilite l'ecriture du fichier de sortie on stock toutes les infos dans des listes d'objets
-                            List<object> engapi = new List<object>();
-                            List<object> gapiece = new List<object>();
-                            List<object> nomenpiece = new List<object>();
-                            string separator = ";";
-
-                            //recuperation d'une tole/stock dont la matiere est egale a celle de la  piece
-                            if (GetRadomSheet(contextlocal, reference, out stock, out sheet) != true)
+                            if (string.IsNullOrEmpty(strresult) == true || long.TryParse(strresult, out affaire) == false)//i now = 1 )
                             {
-                                Alma_Log.Write_Log_Important("aucun element de stock n' a ete trouve, seules les informations renseignées ou calculables vont etre renvoyees ");
-                            };
-
-
-                            //recuperation des infos de la piece
-                            double surface = 0;
-                            double parttime = part_infos.Quote_part_cyle_time + 0.1;
-                            //unité en m2
-                            //surface = selected_reference.GetFieldValueAsDouble("_SURFACE") * 10E-6;
-                            surface = part_infos.Surface * 10E-6;
-                            string codepiece = SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("_NAME"));
-                            //unite en mm
-
-                            double thickness = part_infos.Thickness;
-                            //string matiere = selected_reference.GetFieldValueAsEntity("_MATERIAL").GetFieldValueAsString("_NAME");
-                            string matiere = SimplifiedMethods.ConvertNullStringToEmptystring(part_infos.Material);
-                            double feed = AF_ImportTools.Machine_Info.GetFeed(contextlocal, part_infos.DefaultMachineEntity, part_infos.MaterialEntity);
-
-
-                            double xdim = part_infos.Width;
-                            double ydim = part_infos.Height * 10E-3;
-                            double poids = part_infos.Weight;
-
-                            //données clipper de la piece
-
-                            string affaire = ""; //SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("AFFAIRE"));
-                            string description = part_infos.Name;// SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("_REFERENCE"));
-                            string emffile;
-                            /// a revoir avec les grometrie par defaut
-                            emffile = part_infos.EmfFile;//SimplifiedMethods.GetPreview(reference);
-                            string en_rang = ""; // SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("EN_RANG"));
-                            string en_pere_piece = ""; // SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("EN_PERE_PIECE"));
-                            //string idlnbom = "";// SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("IDLNBOM"));
-
-                            string referenceId = reference.Id.ToString(); ;  // reference.Id32.ToString();
-                            string centrefrais = "";
-                            centrefrais = SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsEntity("_DEFAULT_CUT_MACHINE_TYPE").GetFieldValueAsEntity("CENTREFRAIS_MACHINE").GetFieldValueAsString("_CODE"));
-
-                            //string centrefrais = SimplifiedMethods.ConvertEmptyStringToNullstring(to_produce_ref.GetFieldValueAsEntity("CENTREFRAIS").ToString());
-                            string codematiere = SimplifiedMethods.ConvertNullStringToEmptystring(stock.GetFieldValueAsString("_NAME"));
-                            //recuperation des infos de la tole
-                            double xDim_Tole = sheet.GetFieldValueAsDouble("_LENGTH");
-                            double yDim_Tole = sheet.GetFieldValueAsDouble("_WIDTH");
-                            //double surface_Tole = sheet.GetFieldValueAsDouble("_SURFACE");
-                            //pour le moment on considere que la surface de la tole est
-                            double surface_Tole = xDim_Tole * yDim_Tole * 10E-6;
-                            string nomdelaTole = SimplifiedMethods.ConvertNullStringToEmptystring(stock.GetFieldValueAsString("_NAME"));
-                            //section engapi
-
-                            engapi.Add("ENGAPI");
-                            engapi.Add(codepiece);
-                            engapi.Add(affaire);
-                            engapi.Add(description);
-                            engapi.Add(emffile);
-                            engapi.Add(string.Format("{0:0.00000}", poids / 1000));
-                            //engapi.Add(idlnbom);
-                            engapi.Add(en_rang);
-                            engapi.Add(en_pere_piece);
-                            engapi.Add(referenceId);
-                            //var answer= MessageBox.Show.   
-                            if (EngapiOnly == false)
-                            {
-                                gapiece.Add("GAPIECE");
-                                gapiece.Add(centrefrais);
-                                //pour le moment ces valeurs sont nulles
-                                gapiece.Add(string.Format("{0:0.10000}", parttime));
-                                gapiece.Add("");
-                                ///
+                                //throw new MissingAffaireExecption();
+                                MessageBox.Show(name + " : Numero d'affaire incorrecte, cette piece sera ignorée.");
+                                //Application.Exit();
+                                continue;
                             }
-                            nomenpiece.Add("NOMENPIECE");
-                            nomenpiece.Add(codematiere);
-                            nomenpiece.Add(xDim_Tole);
-                            nomenpiece.Add(yDim_Tole);
-
-
-                            if (surface_Tole > 0)
+                            else
                             {
-                                nomenpiece.Add(string.Format("{0:0.00000}", surface / surface_Tole));
-                            }
 
-                            nomenpiece.Add(xdim);
-                            nomenpiece.Add(ydim);
+                                //creation d'un part info
+
+                                AF_ImportTools.PartInfo part_infos = new PartInfo();
+                                part_infos.GetPartinfos_FromMachinablePart(ref contextlocal, machinable_part);
+
+
+                                //pour facilite l'ecriture du fichier de sortie on stock toutes les infos dans des listes d'objets
+                                List<object> engapi = new List<object>();
+                                List<object> gapiece = new List<object>();
+                                List<object> nomenpiece = new List<object>();
+                                string separator = ";";
+
+                                //recuperation d'une tole/stock dont la matiere est egale a celle de la  piece
+                                if (GetRadomSheet(contextlocal, reference, out stock, out sheet) != true)
+                                {
+                                    Alma_Log.Write_Log_Important("aucun element de stock n' a ete trouve, seules les informations renseignées ou calculables vont etre renvoyees ");
+                                };
+
+
+                                //recuperation des infos de la piece
+                                double surface = 0;
+                                double parttime = part_infos.Quote_part_cyle_time + 0.1;
+                                //unité en m2
+                                //surface = selected_reference.GetFieldValueAsDouble("_SURFACE") * 10E-6;
+                                surface = part_infos.Surface * 10E-6;
+                                string codepiece = SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("_NAME"));
+                                //unite en mm
+
+                                double thickness = part_infos.Thickness;
+                                //string matiere = selected_reference.GetFieldValueAsEntity("_MATERIAL").GetFieldValueAsString("_NAME");
+                                string matiere = SimplifiedMethods.ConvertNullStringToEmptystring(part_infos.Material);
+                                double feed = AF_ImportTools.Machine_Info.GetFeed(contextlocal, part_infos.DefaultMachineEntity, part_infos.MaterialEntity);
+
+                                //
+                                //double xdim = part_infos.Width;
+                                //double ydim = part_infos.Height;
+
+
+                                double xdim;
+                                double ydim;
+                                //longeur > largeur
+                                if (part_infos.Width > part_infos.Height)
+                                {
+                                    xdim = part_infos.Width;
+                                    ydim = part_infos.Height;
+
+                                }
+                                else
+                                {
+                                    ydim = part_infos.Width;
+                                    xdim = part_infos.Height;
+                                }
 
 
 
-                            string myline = "";
-                            var last_o = engapi.LastOrDefault();
-                            separator = ";";
-                            foreach (object o in engapi)
-                            {
-                                if (o.Equals(last_o))
-                                { separator = ""; }
-                                myline += o.ToString() + separator;
-                            }
-                            last_o = null;
-                            csvfile.WriteLine(myline.Replace(",", "."));
+                                double poids = part_infos.Weight;
 
-                            //ecriture de gapiece uniquement si retour possible
-                            //actuellement si la gamme existe clipper rajoute une nouvelle gamme
-                            if (EngapiOnly == false)
-                            {
+                                //données clipper de la piece
+
+                                //string affaire = ""; //SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("AFFAIRE"));
+                                string description = "Piece de dim : " + String.Format("{0:0.00}", xdim) + " mm" + " X " + String.Format("{0:0.00}", ydim) + " mm";//part_infos.Name;// SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("_REFERENCE"));
+
+
+                                string emffile;
+                                /// a revoir avec les grometrie par defaut
+                                emffile = part_infos.EmfFile;//SimplifiedMethods.GetPreview(reference);
+                                string en_rang = ""; // SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("EN_RANG"));
+                                string en_pere_piece = ""; // SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("EN_PERE_PIECE"));
+                                                           //string idlnbom = "";// SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("IDLNBOM"));
+
+                                string referenceId = reference.Id.ToString(); ;  // reference.Id32.ToString();
+                                string centrefrais = "";
+                                centrefrais = SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsEntity("_DEFAULT_CUT_MACHINE_TYPE").GetFieldValueAsEntity("CENTREFRAIS_MACHINE").GetFieldValueAsString("_CODE"));
+
+                                //string centrefrais = SimplifiedMethods.ConvertEmptyStringToNullstring(to_produce_ref.GetFieldValueAsEntity("CENTREFRAIS").ToString());
+                                string codematiere = SimplifiedMethods.ConvertNullStringToEmptystring(stock.GetFieldValueAsString("_NAME"));
+                                //recuperation des infos de la tole
+                                double xDim_Tole = sheet.GetFieldValueAsDouble("_LENGTH");
+                                double yDim_Tole = sheet.GetFieldValueAsDouble("_WIDTH");
+                                //double surface_Tole = sheet.GetFieldValueAsDouble("_SURFACE");
+                                //pour le moment on considere que la surface de la tole est
+                                double surface_Tole = xDim_Tole * yDim_Tole * 10E-6;
+                                string nomdelaTole = SimplifiedMethods.ConvertNullStringToEmptystring(stock.GetFieldValueAsString("_NAME"));
+                                //section engapi
+
+                                engapi.Add("ENGAPI");
+                                engapi.Add(codepiece);
+                                engapi.Add(affaire.ToString());
+                                engapi.Add(description);
+                                engapi.Add(emffile);
+                                engapi.Add(string.Format("{0:0.00000}", poids / 1000));
+                                //engapi.Add(idlnbom);
+                                engapi.Add(en_rang);
+                                engapi.Add(en_pere_piece);
+                                engapi.Add(referenceId);
+                                //var answer= MessageBox.Show.   
+                                if (EngapiOnly == false)
+                                {
+                                    gapiece.Add("GAPIECE");
+                                    gapiece.Add(centrefrais);
+                                    //pour le moment ces valeurs sont nulles
+                                    //String.Format(Clipper_Param.Get_string_format_double(), clipperpart.Part_Balanced_Weight * clipperpart.Nested_Quantity
+                                    gapiece.Add(string.Format("{0:0.0000}", 0));
+                                    gapiece.Add(string.Format("{0:0.0000}", parttime));
+                                    //gapiece.Add("");
+                                    ///
+                                }
+                                nomenpiece.Add("NOMENPIECE");
+                                nomenpiece.Add(codematiere);
+                                nomenpiece.Add(xDim_Tole);
+                                nomenpiece.Add(yDim_Tole);
+
+
+                                if (surface_Tole > 0)
+                                {
+                                    nomenpiece.Add(string.Format("{0:0.00000}", surface / surface_Tole));
+                                }
+
+                                nomenpiece.Add(xdim);
+                                nomenpiece.Add(ydim);
+
+
+
+                                string myline = "";
+                                var last_o = engapi.LastOrDefault();
+                                separator = ";";
+                                foreach (object o in engapi)
+                                {
+                                    if (o.Equals(last_o))
+                                    { separator = ""; }
+                                    myline += o.ToString() + separator;
+                                }
+                                last_o = null;
+
+
+                                csvfile.WriteLine(myline.Replace(",", "."));
+
+                                //ecriture de gapiece uniquement si retour possible
+                                //actuellement si la gamme existe clipper rajoute une nouvelle gamme
+                                //GAMME
+                                if (EngapiOnly == false)
+                                {
+                                    myline = "";
+                                    last_o = gapiece.LastOrDefault();
+                                    separator = ";";
+
+                                    foreach (object o in gapiece)
+                                    {
+                                        if (o.Equals(last_o)) { separator = ""; }
+                                        myline += o.ToString() + separator;
+                                    }
+                                    csvfile.WriteLine(myline.Replace(",", "."));
+                                }
+
+                                //ecriture de nomepiece
+                                //NOMENPIECE
                                 myline = "";
-                                last_o = gapiece.LastOrDefault();
+                                last_o = nomenpiece.LastOrDefault();
                                 separator = ";";
 
-                                foreach (object o in gapiece)
+                                foreach (object o in nomenpiece)
                                 {
                                     if (o.Equals(last_o)) { separator = ""; }
                                     myline += o.ToString() + separator;
                                 }
+
                                 csvfile.WriteLine(myline.Replace(",", "."));
+                                last_o = null;
+                                //on set le setfiled value a false
+
+                                //reference.SetFieldValue("REMONTER_DT", false);
+                                //reference.Save();
+                                part_infos = null;
+
+
+
                             }
-                            //ecriture de nomepiece
-                            myline = "";
-                            last_o = gapiece.LastOrDefault();
-                            separator = ";";
 
-                            foreach (object o in nomenpiece)
-                            {
-                                if (o.Equals(last_o)) { separator = ""; }
-                                myline += o.ToString() + separator;
-                            }
+                        
 
-                            csvfile.WriteLine(myline.Replace(",", "."));
-                            last_o = null;
-                            //on set le setfiled value a false
 
-                            reference.SetFieldValue("REMONTER_DT", false);
-                            reference.Save();
-                            part_infos = null;
+
+                        
+
+
+
+
 
                         }
                     }
@@ -9127,8 +9305,10 @@ namespace AF_Clipper_Dll
             select_reference_list.Init(contextlocal, Part_To_Produce_sansdt);
             select_reference_list.MultiSelect = true;
 
+            //ecriture remplacement du fichier
+            File_Tools.replaceFile(CsvExportPath, false);
 
-
+            MessageBox.Show("Seules les pieces selectionnées pour l'export seront visibles", "Export Pieces à porduire ", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             using (StreamWriter csvfile = new StreamWriter(CsvExportPath, true))
             {
@@ -9147,6 +9327,7 @@ namespace AF_Clipper_Dll
                         IEntity reference = null;
                         //IEntity to_produce_ref = null;
                         IMachineManager machinemanager = new MachineManager();
+                        
 
                         if (part_To_Produce.GetFieldValueAsEntity("CENTREFRAIS") == null)
                         {
@@ -9200,16 +9381,27 @@ namespace AF_Clipper_Dll
                             string matiere = SimplifiedMethods.ConvertNullStringToEmptystring(part_infos.Material);
                             double feed = AF_ImportTools.Machine_Info.GetFeed(contextlocal, part_infos.DefaultMachineEntity, part_infos.MaterialEntity);
 
-                            //double xdim = selected_reference.GetFieldValueAsDouble("_DIMENS1");
-                            //double ydim = selected_reference.GetFieldValueAsDouble("_DIMENS2");
-                            double xdim = part_infos.Width;
-                            double ydim = part_infos.Height * 10E-3;
+
+                            double xdim;
+                            double ydim;
+                            //longeur > largeur
+                            if (part_infos.Width > part_infos.Height)
+                            {
+                                 xdim = part_infos.Width;
+                                 ydim = part_infos.Height;
+
+                            }
+                            else
+                            {
+                                 ydim = part_infos.Width;
+                                 xdim = part_infos.Height;
+                            }
                             //double poids = selected_reference.GetFieldValueAsDouble("_WEIGHT") * 10E-3;
                             double poids = part_infos.Weight;
 
                             //données clipper de la piece
                             string affaire = SimplifiedMethods.ConvertNullStringToEmptystring(part_To_Produce.GetFieldValueAsString("AFFAIRE"));
-                            string description = SimplifiedMethods.ConvertNullStringToEmptystring(reference.GetFieldValueAsString("_REFERENCE"));
+                            string description = SimplifiedMethods.ConvertNullStringToEmptystring(part_To_Produce.GetFieldValueAsString("_DESCRIPTION"));
                             //string emffile = part_infos.EmfFile;
                             string emffile;
                             /// a revoir avec les grometrie par defaut
@@ -9249,8 +9441,9 @@ namespace AF_Clipper_Dll
                             gapiece.Add("GAPIECE");
                             gapiece.Add(centrefrais);
                             //pour le moment ces valeurs sont nulles
-                            gapiece.Add(string.Format("{0:0.10000}", parttime));
-                            gapiece.Add("");
+                            gapiece.Add(string.Format("{0:0.00000}", 0));
+                            gapiece.Add(string.Format("{0:0.00000}", parttime));
+                           
                             ///
 
                             nomenpiece.Add("NOMENPIECE");
@@ -9264,8 +9457,8 @@ namespace AF_Clipper_Dll
                                 nomenpiece.Add(string.Format("{0:0.00000}", surface / surface_Tole));
                             }
 
-                            nomenpiece.Add(xdim);
-                            nomenpiece.Add(ydim);
+                            nomenpiece.Add(string.Format("{0:0.00000}", xdim));
+                            nomenpiece.Add(string.Format("{0:0.00000}", ydim));
 
 
 
@@ -9283,6 +9476,8 @@ namespace AF_Clipper_Dll
 
                             //ecriture de gapiece uniquement si retour possible
                             //actuellement si la gamme existe clipper rajoute une nouvelle gamme
+                            //on force EngapiOnly a true
+                            EngapiOnly = false;
                             if (EngapiOnly == false)
                             {
                                 myline = "";
@@ -9298,7 +9493,7 @@ namespace AF_Clipper_Dll
                             }
                             //ecriture de nomepiece
                             myline = "";
-                            last_o = gapiece.LastOrDefault();
+                            last_o = nomenpiece.LastOrDefault();
                             separator = ";";
 
                             foreach (object o in nomenpiece)
@@ -9311,8 +9506,8 @@ namespace AF_Clipper_Dll
                             last_o = null;
                             //on set le setfiled value a false
 
-                            reference.SetFieldValue("REMONTER_DT", false);
-                            reference.Save();
+                            part_To_Produce.SetFieldValue("SANS_DT", false);
+                            part_To_Produce.Save();
                             part_infos = null;
 
                         }
@@ -9426,10 +9621,11 @@ namespace AF_Clipper_Dll
 
 
     #region exception
+    //il manque un numero d'affaire
     public class MissingParameterException : Exception
         {
 
-            public MissingParameterException(string parametername)
+            public  MissingParameterException(string parametername)
             {
                 if (AF_Clipper_Dll.Clipper_Param.GetVerbose_Log() == true)
                 {
@@ -9444,6 +9640,29 @@ namespace AF_Clipper_Dll
 
 
         }
+
+
+    /// <summary>
+    /// il manque le numero d'affaire
+    /// </summary>
+    public class MissingAffaireExecption : Exception
+    {
+
+        public  MissingAffaireExecption()
+        {
+            if (AF_Clipper_Dll.Clipper_Param.GetVerbose_Log() == true)
+            {
+
+                MessageBox.Show("Numero d'affaire incorrecte.");
+                Alma_Log.Write_Log_Important("Numero d'affaire incorrecte.");
+            }
+            Alma_Log.Write_Log("Numero d'affaire incorrecte.");
+           
+        }
+
+
+
+    }
     #endregion
 }
 

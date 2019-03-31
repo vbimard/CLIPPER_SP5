@@ -174,7 +174,7 @@ namespace ActcutClipperTest
             long quotenumber;
             if(txtQuoteid.Text != null){
                 bool parsed = Int64.TryParse(txtQuoteid.Text, out quotenumber);
-                ClipperApi.ExportQuote(quotenumber, "CMD" + txtQuoteid.Text, @"C:\Temp\toto.txt");
+                ClipperApi.ExportQuote(quotenumber, "CMD" + txtQuoteid.Text, @"c:\temp\toto.txt");
                 if (!parsed)
                 MessageBox.Show("Int32.TryParse could not parse '{0}' to an int.");
             }

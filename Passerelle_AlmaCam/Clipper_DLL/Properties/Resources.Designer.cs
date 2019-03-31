@@ -136,7 +136,7 @@ namespace AF_Clipper_Dll.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à 2.1.4;2.1.5.
+        ///   Recherche une chaîne localisée semblable à 2.1.5.
         /// </summary>
         public static string Almcam_Version {
             get {

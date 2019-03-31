@@ -40,8 +40,16 @@ namespace Wpm.Implement.ModelSetting
 							commandTypeFactory.Shortcut = Shortcut.None;
 							commandTypeFactory.WorkOnEntityTypeKey = "_REFERENCE";
 							commandTypeFactory.LargeImage = true;
-							
-							if (!commandTypeFactory.UpdateModel())
+                            if (File.Exists(@"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png"))
+                            {
+                              commandTypeFactory.ImageFile = @"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png";
+                            }
+                            else
+                            {
+                            commandTypeFactory.ImageFile = "";
+                            }
+
+                        if (!commandTypeFactory.UpdateModel())
 							{
 								foreach (ModelSettingError error in commandTypeFactory.ErrorList)
 								{
@@ -69,9 +77,16 @@ namespace Wpm.Implement.ModelSetting
 								commandTypeFactory.Shortcut = Shortcut.None;
 								commandTypeFactory.WorkOnEntityTypeKey = "_TO_PRODUCE_REFERENCE";
 								commandTypeFactory.LargeImage = true;
-								commandTypeFactory.ImageFile = "";
-								
-								if (!commandTypeFactory.UpdateModel())
+                                if (File.Exists(@"C:\AlmaCAM\Bin\Icones\Clipper\"+commandTypeFactory.Key + ".png"))
+                                {
+                                    commandTypeFactory.ImageFile = @"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png";
+                                }
+                                else
+                                {
+                                    commandTypeFactory.ImageFile = "";
+                                }
+
+                        if (!commandTypeFactory.UpdateModel())
 								{
 									foreach (ModelSettingError error in commandTypeFactory.ErrorList)
 									{
@@ -98,10 +113,17 @@ namespace Wpm.Implement.ModelSetting
 									commandTypeFactory.PlugInClassName = "Clipper_8_Import_Stock_Processor";
 									commandTypeFactory.Shortcut = Shortcut.None;
 									commandTypeFactory.WorkOnEntityTypeKey = "_STOCK";
-									commandTypeFactory.LargeImage = true;
-									commandTypeFactory.ImageFile = "";
-									
-									if (!commandTypeFactory.UpdateModel())
+                                    commandTypeFactory.LargeImage = true;
+                        if (File.Exists(@"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png"))
+                                    {
+                                        commandTypeFactory.ImageFile = @"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png";
+                                    }
+                                    else
+                                    {
+                                            commandTypeFactory.ImageFile = "";
+                                    }
+
+                        if (!commandTypeFactory.UpdateModel())
 									{
 										foreach (ModelSettingError error in commandTypeFactory.ErrorList)
 										{
@@ -129,9 +151,17 @@ namespace Wpm.Implement.ModelSetting
 										commandTypeFactory.Shortcut = Shortcut.None;
 										commandTypeFactory.WorkOnEntityTypeKey = "_QUALITY";
 										commandTypeFactory.LargeImage = true;
-										commandTypeFactory.ImageFile = "";
-										
-										if (!commandTypeFactory.UpdateModel())
+
+                                            if (File.Exists(@"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png"))
+                                            {
+                                                commandTypeFactory.ImageFile = @"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png";
+                                            }
+                                            else
+                                            {
+                                                commandTypeFactory.ImageFile = "";
+                                            }
+
+                        if (!commandTypeFactory.UpdateModel())
 										{
 											foreach (ModelSettingError error in commandTypeFactory.ErrorList)
 											{
@@ -146,6 +176,7 @@ namespace Wpm.Implement.ModelSetting
 			  #endregion
 	
 			#region Import Fournitures
+            /*
 			{
             if (CommmandeExists(context,"IMPORT_CLIPPER_FOURNITURES")==false)
 				{
@@ -159,8 +190,17 @@ namespace Wpm.Implement.ModelSetting
 						commandTypeFactory.Shortcut = Shortcut.None;
 						commandTypeFactory.WorkOnEntityTypeKey = "_SIMPLE_SUPPLY";
 						commandTypeFactory.LargeImage = true;
-						
-						if (!commandTypeFactory.UpdateModel())
+
+                        if (File.Exists(@"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png"))
+                        {
+                            commandTypeFactory.ImageFile = @"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png";
+                        }
+                        else
+                        {
+                            commandTypeFactory.ImageFile = "";
+                        }
+
+                        if (!commandTypeFactory.UpdateModel())
 						{
 							foreach (ModelSettingError error in commandTypeFactory.ErrorList)
 							{
@@ -172,6 +212,7 @@ namespace Wpm.Implement.ModelSetting
 					}
 				}
 			}
+            */
             #endregion
 
 			#region CLIP Configuration
@@ -179,22 +220,30 @@ namespace Wpm.Implement.ModelSetting
             {
 				if (CommmandeExists(context,"CLIP_CONFIGURATION")==false)
 				{
-							ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, true);
-							commandTypeFactory.Key = "CLIP_CONFIGURATION";
-							commandTypeFactory.Name = "CLIP Configuration";
-							commandTypeFactory.PlugInFileName = @"AF_Clipper_Dll.dll";
-							commandTypeFactory.PlugInNameSpace = "AF_Clipper_Dll";
-							commandTypeFactory.PlugInClassName = "ClipperIE_Global";
-							commandTypeFactory.Shortcut = Shortcut.None;
-							commandTypeFactory.LargeImage = true;
-							commandTypeFactory.ImageFile = "";
-						
-						{
+                    ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, true);
+                    commandTypeFactory.Key = "CLIP_CONFIGURATION";
+                    commandTypeFactory.Name = "CLIP Configuration";
+                    commandTypeFactory.PlugInFileName = @"AF_Clipper_Dll.dll";
+                    commandTypeFactory.PlugInNameSpace = "AF_Clipper_Dll";
+                    commandTypeFactory.PlugInClassName = "ClipperIE_Global";
+                    commandTypeFactory.Shortcut = Shortcut.None;
+                    commandTypeFactory.LargeImage = true;
+
+                    if (File.Exists(@"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png"))
+                    {
+                        commandTypeFactory.ImageFile = @"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png";
+                    }
+                    else
+                    {
+                        commandTypeFactory.ImageFile = "";
+                    }
+
+                    {
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "IMPORT_CDA";
-							parameterDescription.Name = "Chemin complet vers le cahier d'affaire ( CAHIER_AFFAIRE.csv )";
+							parameterDescription.Name = "Chemin complet vers le cahier d'affaire ";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
-							parameterDescription.DefaultValue = @"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\CAHIER_AFFAIRE.csv";
+							parameterDescription.DefaultValue = @"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Import_OF\CAHIER_AFFAIRE.csv";
 							commandTypeFactory.ParameterList.Add(parameterDescription);
 							
 						}
@@ -248,7 +297,7 @@ namespace Wpm.Implement.ModelSetting
 							parameterDescription.Key = "MODEL_CA";
 							parameterDescription.Name = "Model Cahier Affaire";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
-							parameterDescription.DefaultValue = @"0#_NAME#string;1#AFFAIRE#string;2#THICKNESS#string;3#MATERIAL_CLIPPER#string;4#CENTREFRAIS#string;5#TECHNOLOGIE#string;6#FAMILY#string;7#IDLNROUT#string;8#CENTREFRAISSUIV#string;9#CUSTOMER#string;10#_QUANTITY#integer;11#QUANTITY#double;12#ECOQTY#string;13#STARTDATE#date;14#ENDDATE#date;15#PLAN#string;16#FORMATCLIP#string;17#IDMAT#string;18#IDLNBOM#string;19#NUMMAG#string;20#FILENAME#string;21#_DESCRIPTION#string;22#AF_CDE#string;23#DELAI_INT#date;24#EN_RANG#string;25#EN_PERE_PIECE#string";
+							parameterDescription.DefaultValue = @"0#_NAME#string;1#AFFAIRE#string;2#THICKNESS#string;3#_MATERIAL#string;4#CENTREFRAIS#string;5#TECHNOLOGIE#string;6#FAMILY#string;7#IDLNROUT#string;8#CENTREFRAISSUIV#string;9#CUSTOMER#string;10#_QUANTITY#integer;11#QUANTITY#double;12#ECOQTY#string;13#STARTDATE#date;14#ENDDATE#date;15#PLAN#string;16#FORMATCLIP#string;17#IDMAT#string;18#IDLNBOM#string;19#NUMMAG#string;20#FILENAME#string;21#_DESCRIPTION#string;22#AF_CDE#string;23#DELAI_INT#date;24#EN_RANG#string;25#EN_PERE_PIECE#string";
 							commandTypeFactory.ParameterList.Add(parameterDescription);
 							
 						}

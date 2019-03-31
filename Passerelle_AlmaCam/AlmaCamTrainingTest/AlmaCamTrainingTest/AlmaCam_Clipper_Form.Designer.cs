@@ -160,7 +160,7 @@
             this.importerStockToolStripMenuItem,
             this.recreerLEmfToolStripMenuItem});
             this.importStockToolStripMenuItem.Name = "importStockToolStripMenuItem";
-            this.importStockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.importStockToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.importStockToolStripMenuItem.Text = "Stock";
             this.importStockToolStripMenuItem.Click += new System.EventHandler(this.importStockToolStripMenuItem_Click);
             // 
@@ -197,7 +197,7 @@
             this.avecDTToolStripMenuItem,
             this.sansDTToolStripMenuItem});
             this.importOFToolStripMenuItem.Name = "importOFToolStripMenuItem";
-            this.importOFToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.importOFToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.importOFToolStripMenuItem.Text = "Import_OF";
             this.importOFToolStripMenuItem.Click += new System.EventHandler(this.importOFToolStripMenuItem_Click);
             // 
@@ -222,7 +222,7 @@
             this.relanceClotureToolStripMenuItem2,
             this.remonteeDTToolStripMenuItem});
             this.clotureToolStripMenuItem.Name = "clotureToolStripMenuItem";
-            this.clotureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clotureToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.clotureToolStripMenuItem.Text = "Retour Gp";
             // 
             // relanceenvoiecoupeToolStripMenuItem
@@ -268,7 +268,7 @@
             this.initialiserStockToolStripMenuItem.Name = "initialiserStockToolStripMenuItem";
             this.initialiserStockToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.initialiserStockToolStripMenuItem.Text = "Initialiser Stock";
-            this.initialiserStockToolStripMenuItem.ToolTipText = "Initialisation des nouveaux champs du  stock pour la passerelle";
+            this.initialiserStockToolStripMenuItem.ToolTipText = "Initialisation des nouveaux champs du  stock pour une passerelle existante";
             this.initialiserStockToolStripMenuItem.Click += new System.EventHandler(this.initialiserStockToolStripMenuItem_Click);
             // 
             // preparerLaBasePourClipperToolStripMenuItem

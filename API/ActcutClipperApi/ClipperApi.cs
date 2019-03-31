@@ -5,18 +5,16 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.IO;
-
-using Alma.BaseUI.Utils;
-
+//using Alma.BaseUI.Utils;
 using Wpm.Schema.Kernel;
-using Wpm.Implement.Manager;
-using Wpm.Implement.ComponentEditor;
+//using Wpm.Implement.Manager;
+//using Wpm.Implement.ComponentEditor;
 
 using Actcut.QuoteModel;
 using Actcut.QuoteModelManager;
 using Actcut.ActcutModelManagerUI;
-
-
+using Wpm.Implement.Manager;
+using Wpm.Implement.ComponentEditor;
 
 namespace AF_Actcut.ActcutClipperApi
 {
@@ -85,17 +83,15 @@ namespace AF_Actcut.ActcutClipperApi
         public bool ExportQuote(long quoteNumber, string orderNumber, string exportFile)
 
         {
+            bool ret = false;
             if (_Context != null)
             {
                 IQuoteManagerUI quoteManagerUI = new QuoteManagerUI();
                 IEntity quoteEntity = quoteManagerUI.GetQuoteEntity(_Context, quoteNumber);
-                bool ret = quoteManagerUI.AccepQuote(_Context, quoteEntity, orderNumber, exportFile);
-                return (ret ? true : false);
+                ret = quoteManagerUI.AccepQuote(_Context, quoteEntity, orderNumber, exportFile);
+               
             }
-            else
-            {
-                return false;
-            }
+            return ret;
         }
 
         /// <summary>

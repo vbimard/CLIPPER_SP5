@@ -95,6 +95,26 @@ namespace AlmaCamTrainingTest.Properties {
         }
         
         /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap CLIP_CONFIGURATION {
+            get {
+                object obj = ResourceManager.GetObject("CLIP_CONFIGURATION", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap CLIPPER_EXPORT_DT_DLL {
+            get {
+                object obj = ResourceManager.GetObject("CLIPPER_EXPORT_DT_DLL", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à using System;
         ///using System.IO;
         ///using System.Collections.Generic;
@@ -192,6 +212,26 @@ namespace AlmaCamTrainingTest.Properties {
         }
         
         /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap IMPORT_CLIPPER_FOURNITURES {
+            get {
+                object obj = ResourceManager.GetObject("IMPORT_CLIPPER_FOURNITURES", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap IMPORT_CLIPPER_MATERIAL {
+            get {
+                object obj = ResourceManager.GetObject("IMPORT_CLIPPER_MATERIAL", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à [QUALITY]
         ///OleDb=Provider=Microsoft.Jet.OLEDB.4.0;Data Source=&quot;C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Import_PrixMatieres\&quot;;Extended Properties=&quot;text;HDR=yes;FMT=Delimited&quot;
         ///DbSql=SELECT A,B,C,D,E,F/1000 FROM [Export_Nuance_Etat.csv]
@@ -206,6 +246,26 @@ namespace AlmaCamTrainingTest.Properties {
         public static string Import_Matiere_2 {
             get {
                 return ResourceManager.GetString("Import_Matiere_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap IMPORT_OF {
+            get {
+                object obj = ResourceManager.GetObject("IMPORT_OF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap IMPORT_STOCK {
+            get {
+                object obj = ResourceManager.GetObject("IMPORT_STOCK", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

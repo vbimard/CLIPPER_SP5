@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\..\AlmaCAM\Bin\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\..\Program Files %28x86%29\Clip Industrie\CLIPPER 8\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,22 +27,34 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\..\AlmaCAM\Bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Wpm_32513.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AF_Actcut.ActcutClipperApi">
-      <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\AF_Actcut.ActcutClipperApi.dll</HintPath>
+    <Reference Include="Actcut.ActcutModelManagerUI, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Actcut.ActcutModelManagerUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="AF_ImportTools, Version=2.1.3.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="AF_Actcut.ActcutClipperApi, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\AF_Actcut.ActcutClipperApi.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AF_ImportTools, Version=2.1.5.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\AF_ImportTools.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Alma.NetKernel, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Alma.NetKernel.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -54,9 +66,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Wpm.Implement.Manager, Version=2.1.4.65224, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Wpm.Implement.Manager, Version=2.1.5.37817, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Wpm.Implement.Manager.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -82,7 +95,16 @@
       <DesignTime>True</DesignTime>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Wpm_32513.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "C:\AlmaCAM\Bin\AlmaCamUser1.exe" "C:\Program Files (x86)\Clip Industrie\CLIPPER 8\AF_Export_Devis_Clipper.exe"
+copy "C:\AlmaCAM\Bin\AlmaCamUser1.exe" "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_Export_Devis_Clipper.exe"
+copy "C:\AlmaCAM\Bin\AlmaCamUser1.exe" "C:\AlmaCAM\Bin\AF_Export_Devis_Clipper.exe"
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
