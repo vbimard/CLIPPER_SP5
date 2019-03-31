@@ -191,6 +191,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Resources\Clipper.zip" />
     <None Include="Resources\Entities3.cs" />
     <None Include="Resources\CommandesV2.cs" />
     <None Include="Resources\event.cs" />

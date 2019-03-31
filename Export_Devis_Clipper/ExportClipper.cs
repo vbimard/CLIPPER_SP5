@@ -234,7 +234,7 @@ namespace AF_Export_Devis_Clipper
         private IDictionary<string, long> _ReferenceListCount = new Dictionary<string, long>();
         private IDictionary<long, long> _FixeCostPartExportedList = new Dictionary<long, long>();
         private IDictionary<string, string> _PathList = new Dictionary<string, string>();
-
+        private bool ActCut_Force_Export_Dpr = false;
         private bool _GlobalExported = false;
         //declaration du nouveau log //
 
@@ -378,7 +378,7 @@ namespace AF_Export_Devis_Clipper
 
                 //depuis 2.1.5
                 bool rst = false;
-                bool ActCut_Force_Export_Dpr = false;
+                //bool ActCut_Force_Export_Dpr = false;
                 IParameterValue iparametervalue;
 
                 string Export_GP_Directory = "";
@@ -390,28 +390,32 @@ namespace AF_Export_Devis_Clipper
 
                 rst = contextlocal.ParameterSetManager.TryGetParameterValue("_EXPORT", "_ACTCUT_DPR_DIRECTORY", out iparametervalue);
                 Export_DPR_Directory = iparametervalue.GetValueAsString();
+                ///
                 rst = contextlocal.ParameterSetManager.TryGetParameterValue("_EXPORT", "_ACTCUT_FORCE_EXPORT_DPR", out iparametervalue);
-
                 ActCut_Force_Export_Dpr = iparametervalue.GetValueAsBoolean();
 
-                if (ActCut_Force_Export_Dpr)
+                if (ActCut_Force_Export_Dpr==true)
                 {
 
                     rst = contextlocal.ParameterSetManager.TryGetParameterValue("_EXPORT", "_ACTCUT_FORCE_DPR_DIRECTORY", out iparametervalue);
                     ActCut_Force_Dpr_Directory = iparametervalue.GetValueAsString();
                     //on force ke exportdpr directory
-                    Export_DPR_Directory = iparametervalue.GetValueAsString(); 
+                    Export_DPR_Directory = iparametervalue.GetValueAsString();
+
+
+                    if (string.IsNullOrEmpty(Export_GP_Directory)) { throw new UnvalidatedQuoteConfigurations("Le chemin d'export des devis n'est pas defini, l'export va etre annulé."); }
+        
+                   if (string.IsNullOrEmpty(Export_DPR_Directory)) { throw new UnvalidatedQuoteConfigurations("Le chemin d'export des devis n'est pas defini, l'export va etre annulé."); }
+                    
 
                 }
 
 
+                if (string.IsNullOrEmpty(Export_GP_Directory)==false)
+                { _PathList.Add("Export_GP_Directory", Export_GP_Directory); }
+                if (string.IsNullOrEmpty(Export_DPR_Directory)==false) 
+                { _PathList.Add("Export_DPR_Directory", Export_DPR_Directory); }
 
-
-                if (string.IsNullOrEmpty(Export_GP_Directory)) { throw new UnvalidatedQuoteConfigurations("Le chemin d'export des devis n'est pas defini, l'export va etre annulé.");  }
-                else { _PathList.Add("Export_GP_Directory", Export_GP_Directory);  }
-
-                if (string.IsNullOrEmpty(Export_DPR_Directory)) { throw new UnvalidatedQuoteConfigurations("Le chemin d'export des devis n'est pas defini, l'export va etre annulé."); }
-                { _PathList.Add("Export_DPR_Directory", Export_DPR_Directory);  }
 
                 if (!string.IsNullOrEmpty(Export_DPR_Directory)) { _PathList.Add(" ActCut_Force_Dpr_Directory", ActCut_Force_Dpr_Directory); }
 
@@ -466,7 +470,8 @@ namespace AF_Export_Devis_Clipper
             try {
                     
                     //creation de la directory si elle n'exist pas
-                    if (!Directory.Exists(Export_Directory))
+
+                    if (!Directory.Exists(Export_Directory) && string.IsNullOrEmpty(Export_Directory)==false)
                     {
                          Directory.CreateDirectory(Export_Directory);
                     }
@@ -1963,7 +1968,7 @@ namespace AF_Export_Devis_Clipper
                                 string matiere = partEntity.GetFieldValueAsEntity("_MATERIAL").GetFieldValueAsEntity("_QUALITY").GetFieldValueAsString("_NAME");
                                 string thickness = partEntity.GetFieldValueAsEntity("_MATERIAL").GetFieldValueAsLong("_THICKNESS").ToString(); //partEntity.GetFieldValueAsLong("_THICKNESS").ToString();
 
-                    CreateEmptyDprWithThickness(emfFile.Replace(".emf", ".dpr"), matiere, thickness);
+                                CreateEmptyDprWithThickness(emfFile.Replace(".emf", ".dpr"), matiere, thickness);
                                 CreateEmptyEmf(emfFile.Replace(".emf", ".dpr.emf"));
 
                             }
@@ -2843,6 +2848,8 @@ namespace AF_Export_Devis_Clipper
                         else if (assistantType.Contains("PluggedSimpleAssistantEx"))
                         {
                             //creation du point rouge dans l'emf : signature des apercus de pieces quotes
+                           
+
                             Sign_quote_Emf(emfFile);
                         }
 
@@ -2851,27 +2858,55 @@ namespace AF_Export_Devis_Clipper
                         else if (assistantType.Contains("PluggedSketchAssistant"))
                         {
                             //creation du point rouge dans l'emf : signature des apercus de peices quotes
-                            Sign_quote_Emf(emfFile);
+
+                            if (ActCut_Force_Export_Dpr == false)
+                            { //rien 
+                                emfFile = AF_ImportTools.SimplifiedMethods.GetPreview(partEntity);
+                            }
+                            else
+                            {  Sign_quote_Emf(emfFile);}
+                            //emfFile = partEntity.GetFieldValueAsString("_DPR_FILENAME") + ".emf";
+                            
 
                         }
                         //PluggedGeometryAssistant
                         else if (assistantType.Contains("PluggedGeometryAssistant"))
                         {
                             //creation du point rouge dans l'emf : signature des apercus de peices quotes
-                            Sign_quote_Emf(emfFile);
+
+                            if (ActCut_Force_Export_Dpr == false) { //rien 
+                                emfFile = AF_ImportTools.SimplifiedMethods.GetPreview(partEntity);
+                            }
+                                else
+                            { Sign_quote_Emf(emfFile); }
+
+                           
+                            
 
                         }
                         //PluggedDplAssistant
                         else if (assistantType.Contains("PluggedDplAssistan"))
                         {   //creation du point rouge dans l'emf : signature des apercus de peices quotes
-                            Sign_quote_Emf(emfFile);
+                                if (ActCut_Force_Export_Dpr == false)
+                                { //rien 
+                                emfFile = AF_ImportTools.SimplifiedMethods.GetPreview(partEntity);
+                                }
+                                else
+                                 { Sign_quote_Emf(emfFile); }
+                                    
 
                         }
 
                         //PluggedDxfAssistant
                         else if (assistantType.Contains("PluggedDxfAssistant"))
                         {   //creation du point rouge dans l'emf : signature des apercus de peices quotes
-                            Sign_quote_Emf(emfFile);
+                            if (ActCut_Force_Export_Dpr==false)
+                            { //rien 
+                                emfFile = AF_ImportTools.SimplifiedMethods.GetPreview(partEntity);
+                            }
+                            else
+                            {   Sign_quote_Emf(emfFile);}
+                           
 
 
                         }
@@ -2879,6 +2914,7 @@ namespace AF_Export_Devis_Clipper
 
                         else
                         {  //creation du point rouge dans l'emf : signature des apercus de peices quotes
+
                             Sign_quote_Emf(emfFile);
 
                         }

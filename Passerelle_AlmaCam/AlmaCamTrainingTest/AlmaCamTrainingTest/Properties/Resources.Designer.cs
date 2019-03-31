@@ -115,6 +115,16 @@ namespace AlmaCamTrainingTest.Properties {
         }
         
         /// <summary>
+        ///   Recherche une ressource localisée de type System.Byte[].
+        /// </summary>
+        public static byte[] Clipper_Machine {
+            get {
+                object obj = ResourceManager.GetObject("Clipper_Machine", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à using System;
         ///using System.IO;
         ///using System.Collections.Generic;

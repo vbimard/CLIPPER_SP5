@@ -28,6 +28,9 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using Wpm.Implement.ModelSetting;
 using Alma.BaseUI.DescriptionEditor;
+using Actcut.ResourceManager;
+using Actcut.ActcutModelManagerUI;
+using Alma.BaseUI.ErrorMessage;
 
 //suppression de wpm.schema.component.dll et remplacement par wpm.schema.componenteditor.dll 
 
@@ -798,24 +801,71 @@ namespace AlmaCamTrainingTest
             //ouverture du context
 
             IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
-  
+
+            //import de la machine clipper
+            
+            ImportMachine();
+
+
+            
             Update_Clipper_Parameters(_Context);
             Update_Clipper_Stock(_Context);
+            //
+            //mise a jour des champs
+            Update_FieldValues(_Context);
+            //
 
             MessageBox.Show("Database Prepared for clipper");
 
         }
 
 
+        public void ImportMachine()
+        {
+            try {
+                SimplifiedMethods.NotifyMessage("Updating Database", "Installating Clipper machine...");
+                MachineManager machineManager = new MachineManager();
+                IModelsRepository modelsRepository = new ModelsRepository();
+                _Context = modelsRepository.GetModelContext(Lst_Model.Text);
+                string ZipFileName = null;
 
+
+               
+
+
+                ZipFileName = Path.GetTempPath() + "Clipper.zip";
+                File.WriteAllBytes(ZipFileName, Properties.Resources.Clipper_Machine);
+
+                //import cam machine
+
+                IImportMachineEntity importMachineEntity = new ImportMachineEntity();
+                importMachineEntity.Init(_Context, out string ErrorMessage);
+
+                //ZipFileName = @"C:\AlmaCAM\Bin\AlmaCam_Clipper\SampleFiles\Machines\AlmaCam\Clipper.zip";
+
+                importMachineEntity.ReadZipFile(ZipFileName);
+                importMachineEntity.ImportMachine();
+
+                Update_FieldValues(_Context);
+            }
+
+
+
+
+            catch { }
+
+           
+            
+
+
+        }
 
 
         public void Update_Clipper_Parameters(IContext _Context)
         {
 
 
-
-            SimplifiedMethods.NotifyMessage("Updating Database", "Updating Parameters...");
+            SimplifiedMethods.NotifyMessage("Updating Database", "Updating Clipper Parameters values...");
             ITransaction transaction = _Context.CreateTransaction();
             IParameterValue parameterValue;
             //
@@ -867,10 +917,6 @@ namespace AlmaCamTrainingTest
             parameterValue.Save(transaction);
 
             //update export
-
-
-
-
 
             parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_OF_PATH");
             parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
@@ -946,12 +992,11 @@ namespace AlmaCamTrainingTest
 
 
         }
-
-
+        
         public void Update_Clipper_Stock(IContext _Context)
         {
 
-            SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Ouverture de la base de " + Lst_Model.Text + " entités de stock.");
+            SimplifiedMethods.NotifyMessage("Almacam_Clipper", " mise à jour des entités de stock de stock.");
 
             
                                                                                    //set value 
@@ -1010,7 +1055,77 @@ namespace AlmaCamTrainingTest
 
         }
 
+        public void Update_FieldValues(IContext _Context)
+        {
 
+            SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Mise a jour des entités .");
+
+            IEntity ClipCFEntity = null;
+            IEntity SuperUserEntity = null;
+
+            IEntityList userliste = _Context.EntityManager.GetEntityList("SYS_USER", "USER_NAME", ConditionOperator.Equal, "SUPER");
+            userliste.Fill(false);
+            if (userliste.Count() !=0 )
+            {
+                SuperUserEntity = userliste.FirstOrDefault();
+            }
+            else
+            {
+                SuperUserEntity = _Context.EntityManager.CreateEntity("SYS_USER");
+                SuperUserEntity.SetFieldValue("USER_NAME", "SUPER");
+                SuperUserEntity.SetFieldValue("ROLES", "_ADMINISTRATOR");
+                SuperUserEntity.Save();
+
+            }
+
+            //            
+
+            IEntityList centrefraisliste = _Context.EntityManager.GetEntityList("_CENTRE_FRAIS", "_CODE", ConditionOperator.Equal, "CLIP");
+            centrefraisliste.Fill(false);
+            if (centrefraisliste.Count() > 0)
+            {
+                ClipCFEntity = centrefraisliste.FirstOrDefault();
+            }
+            else
+            {
+                ClipCFEntity = _Context.EntityManager.CreateEntity("_CENTRE_FRAIS");
+                ClipCFEntity.SetFieldValue("_NAME", "CLIP");
+                ClipCFEntity.SetFieldValue("_CODE", "CLIP");
+                ClipCFEntity.Save();
+
+            }
+
+            //machine clipper
+            IEntityList machineList = _Context.EntityManager.GetEntityList("_CUT_MACHINE_TYPE","_NAME",ConditionOperator.Equal, "Clipper");
+            machineList.Fill(false);
+
+            
+
+            if (machineList.Count()>0)
+                {// non ttraite
+                machineList.FirstOrDefault().SetFieldValue("CENTREFRAIS_MACHINE", ClipCFEntity);
+                }
+            
+            machineList.FirstOrDefault().Save();
+            
+
+        SimplifiedMethods.NotifyMessage("Machine Updated", "Done.");
+
+
+            machineList = null;
+            centrefraisliste = null;
+            ClipCFEntity = null;
+            SuperUserEntity = null;
+
+            ///
+
+
+
+
+            ///
+
+
+        }
 
         private void iMportChaierDaffaireToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1296,6 +1411,13 @@ namespace AlmaCamTrainingTest
             //SimplifiedMethods.NotifyMessage("Updating Database", "Updating Parameters...");
             Update_Clipper_Parameters(_Context);
             SimplifiedMethods.NotifyMessage("Updating Database", "Done");
+        }
+
+        private void importClipperMachineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           
+            ImportMachine();
+
         }
     }
 
