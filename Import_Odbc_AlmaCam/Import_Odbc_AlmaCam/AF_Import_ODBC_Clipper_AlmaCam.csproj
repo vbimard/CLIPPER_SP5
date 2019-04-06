@@ -107,7 +107,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(ProjectPath)"+AF_import-clipper.json" "C:\AlmaCAM\Bin\$(SolutionName)"
+    <PostBuildEvent>copy "C:\AlmaCAM\Bin\AF_import-clipper.json" "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_import-clipper.json"
+copy "$(ProjectPath)"+"\"+AF_import-clipper.json"  "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_import-clipper.json"
+copy "C:\AlmaCAM\Bin\AF_Import_ODBC_Clipper_AlmaCam.dll " C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_Import_ODBC_Clipper_AlmaCam.dll"
+copy "C:\AlmaCAM\Bin\Newtonsoft.Json.dll"  "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\Newtonsoft.Json.dll"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

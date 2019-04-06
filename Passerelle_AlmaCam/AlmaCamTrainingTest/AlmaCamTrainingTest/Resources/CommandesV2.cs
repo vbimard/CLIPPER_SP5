@@ -19,9 +19,7 @@ namespace Wpm.Implement.ModelSetting
 {
     public partial class ImportUserCommandType : ScriptModelCustomization, IScriptModelCustomization
     {
-		
-		
-		
+			
 		
         public override bool Execute(IContext context, IContext hostContext)
         {
@@ -33,7 +31,7 @@ namespace Wpm.Implement.ModelSetting
 						{
 							ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, false);
 							commandTypeFactory.Key = "CLIPPER_EXPORT_DT_DLL";
-							commandTypeFactory.Name = "Export Dossier Technique";
+							commandTypeFactory.Name = "Clipper  : Export Dossier Technique";
 							commandTypeFactory.PlugInFileName = @"AF_Clipper_Dll.dll";
 							commandTypeFactory.PlugInNameSpace = "AF_Clipper_Dll";
 							commandTypeFactory.PlugInClassName = "Clipper_8_Export_DT_Processor";
@@ -70,7 +68,7 @@ namespace Wpm.Implement.ModelSetting
 							{
 								ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, false);
 								commandTypeFactory.Key = "IMPORT_OF";
-								commandTypeFactory.Name = "Import OF";
+								commandTypeFactory.Name = "Clipper  : Import OF";
 								commandTypeFactory.PlugInFileName = @"AF_Clipper_Dll.dll";
 								commandTypeFactory.PlugInNameSpace = "AF_Clipper_Dll";
 								commandTypeFactory.PlugInClassName = "Clipper_8_Import_OF_Processor";
@@ -107,7 +105,7 @@ namespace Wpm.Implement.ModelSetting
 								{
 									ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, false);
 									commandTypeFactory.Key = "IMPORT_STOCK";
-									commandTypeFactory.Name = "Import Stock";
+									commandTypeFactory.Name = "Clipper  : Import Stock";
 									commandTypeFactory.PlugInFileName = @"AF_Clipper_Dll.dll";
 									commandTypeFactory.PlugInNameSpace = "AF_Clipper_Dll";
 									commandTypeFactory.PlugInClassName = "Clipper_8_Import_Stock_Processor";
@@ -144,7 +142,7 @@ namespace Wpm.Implement.ModelSetting
 									{
 										ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, false);
 										commandTypeFactory.Key = "IMPORT_CLIPPER_MATERIAL";
-										commandTypeFactory.Name = "ImporterMatiere";
+										commandTypeFactory.Name = "Clipper  : Import Matiere";
 										commandTypeFactory.PlugInFileName = @"AF_Import_ODBC_Clipper_AlmaCam.dll";
 										commandTypeFactory.PlugInNameSpace = "AF_Import_ODBC_Clipper_AlmaCam";
 										commandTypeFactory.PlugInClassName = "Clipper8_ImportMatiere_Processor";
@@ -176,14 +174,14 @@ namespace Wpm.Implement.ModelSetting
             #endregion
 
             #region Import Fournitures
-            /*
+            
             {
-                if (CommmandeExists(context, "IMPORT_CLIPPER_FOURNITURES") == false)
+                if (CommmandeExists(context, "IMPORT_FOURNITURES") == false)
                 {
                     {
                         ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, false);
-                        commandTypeFactory.Key = "IMPORT_CLIPPER_FOURNITURES";
-                        commandTypeFactory.Name = "Importer Fournitures";
+                        commandTypeFactory.Key = "IMPORT_FOURNITURES";
+                        commandTypeFactory.Name = "Clipper  : Importer Fournitures";
                         commandTypeFactory.PlugInFileName = @"AF_Import_ODBC_Clipper_AlmaCam.dll";
                         commandTypeFactory.PlugInNameSpace = "AF_Import_ODBC_Clipper_AlmaCam";
                         commandTypeFactory.PlugInClassName = "Clipper_Import_Fournitures_Divers_Processor";
@@ -211,7 +209,7 @@ namespace Wpm.Implement.ModelSetting
 
                     }
                 }
-            }*/
+            }
             /*
 			{
             if (CommmandeExists(context,"IMPORT_CLIPPER_FOURNITURES")==false)
@@ -252,46 +250,7 @@ namespace Wpm.Implement.ModelSetting
             #endregion
 
             #region CLIP Configuration
-            /*
-            {
-                if (CommmandeExists(context, "CLIP_CONFIGURATION") == false)
-                {
-                    {
-                        ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, false);
-                        commandTypeFactory.Key = "CLIP_CONFIGURATION";
-                        commandTypeFactory.Name = "CLIP Configuration";
-                        commandTypeFactory.PlugInFileName = @"AF_Clipper_Dll.dll";
-                        commandTypeFactory.PlugInNameSpace = "AF_Clipper_Dll";
-                        commandTypeFactory.PlugInClassName = "ClipperIE_Global";
-                        commandTypeFactory.Shortcut = Shortcut.None;
-                        //commandTypeFactory.WorkOnEntityTypeKey = "_SIMPLE_SUPPLY";
-                        commandTypeFactory.LargeImage = true;
-
-                        if (File.Exists(@"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png"))
-                        {
-                            commandTypeFactory.ImageFile = @"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png";
-                        }
-                        else
-                        {
-                            commandTypeFactory.ImageFile = "";
-                        }
-
-                        if (!commandTypeFactory.UpdateModel())
-                        {
-                            foreach (ModelSettingError error in commandTypeFactory.ErrorList)
-                            {
-                                hostContext.TraceLogger.TraceError(error.Message, true);
-                            }
-                            return false;
-                        }
-
-                    }
-                }
-            }
-            */
-
-
-
+            
 
             
             {
@@ -299,7 +258,7 @@ namespace Wpm.Implement.ModelSetting
 				{
                     ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, true);
                     commandTypeFactory.Key = "CLIP_CONFIGURATION";
-                    commandTypeFactory.Name = "CLIP Configuration";
+                    commandTypeFactory.Name = "Clipper  : CLIP Configuration";
                     commandTypeFactory.PlugInFileName = @"AF_Clipper_Dll.dll";
                     commandTypeFactory.PlugInNameSpace = "AF_Clipper_Dll";
                     commandTypeFactory.PlugInClassName = "ClipperIE_Global";

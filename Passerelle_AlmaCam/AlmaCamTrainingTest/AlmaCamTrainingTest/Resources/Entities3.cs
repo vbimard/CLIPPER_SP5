@@ -51,7 +51,9 @@ namespace Wpm.Implement.ModelSetting
             stock_Dictionnary.Add("NAF_LOTIE", fielddesc);
 			fielddesc = new NewField("AF_STOCK_RENAME", "Clip rename",FieldDescriptionEditableType.NoEditable,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.Boolean,"");
             stock_Dictionnary.Add("AF_STOCK_RENAME", fielddesc);
-			fielddesc = new NewField("AF_STOCK_CFAO", "Clip Cfao",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.Boolean,"");
+            fielddesc = new NewField("AF_STOCK_NAME", "Clip nom du stock", FieldDescriptionEditableType.NoEditable, FieldDescriptionVisibilityType.AllSection, FieldDescriptionType.String, "");
+            stock_Dictionnary.Add("AF_STOCK_NAME", fielddesc);
+            fielddesc = new NewField("AF_STOCK_CFAO", "Clip Cfao",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.Boolean,"");
             stock_Dictionnary.Add("AF_STOCK_CFAO", fielddesc);
 			fielddesc = new NewField("AF_IS_OMMITED", "Clip omitted",FieldDescriptionEditableType.AllSection,FieldDescriptionVisibilityType.AllSection,FieldDescriptionType.Boolean,"");
             stock_Dictionnary.Add("AF_IS_OMMITED", fielddesc);

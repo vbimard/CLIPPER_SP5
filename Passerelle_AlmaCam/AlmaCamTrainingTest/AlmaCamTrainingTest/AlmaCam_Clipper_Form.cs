@@ -764,7 +764,8 @@ namespace AlmaCamTrainingTest
 
         private void preparerLaBasePourClipperToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            ///
+            //detection des composants odbc 
 
 
 
@@ -812,7 +813,7 @@ namespace AlmaCamTrainingTest
             Update_Clipper_Stock(_Context);
             //
             //mise a jour des champs
-            Update_FieldValues(_Context);
+            Update_DefaultValues(_Context);
             //
 
             MessageBox.Show("Database Prepared for clipper");
@@ -823,30 +824,42 @@ namespace AlmaCamTrainingTest
         public void ImportMachine()
         {
             try {
-                SimplifiedMethods.NotifyMessage("Updating Database", "Installating Clipper machine...");
+                
                 MachineManager machineManager = new MachineManager();
                 IModelsRepository modelsRepository = new ModelsRepository();
+
                 _Context = modelsRepository.GetModelContext(Lst_Model.Text);
                 string ZipFileName = null;
-
-
+                
                
 
-
-                ZipFileName = Path.GetTempPath() + "Clipper.zip";
-                File.WriteAllBytes(ZipFileName, Properties.Resources.Clipper_Machine);
+                //
+                IEntityList Current_MachineList = _Context.EntityManager.GetEntityList("_CUT_MACHINE_TYPE", "_NAME", ConditionOperator.Equal, "CLIP");
+                Current_MachineList.Fill(false);
 
                 //import cam machine
+                if (Current_MachineList.Count == 0) {
+                    ZipFileName = Path.GetTempPath() + "Clipper.zip";
+                    //ecriture de la machine .zip
+                    File.WriteAllBytes(ZipFileName, Properties.Resources.Clipper_Machine);
+                    SimplifiedMethods.NotifyMessage("Updating Database", "Clipper machine not detected...Installating Clipper machine...");
+                    IImportMachineEntity importMachineEntity = new ImportMachineEntity();
 
-                IImportMachineEntity importMachineEntity = new ImportMachineEntity();
                 importMachineEntity.Init(_Context, out string ErrorMessage);
 
                 //ZipFileName = @"C:\AlmaCAM\Bin\AlmaCam_Clipper\SampleFiles\Machines\AlmaCam\Clipper.zip";
 
                 importMachineEntity.ReadZipFile(ZipFileName);
                 importMachineEntity.ImportMachine();
+                Update_DefaultValues(_Context);
 
-                Update_FieldValues(_Context);
+                File.Delete(ZipFileName);
+                }
+                SimplifiedMethods.NotifyMessage("Updating Database", "Import Clipper machine Done...");
+
+                 machineManager = null;
+                 modelsRepository = null;
+
             }
 
 
@@ -927,6 +940,10 @@ namespace AlmaCamTrainingTest
             parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
             parameterValue.Save(transaction);
 
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_FORCE_DPR_DIRECTORY");
+            parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
+            parameterValue.Save(transaction);
+
             //
 
             
@@ -939,7 +956,10 @@ namespace AlmaCamTrainingTest
             parameterValue.Save(transaction);
 
             parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_CFAO_MODE");
-            parameterValue.SetValue(1);
+            //1 pour oiece par defaut
+            //parameterValue.SetValue(1);
+            //0 pour pas d'export
+            parameterValue.SetValue(0);
             parameterValue.Save(transaction);
 
             parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_CLIPPER_QUOTE_NUMBER_OFFSET");
@@ -963,6 +983,12 @@ namespace AlmaCamTrainingTest
             parameterValue.SetValue(@"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Devis");
             parameterValue.Save(transaction);
 
+
+            ///paramétrage des prix
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_QUOTE", "_MAT_COST_BY_MATERIAL");
+            parameterValue.SetValue(true);
+            parameterValue.Save(transaction);
+
             //update part export value
 
             //ouverture des imports 
@@ -977,18 +1003,24 @@ namespace AlmaCamTrainingTest
             parameterValue.Save(transaction);
 
             //creation des entités par defaut
-            SimplifiedMethods.NotifyMessage("Updating Defautl data", "Updating Parameters...");
+        
 
             IEntity firm = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_FIRM", "_NAME", "Alma");
             //IEntity site = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_SITE", "_NAME", "AlmaFrance");//
             IEntity CentreFrais = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_CENTRE_FRAIS", "_CODE", "Clip");
 
 
+           //ajout des fichiers json
+            
+             string CommandJsPath = Directory.GetCurrentDirectory() + Properties.Resources.AF_import_clipper;
+             File.WriteAllText(CommandJsPath, "AF_import_clipper.json");
+
             _Context = null;
             transaction = null;
 
 
-
+            //creation des entités par defaut
+            SimplifiedMethods.NotifyMessage("Updating Defautl data", "Updating Parameters DONE...");
 
 
         }
@@ -996,7 +1028,7 @@ namespace AlmaCamTrainingTest
         public void Update_Clipper_Stock(IContext _Context)
         {
 
-            SimplifiedMethods.NotifyMessage("Almacam_Clipper", " mise à jour des entités de stock de stock.");
+            SimplifiedMethods.NotifyMessage("Almacam_Clipper", " mise à jour des entités de stock de stock pour clipper.");
 
             
                                                                                    //set value 
@@ -1055,10 +1087,10 @@ namespace AlmaCamTrainingTest
 
         }
 
-        public void Update_FieldValues(IContext _Context)
+        public void Update_DefaultValues(IContext _Context)
         {
 
-            SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Mise a jour des entités .");
+            SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Definition des valeurs par defaut.");
 
             IEntity ClipCFEntity = null;
             IEntity SuperUserEntity = null;
@@ -1107,9 +1139,34 @@ namespace AlmaCamTrainingTest
                 }
             
             machineList.FirstOrDefault().Save();
-            
 
-        SimplifiedMethods.NotifyMessage("Machine Updated", "Done.");
+
+            //société emettrice
+           
+
+            IEntity Societe_Emet_Entity = null;
+
+            IEntityList Societe_Emet_EntityList = _Context.EntityManager.GetEntityList("_MANUFACTURER");
+            Societe_Emet_EntityList.Fill(false);
+
+            if (Societe_Emet_EntityList.Count() == 0)
+            {
+                Societe_Emet_Entity = Societe_Emet_EntityList.FirstOrDefault();
+
+                Societe_Emet_Entity = _Context.EntityManager.CreateEntity("_MANUFACTURER");
+                Societe_Emet_Entity.SetFieldValue("_NAME", "AVENIO");
+                Societe_Emet_Entity.SetFieldValue("_ADDRESS", "Rue du college de la croix");
+                Societe_Emet_Entity.SetFieldValue("_POSTCODE", "84000");
+                Societe_Emet_Entity.SetFieldValue("_CITY", "AVIGNON");
+                Societe_Emet_Entity.Save();
+
+            }
+
+
+
+
+
+            SimplifiedMethods.NotifyMessage("Machine Updated", "Done.");
 
 
             machineList = null;
@@ -1418,6 +1475,13 @@ namespace AlmaCamTrainingTest
            
             ImportMachine();
 
+        }
+
+        private void addDefaultValuesForTestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            IModelsRepository modelsRepository = new ModelsRepository();
+            IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text); 
+            Update_DefaultValues(_Context);
         }
     }
 

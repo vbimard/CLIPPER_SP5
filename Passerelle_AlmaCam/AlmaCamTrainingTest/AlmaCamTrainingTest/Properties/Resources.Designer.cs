@@ -85,6 +85,16 @@ namespace AlmaCamTrainingTest.Properties {
         }
         
         /// <summary>
+        ///   Recherche une ressource localisée de type System.Byte[].
+        /// </summary>
+        public static byte[] AF_import_clipper {
+            get {
+                object obj = ResourceManager.GetObject("AF_import_clipper", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap BUTTON {
@@ -200,7 +210,7 @@ namespace AlmaCamTrainingTest.Properties {
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à [SYS_USER]
-        ///OleDb=Provider=PCSOFT.HFSQL;Initial Catalog=CLIPPER_ALMA;User ID=admin;Password=&quot;&quot;;Data Source=localhost;
+        ///OleDb=Provider=PCSOFT.HFSQL;Initial Catalog=CLIPPER_ALMA;User ID=admin;Password=&quot;&quot;;Data Source=VMSR2012CLIP;
         ///DbSql=SELECT CODEEMP,PRENOMEMP,NOMEMP,ADINTERNET,TEL,DATESO DESIGN FROM EMPLOYE WHERE DATESO=&apos;&apos;
         ///EntityType=SYS_USER
         ///ImportKey=USER_NAME
@@ -211,9 +221,8 @@ namespace AlmaCamTrainingTest.Properties {
         ///_PHONE=4
         ///
         ///[CENTRE_FRAIS]
-        ///OleDb=Provider=PCSOFT.HFSQL;Initial Catalog=CLIPPER_ALMA;User ID=admin;Password=&quot;&quot;;Data Source=localhost;
-        ///DbSql=SELECT COFRAIS, DESIGN, DATESO FROM CFRAIS WHERE DATESO=&apos;&apos;
-        ///Enti [le reste de la chaîne a été tronqué]&quot;;.
+        ///OleDb=Provider=PCSOFT.HFSQL;Initial Catalog=CLIPPER_ALMA;User ID=admin;Password=&quot;&quot;;Data Source=VMSR2012CLIP;
+        ///DbSql=SELECT COFRAIS, DESIGN, DATESO FROM CFRAIS WHERE DATESO=&apos;&apos; [le reste de la chaîne a été tronqué]&quot;;.
         /// </summary>
         public static string Import_client_1 {
             get {

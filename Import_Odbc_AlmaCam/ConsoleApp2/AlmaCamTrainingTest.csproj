@@ -93,6 +93,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy C:\AlmaCAM\Bin\AlmaCamUser1.exe  C:\AlmaCAM\Bin\AF_IMPORT_ODBC.exe
-copy C:\AlmaCAM\Bin\AlmaCamUser1.exe  C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP4\AF_IMPORT_ODBC.exe</PostBuildEvent>
+copy C:\AlmaCAM\Bin\AlmaCamUser1.exe  C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_IMPORT_ODBC.exe</PostBuildEvent>
   </PropertyGroup>
 </Project>

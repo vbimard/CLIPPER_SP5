@@ -59,13 +59,14 @@
             this.ajouterLesCommandesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ajouerLesChampsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateToSpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importClipperMachineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.InfosLabel = new System.Windows.Forms.Label();
             this.Lst_Model = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.importClipperMachineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addDefaultValuesForTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -165,7 +166,7 @@
             this.importerStockToolStripMenuItem,
             this.recreerLEmfToolStripMenuItem});
             this.importStockToolStripMenuItem.Name = "importStockToolStripMenuItem";
-            this.importStockToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.importStockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.importStockToolStripMenuItem.Text = "Stock";
             this.importStockToolStripMenuItem.Click += new System.EventHandler(this.importStockToolStripMenuItem_Click);
             // 
@@ -202,7 +203,7 @@
             this.avecDTToolStripMenuItem,
             this.sansDTToolStripMenuItem});
             this.importOFToolStripMenuItem.Name = "importOFToolStripMenuItem";
-            this.importOFToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.importOFToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.importOFToolStripMenuItem.Text = "Import_OF";
             this.importOFToolStripMenuItem.Click += new System.EventHandler(this.importOFToolStripMenuItem_Click);
             // 
@@ -227,7 +228,7 @@
             this.relanceClotureToolStripMenuItem2,
             this.remonteeDTToolStripMenuItem});
             this.clotureToolStripMenuItem.Name = "clotureToolStripMenuItem";
-            this.clotureToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.clotureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.clotureToolStripMenuItem.Text = "Retour Gp";
             // 
             // relanceenvoiecoupeToolStripMenuItem
@@ -260,7 +261,7 @@
             this.testConnexionAPIToolStripMenuItem1,
             this.exportDevisToolStripMenuItem1});
             this.exportDevisToolStripMenuItem.Name = "exportDevisToolStripMenuItem";
-            this.exportDevisToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.exportDevisToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportDevisToolStripMenuItem.Text = "Export devis";
             // 
             // testConnexionAPIToolStripMenuItem1
@@ -284,7 +285,8 @@
             this.ajouterLesCommandesToolStripMenuItem,
             this.ajouerLesChampsToolStripMenuItem,
             this.updateToSpToolStripMenuItem,
-            this.importClipperMachineToolStripMenuItem});
+            this.importClipperMachineToolStripMenuItem,
+            this.addDefaultValuesForTestToolStripMenuItem});
             this.integrationToolStripMenuItem.Name = "integrationToolStripMenuItem";
             this.integrationToolStripMenuItem.Size = new System.Drawing.Size(77, 20);
             this.integrationToolStripMenuItem.Text = "Integration";
@@ -339,6 +341,13 @@
             this.updateToSpToolStripMenuItem.ToolTipText = "Miase a jours des parametres de la config. clipper";
             this.updateToSpToolStripMenuItem.Click += new System.EventHandler(this.updateToSpToolStripMenuItem_Click);
             // 
+            // importClipperMachineToolStripMenuItem
+            // 
+            this.importClipperMachineToolStripMenuItem.Name = "importClipperMachineToolStripMenuItem";
+            this.importClipperMachineToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.importClipperMachineToolStripMenuItem.Text = "Import Clipper Machine";
+            this.importClipperMachineToolStripMenuItem.Click += new System.EventHandler(this.importClipperMachineToolStripMenuItem_Click);
+            // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -391,12 +400,12 @@
             this.label1.Text = "Model";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
-            // importClipperMachineToolStripMenuItem
+            // addDefaultValuesForTestToolStripMenuItem
             // 
-            this.importClipperMachineToolStripMenuItem.Name = "importClipperMachineToolStripMenuItem";
-            this.importClipperMachineToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
-            this.importClipperMachineToolStripMenuItem.Text = "Import Clipper Machine";
-            this.importClipperMachineToolStripMenuItem.Click += new System.EventHandler(this.importClipperMachineToolStripMenuItem_Click);
+            this.addDefaultValuesForTestToolStripMenuItem.Name = "addDefaultValuesForTestToolStripMenuItem";
+            this.addDefaultValuesForTestToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.addDefaultValuesForTestToolStripMenuItem.Text = "Add default values for test";
+            this.addDefaultValuesForTestToolStripMenuItem.Click += new System.EventHandler(this.addDefaultValuesForTestToolStripMenuItem_Click);
             // 
             // AlmaCam_Clipper_Form
             // 
@@ -469,6 +478,7 @@
         private System.Windows.Forms.ToolStripMenuItem testConnexionAPIToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem exportDevisToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem importClipperMachineToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addDefaultValuesForTestToolStripMenuItem;
     }
 }
 

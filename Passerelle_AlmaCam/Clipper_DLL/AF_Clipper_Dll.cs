@@ -6321,6 +6321,7 @@ namespace AF_Clipper_Dll
 
                                 //formatage de La date;
                                 //en cas d'erreur sur les types /// les ecoqty sont toujours en string mais dans certains base  on peut avoir l'erreur
+                                /*
                                 if (reference_to_produce.GetFieldValue("ECOQTY").GetType() == typeof(Int64))
                                 {
                                     reference_to_produce.SetFieldValue(field.Key, int.Parse(field.Value.ToString()));
@@ -6329,8 +6330,8 @@ namespace AF_Clipper_Dll
                                 {
                                     reference_to_produce.SetFieldValue(field.Key, field.Value);
                                 }
-
-
+                                */
+                                reference_to_produce.SetFieldValue(field.Key, field.Value);
 
                                 break;
 
@@ -7786,12 +7787,7 @@ namespace AF_Clipper_Dll
                        AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_LENGTH"]),
                        AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_WIDTH"]),
                        AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["THICKNESS"])); 
-                       /*
-                string sheet_to_update_reference=StockManager.getStandardSheetReference(line_Dictionnary["_MATERIAL"].ToString().Replace('§', '*'),
-                    AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_LENGTH"])), 
-                    AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["_WIDTH"])),
-                AF_ImportTools.SimplifiedMethods.NumberToString((double)line_Dictionnary["THICKNESS"])
-                */
+                  
 
                 //tole pleine ou chute
                 TypeTole type_tole = TypeTole.Tole;
@@ -7827,7 +7823,7 @@ namespace AF_Clipper_Dll
                     newsheet.SetFieldValue("_WIDTH", w);
                     newsheet.SetFieldValue("_LENGTH", l);
                     newsheet.Complete = true;
-
+                    newsheet.Save();
                     //creation du nom auto d'almacam
                     CommonModelBuilder.ComputeSheetReference(newsheet.Context, newsheet);
                     newsheet.Save();

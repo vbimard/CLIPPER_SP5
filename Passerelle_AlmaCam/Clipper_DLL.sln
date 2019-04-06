@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlmaCamTrainingTest", "Alma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AF_ImportTools", "..\..\GENERIQUE\AF_ImportTools\AF_ImportTools.csproj", "{49768C4B-0F89-40E8-943E-2977EF65834F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AF_Toast_Notification", "..\..\GENERIQUE\AF_Toast_Notification\AF_Toast_Notification.csproj", "{CACFD44F-94D5-4018-97CD-1F9751C4B569}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,18 @@ Global
 		{49768C4B-0F89-40E8-943E-2977EF65834F}.x86|Any CPU.Build.0 = x86|Any CPU
 		{49768C4B-0F89-40E8-943E-2977EF65834F}.x86|x86.ActiveCfg = x86|x86
 		{49768C4B-0F89-40E8-943E-2977EF65834F}.x86|x86.Build.0 = x86|x86
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.Debug|x86.Build.0 = Debug|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.Release|x86.ActiveCfg = Release|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.Release|x86.Build.0 = Release|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.x86|Any CPU.ActiveCfg = Release|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.x86|Any CPU.Build.0 = Release|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.x86|x86.ActiveCfg = Release|Any CPU
+		{CACFD44F-94D5-4018-97CD-1F9751C4B569}.x86|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
