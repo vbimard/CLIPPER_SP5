@@ -834,7 +834,7 @@ namespace AlmaCamTrainingTest
                
 
                 //
-                IEntityList Current_MachineList = _Context.EntityManager.GetEntityList("_CUT_MACHINE_TYPE", "_NAME", ConditionOperator.Equal, "CLIP");
+                IEntityList Current_MachineList = _Context.EntityManager.GetEntityList("_CUT_MACHINE_TYPE", "_NAME", ConditionOperator.Equal, "Clipper");
                 Current_MachineList.Fill(false);
 
                 //import cam machine
@@ -855,6 +855,7 @@ namespace AlmaCamTrainingTest
 
                 File.Delete(ZipFileName);
                 }
+
                 SimplifiedMethods.NotifyMessage("Updating Database", "Import Clipper machine Done...");
 
                  machineManager = null;
@@ -1002,14 +1003,31 @@ namespace AlmaCamTrainingTest
             parameterValue.SetValue(Import_Matiere);
             parameterValue.Save(transaction);
 
-            //creation des entités par defaut
-        
 
-            IEntity firm = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_FIRM", "_NAME", "Alma");
-            //IEntity site = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_SITE", "_NAME", "AlmaFrance");//
+
+            //creation des entités par defaut
+
+            string machinelaser1centrefais = "CLIP";
+            _Context.ParameterSetManager.TryGetParameterValue("_MACHINE_LASER", "_CENTRE_FRAIS", out parameterValue);
+            if (parameterValue.Value==null) { parameterValue.SetValue(machinelaser1centrefais); }
+            parameterValue.Save(transaction);
+
+            IEntityList machinelist = _Context.EntityManager.GetEntityList("_CUT_MACHINE_TYPE","_NAME",ConditionOperator.Equal,"Clipper");
+            machinelist.Fill(false);
+            if (machinelist.Count() > 0)
+            {
+                _Context.ParameterSetManager.TryGetParameterValue("_MACHINE_LASER", "_ALMACAM_MACHINE", out parameterValue);
+                IEntity clipperMachine = machinelist.FirstOrDefault();
+                parameterValue.SetValue(clipperMachine.Id32.ToString());
+                parameterValue.Save(transaction);
+            }
+           
+           
+
+            IEntity firm = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_FIRM", "_NAME", "ALMA");
             IEntity CentreFrais = SimplifiedMethods.CreateEntity_If_Not_Exists(_Context, "_CENTRE_FRAIS", "_CODE", "Clip");
 
-
+           //
            //ajout des fichiers json
             
              string CommandJsPath = Directory.GetCurrentDirectory() + Properties.Resources.AF_import_clipper;
@@ -1048,7 +1066,22 @@ namespace AlmaCamTrainingTest
 
                 SimplifiedMethods.NotifyStatusMessage("", " Initialisation   en cours ...", stocks.Count(), position, ref step, 0);
 
-         
+
+
+                //
+                //ajustement des quantités negatives
+               
+                long dispoqty = stock.GetFieldValueAsLong("_REST_QUANTITY");
+
+                if (dispoqty < 0 || dispoqty == null)
+                {
+                    stock.SetFieldValue("_REST_QUANTITY", 0);
+
+                }
+
+
+
+
                 //les données seront settées par clipper
 
 
@@ -1074,6 +1107,12 @@ namespace AlmaCamTrainingTest
 
                     }
                 }
+
+
+
+
+              
+
 
 
 

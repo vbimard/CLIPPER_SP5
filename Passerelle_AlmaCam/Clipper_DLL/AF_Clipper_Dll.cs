@@ -533,12 +533,18 @@ namespace AF_Clipper_Dll
                 Parameters_Dictionnary.Clear();
 
 
-                string parametersetkey = "CLIPPER_DLL";
+                //string parametersetkey = "CLIPPER_DLL";
+                //parametre_name = "IMPORT_CDA";
+                //context.ParameterSetManager.TryGetParameterValue(parametersetkey, parametre_name, out IParameterValue sp3);
+                // CHANGEMENT DU NOM DES PARAMETRES DEPUIS SP4
+                //if (sp3 != null) { MessageBox.Show("Les paramètres de configurations ne sont pas definis, merci de mettre a jour la base avec les outils de migration"); }
+                string parametersetkey = "CLIP_CONFIGURATION";
                 parametre_name = "IMPORT_CDA";
-                context.ParameterSetManager.TryGetParameterValue(parametersetkey, parametre_name, out IParameterValue sp3);
-                if (sp3 == null) { parametersetkey = "CLIP_CONFIGURATION"; }
+                context.ParameterSetManager.TryGetParameterValue(parametersetkey, parametre_name, out IParameterValue sp5);
+                if (sp5 == null) { MessageBox.Show("Les paramètres de configurations generaux de la passerelle ne sont pas definis, merci de mettre à jour la base avec les outils de migration");
+                    System.Environment.Exit(0);
+                }
 
-                parametre_name = "IMPORT_CDA";
                 //Alma_Log.Info("recuperation du parametre "+parametre_name, "GetlistParam");
                 //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "IMPORT_CDA").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
@@ -6134,7 +6140,7 @@ namespace AF_Clipper_Dll
                     }
 
                     //on recherche une reference cree par le devis ou alors la reference directement dans la table reference                    
-                    //on regarde ensuite si le champs est negatif (--> a ce moment la c'est un quote part)
+                    //on regarde ensuite si le champs est negatif (--> a ce moment la c'est un quote part)post
                     if (id_piece_cfao < 0)
                     {
                         Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ":Pièce" + id_piece_cfao + " venant d'almaquote identifiée. ");
@@ -6321,8 +6327,8 @@ namespace AF_Clipper_Dll
 
                                 //formatage de La date;
                                 //en cas d'erreur sur les types /// les ecoqty sont toujours en string mais dans certains base  on peut avoir l'erreur
-                                /*
-                                if (reference_to_produce.GetFieldValue("ECOQTY").GetType() == typeof(Int64))
+                                
+                                if (reference_to_produce.EntityType.FieldList["ECOQTY"].GetType().Name == "LongField")
                                 {
                                     reference_to_produce.SetFieldValue(field.Key, int.Parse(field.Value.ToString()));
                                 }
@@ -6330,8 +6336,8 @@ namespace AF_Clipper_Dll
                                 {
                                     reference_to_produce.SetFieldValue(field.Key, field.Value);
                                 }
-                                */
-                                reference_to_produce.SetFieldValue(field.Key, field.Value);
+                                
+                                //reference_to_produce.SetFieldValue(field.Key, field.Value);
 
                                 break;
 
