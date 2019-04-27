@@ -274,6 +274,7 @@
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "C:\AlmaCAM\Bin\AF_Clipper.exe"
 copy "$(TargetPath)" "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_Clipper.exe"
+copy "$(TargetPath)" "\\ALMA-FILES\Technique-AS\SOFT\AlmaCam\Template\Clipper\DEBUG_CLIPPER\debug_DLL\AF_Clipper.exe"
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

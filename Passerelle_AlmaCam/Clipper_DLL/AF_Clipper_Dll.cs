@@ -545,77 +545,52 @@ namespace AF_Clipper_Dll
                     System.Environment.Exit(0);
                 }
 
-                //Alma_Log.Info("recuperation du parametre "+parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "IMPORT_CDA").GetValueAsString());
-                Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
+                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 parametre_name = "IMPORT_DM";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "IMPORT_DM").GetValueAsString());
-                Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
+                  Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 parametre_name = "Export_GPAO";
                 Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "EXPORT_Rp").GetValueAsString());
-                Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "EXPORT_Rp", ref Parameters_Dictionnary);
+                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "EXPORT_Rp", ref Parameters_Dictionnary);
 
                 parametre_name = "EXPORT_DT";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "EXPORT_Dt").GetValueAsString());                /**/
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "EXPORT_Dt", ref Parameters_Dictionnary);
 
                 //description import
                 parametre_name = "IMPORT_AUTO";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "IMPORT_AUTO").GetValueAsBoolean());                /**/
                 Get_bool_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary, false);
-
-
 
                 //description import
                 parametre_name = "ACTIVATE_OMISSION";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "IMPORT_AUTO").GetValueAsBoolean());                /**/
                 Get_bool_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary, true);
 
-
+                //description import
+                parametre_name = "ACTIVATE_SHEET_ON_SEND_TO_WSHOP";
+                Get_bool_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary, true);
+                
 
                 if (Convert.ToBoolean(Parameters_Dictionnary["ACTIVATE_OMISSION"]) == false)
-                {
-                    //Alma_Log.Write_Log("ATTENTION : Le traitement par omission du stock est desactivé.");
-                    Alma_Log.Warning("ATTENTION : Le traitement par omission du stock est desactivé.", "PARAMATER_DICTIONARY");
-                }
+                {Alma_Log.Warning("ATTENTION : Le traitement par omission du stock est desactivé.", "PARAMATER_DICTIONARY");}
 
 
                 parametre_name = "EMF_DIRECTORY";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "EMF_DIRECTORY").GetValueAsString());                /**/
-                Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
+                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
 
                 parametre_name = "MODEL_CA";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "MODEL_CA").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 parametre_name = "MODEL_DM";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "MODEL_DM").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 parametre_name = "MODEL_PATH";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "MODEL_PATH").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 parametre_name = "APPLICATION1";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "APPLICATION1").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 parametre_name = "SHEET_REQUIREMENT";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "SHEET_REQUIREMENT").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 //log
@@ -631,25 +606,17 @@ namespace AF_Clipper_Dll
                 /*parametres de sorties*/
                 parametre_name = "STRING_FORMAT_DOUBLE";
                 Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, "{0:0.00###}");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "STRING_FORMAT_DOUBLE").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 parametre_name = "ALMACAM_EDITOR_NAME";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "ALMACAM_EDITOR_NAME").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary);
 
                 //parametre export : chemin de sortie des devis
                 parametre_name = "_EXPORT_GP_DIRECTORY";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_GP_DIRECTORY").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, "_EXPORT", parametre_name, "", ref Parameters_Dictionnary);
 
                 //repertoire de exports dpr
                 parametre_name = "_ACTCUT_DPR_DIRECTORY";
-                //Alma_Log.Info("recuperation du parametre " + parametre_name, "GetlistParam");
-                //Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_DPR_DIRECTORY").GetValueAsString());
                 Get_string_Parameter_Dictionary_Value(context, "_EXPORT", parametre_name, "", ref Parameters_Dictionnary);
 
                 //Champs Spécifique a reporter à partir des information des pieces à produire et de lors de l'import gpao dans les pieces2d (reference almacam)
@@ -673,12 +640,10 @@ namespace AF_Clipper_Dll
                 //verification des path
                 Alma_Log.Info("verification de l'existance des path ", "GetlistParam");
                 if (CheckClipperFolderExists() == false) { throw new System.ApplicationException("Certains chemin d'echanges de la Passerelle AlmaCam-clipper ne sont pas accessibles"); };
-                ///string AlmaCAmVersion = Directory.GetCurrentDirectory().ToString() + Parameters_Dictionnary.Values("");///
                 if (CkeckCompatibilityVersion() == false) { throw new System.ApplicationException("Version de la Dll clipper n'est pas validée pour cette version d'AlmaCam"); }
 
 
                 //verification des chemins
-                //tous les nouveaux paramétres doivent etre ajoutés ici pr ordre decroissant d ecreation (le dernier en bas)
                 parametre_name = "EXPLODE_MULTIPLICITY";
                 Get_bool_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary, false);
 
@@ -711,13 +676,10 @@ namespace AF_Clipper_Dll
                 MessageBox.Show(exFolder.Message);
                 Alma_Log.Error(exFolder, "L'un des dossier de d'echange n'existe pas");
                 return false;
-                //ClipperExit.Close();
+           
             }
 
-            //finally { return false; }
-
-
-            //MessageBox.Show(e.Message+"/r/n Version incompatible ou mauvaise configuration de la base almacam"); }
+          
         }
 
         /// <summary>
@@ -948,6 +910,19 @@ namespace AF_Clipper_Dll
 
         }
 
+
+        /// <summary>
+        /// recupere la validation tole
+        /// </summary>
+        /// <returns>tue if valide false if not
+        /// </returns>
+        public static bool GetSheetAutoValidationMode()
+        {
+            string key = "ACTIVATE_SHEET_ON_SEND_TO_WSHOP";
+            //GetlistParam(context);//
+            if (Parameters_Dictionnary.ContainsKey(key)) { return (bool)Parameters_Dictionnary[key]; } else { return false; }
+
+        }
 
         public static string GetModelDM()
         {
@@ -8303,23 +8278,46 @@ namespace AF_Clipper_Dll
         /// <param name="args"></param>
         public void Execute(IEntity nesting_to_cut)
         {
+            try { 
             //recuperation des path
             Clipper_Param.GetlistParam(nesting_to_cut.Context);
             string export_gpao_path = Clipper_Param.GetPath("Export_GPAO");
 
+            //ouverture des log//
+            string timetag = string.Format("{0:d_M_yyyy_HH_mm_ss}", DateTime.Now);
+            Alma_Log.Create_Log(Clipper_Param.GetVerbose_Log());
+            Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ": retour gp tag :" + timetag);
 
+                if(Clipper_Param.GetSheetAutoValidationMode())
+                Alma_Log.Write_Log("ATTENTION LE MODE UTILISE : AUTO VALIDATION DES FORMATS A L ENVOI A LA COUPE N EST PAS RECOMMANDE");
+
+
+             AF_ImportTools.SimplifiedMethods.NotifyMessage("export rp", "creation du fichier de retour");
             {
-
+               
                 var clipper_nest_infos = new Clipper_8_Nest_Infos();
-                clipper_nest_infos.Fill(nesting_to_cut);
+                clipper_nest_infos.Fill(nesting_to_cut,Clipper_Param.GetSheetAutoValidationMode());
                 //verificaion de l'acces
                 if (File_Tools.HasAccess(export_gpao_path)) {
                     clipper_nest_infos.Export_NestInfosToFile(export_gpao_path);
                 }
 
+                AF_ImportTools.SimplifiedMethods.NotifyMessage("export rp", "export terminé");
             }
 
+            //fermeture des logs//
+            
 
+            }
+            catch (Exception ie)
+            {
+                Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ":"  + ":" + ie.Message);
+            }
+            finally
+            {
+                //fermeture des logs//
+                Alma_Log.Close_Log();
+            }
         }
 
 
@@ -8458,8 +8456,15 @@ namespace AF_Clipper_Dll
                                     HEADER[iheader++] = SimplifiedMethods.EmptyString(NUMMATLOT);   //numero de lot
                                     HEADER[iheader++] = SimplifiedMethods.NumberToString(((Nesting_Sheet_loadingTimeEnd+ Nesting_Sheet_loadingTimeInit) / 60), format);//temps de dechargement // multiplicité toujour a 1
                                     HEADER[iheader++] = "";
-
                                     headerline = SimplifiedMethods.WriteTableToLine(HEADER, iheader, Separator);
+                                    //
+                                    //cas des toles nulles
+                                    if(tole.List_Offcut_Infos.Count() == 0)
+                                    { tole.StockEntity.SetFieldValue("AF_GPAO_FILE", af_gpao_file_name);
+                                        tole.StockEntity.Save();
+                                    }
+                                    
+                                    //
                                     // PART //
 
                                     foreach (Nested_PartInfo part in tole.List_Nested_Part_Infos)
@@ -8535,12 +8540,13 @@ namespace AF_Clipper_Dll
 
 
 
-
+                                        
+                                        tole.Dispose();
 
 
                                     }
 
-
+                                   
                                     ///ecriture
                                     #region ecriture_gpao_file
                                     ///ecriture du fichier
@@ -8561,7 +8567,7 @@ namespace AF_Clipper_Dll
 
 
 
-
+                                    
 
                                 }
                             }
@@ -9045,7 +9051,7 @@ namespace AF_Clipper_Dll
 
                             //IEntity current_machine = null;
                             string strresult = "";
-                            bool result = false;
+                            //bool result = false;
                             long affaire;
                             string name = machinable_part.GetFieldValueAsEntity("IMPLEMENT__PREPARATION").GetFieldValueAsString("_NAME");
                             IEntity reference = machinable_part.GetImplementEntity("_PREPARATION").GetFieldValueAsEntity("_REFERENCE");

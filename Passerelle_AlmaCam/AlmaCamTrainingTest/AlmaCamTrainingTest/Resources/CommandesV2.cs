@@ -366,15 +366,7 @@ namespace Wpm.Implement.ModelSetting
 							commandTypeFactory.ParameterList.Add(parameterDescription);
 							
 						}
-						{
-							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
-							parameterDescription.Key = "VERBOSE_LOG";
-							parameterDescription.Name = "Log verbeux";
-							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
-							parameterDescription.DefaultValue = true;
-							commandTypeFactory.ParameterList.Add(parameterDescription);
-							
-						}
+						
 						{
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "CLIPPER_MACHINE_CF";
@@ -429,9 +421,29 @@ namespace Wpm.Implement.ModelSetting
 							commandTypeFactory.ParameterList.Add(parameterDescription);
 							
 						}
-						
-						
-							if (!commandTypeFactory.UpdateModel())
+
+                        {
+                        IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
+                        parameterDescription.Key = "ACTIVATE_SHEET_ON_SEND_TO_WSHOP";
+                        parameterDescription.Name = "Validation des chutes à l'envoie à la coupe";
+                        parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
+                        parameterDescription.DefaultValue = false;
+                        commandTypeFactory.ParameterList.Add(parameterDescription);
+
+                        }
+
+                        {
+                        IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
+                        parameterDescription.Key = "VERBOSE_LOG";
+                        parameterDescription.Name = "Log verbeux";
+                        parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
+                        parameterDescription.DefaultValue = true;
+                        commandTypeFactory.ParameterList.Add(parameterDescription);
+
+                        }
+
+
+                    if (!commandTypeFactory.UpdateModel())
 							{
 								foreach (ModelSettingError error in commandTypeFactory.ErrorList)
 								{

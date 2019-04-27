@@ -1535,7 +1535,7 @@ namespace AF_Export_Devis_Clipper
                     data[i++] = "0"; //N° identifiant GED 9
                     data[i++] = "0"; //N° identifiant GED 10
                     //////depuis la V8 ////////
-                    data[i++] = GetDprPath(partEntity, quote); //fichier joint
+                    data[i++] = GetDprPathSp5(partEntity, quote); //fichier joint
                     data[i++] = ""; //Date d'injection
                     data[i++] = ""; //partModele; //Modèle
                     data[i++] = usercode;
@@ -1655,7 +1655,7 @@ namespace AF_Export_Devis_Clipper
 
 
 
-                    data[i++] = GetDprPath(partEntity, quote);
+                    data[i++] = GetDprPathSp4(partEntity, quote);
                     data[i++] = ""; //Date d'injection
                     data[i++] = partModele; //Modèle
                     data[i++] = ""; //Employé responsable                
@@ -1922,7 +1922,7 @@ namespace AF_Export_Devis_Clipper
                 data[i++] = "0"; //N° identifiant GED  9
                 data[i++] = "0"; //N° identifiant GED 10
                 //data[i++] = ""; //Fichier joint
-                data[i++] = GetDprPath(partEntity, quote);
+                data[i++] = GetDprPathSp5(partEntity, quote); //GetDprPath(partEntity, quote);
                 data[i++] = ""; //Date d'injection
                 data[i++] = setModele; //Modèle
                 data[i++] = ""; //Employé responsable                
@@ -2782,7 +2782,7 @@ namespace AF_Export_Devis_Clipper
 
             return (quoteEntity.GetFieldValueAsLong("_INC_NO") + offset).ToString();
         }
-        private string GetDprPath(IEntity partEntity, IQuote quote)
+        private string GetDprPathSp5(IEntity partEntity, IQuote quote)
         {
             try
             {
@@ -2822,7 +2822,7 @@ namespace AF_Export_Devis_Clipper
                 //recuperation et construction du chemin des parts
                 /// piece dpr existantes passées par l'assistant dpr
 
-                if (assistantType.Contains("DprAssistant") || isGenericDpr)
+                if (assistantType.Contains("DprAssistant") && isGenericDpr)
                 {
                     //on recupere toujours le chemin d'origine
                     emfFile = partEntity.GetFieldValueAsString("_FILENAME") + ".emf";
@@ -2832,11 +2832,17 @@ namespace AF_Export_Devis_Clipper
                 else
                 {
                     //creation du point rouge dans l'emf : signature des apercus de pieces quotes
-                    if (ActCut_Force_Export_Dpr == true || export_cafo_mode != 0 && dprOutput)
+                    //if (ActCut_Force_Export_Dpr == true || export_cafo_mode != 0 && dprOutput)
+                    emfFile = AF_ImportTools.SimplifiedMethods.GetPreview(partEntity);
+                    if (dprOutput)
                     {
                         emfFile = partEntity.GetFieldValueAsString("_DPR_FILENAME") + ".emf";
                         Sign_quote_Emf(emfFile);
+
+
                     }
+
+
                    
                 }
                                
@@ -2918,7 +2924,22 @@ namespace AF_Export_Devis_Clipper
                         if (assistantType.Contains("DprAssistant") || isGenericDpr)
                         {
 
-                            emfFile = partEntity.GetFieldValueAsString("_FILENAME") + ".emf";
+                            //emfFile = partEntity.GetFieldValueAsString("_FILENAME") + ".emf";
+                            if (ActCut_Force_Export_Dpr == false && export_cafo_mode == 0)
+                            { //rien 
+                                emfFile = AF_ImportTools.SimplifiedMethods.GetPreview(partEntity);
+                            }
+                            else if (ActCut_Force_Export_Dpr == true)
+                            {//
+                                if (partEntity.GetFieldValueAsString("_FILENAME").Contains(".tmp") )
+                                {
+                                    emfFile = AF_ImportTools.SimplifiedMethods.GetPreview(partEntity);
+                                }
+                                else { emfFile = partEntity.GetFieldValueAsString("_FILENAME") + ".emf"; }
+                               
+                                
+                            }
+                            else { Sign_quote_Emf(emfFile); }
 
                         }
 
