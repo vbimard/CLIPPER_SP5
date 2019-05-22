@@ -133,7 +133,7 @@
   <data name="CommandesV2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CommandesV2.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="_event" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="event2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\event.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="Import_client_1" type="System.Resources.ResXFileRef, System.Windows.Forms">

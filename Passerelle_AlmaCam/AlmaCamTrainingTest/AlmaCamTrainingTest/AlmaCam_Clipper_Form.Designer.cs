@@ -49,6 +49,7 @@
             this.relanceenvoiecoupeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.relanceClotureToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.remonteeDTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.anullerRetourGpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportDevisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testConnexionAPIToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.exportDevisToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,7 +73,8 @@
             this.InfosLabel = new System.Windows.Forms.Label();
             this.Lst_Model = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.anullerRetourGpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.progresslabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -235,7 +237,7 @@
             this.remonteeDTToolStripMenuItem,
             this.anullerRetourGpToolStripMenuItem});
             this.clotureToolStripMenuItem.Name = "clotureToolStripMenuItem";
-            this.clotureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clotureToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             this.clotureToolStripMenuItem.Text = "Retour Gp";
             // 
             // relanceenvoiecoupeToolStripMenuItem
@@ -261,6 +263,13 @@
             this.remonteeDTToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.remonteeDTToolStripMenuItem.Text = "Remontee DT";
             this.remonteeDTToolStripMenuItem.Click += new System.EventHandler(this.remonteeDTToolStripMenuItem_Click);
+            // 
+            // anullerRetourGpToolStripMenuItem
+            // 
+            this.anullerRetourGpToolStripMenuItem.Name = "anullerRetourGpToolStripMenuItem";
+            this.anullerRetourGpToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.anullerRetourGpToolStripMenuItem.Text = "Annuler RetourGp";
+            this.anullerRetourGpToolStripMenuItem.Click += new System.EventHandler(this.anullerRetourGpToolStripMenuItem_Click);
             // 
             // exportDevisToolStripMenuItem
             // 
@@ -376,27 +385,27 @@
             // oFToolStripMenuItem
             // 
             this.oFToolStripMenuItem.Name = "oFToolStripMenuItem";
-            this.oFToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.oFToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.oFToolStripMenuItem.Text = "OF";
             this.oFToolStripMenuItem.Click += new System.EventHandler(this.oFToolStripMenuItem_Click);
             // 
             // stockToolStripMenuItem
             // 
             this.stockToolStripMenuItem.Name = "stockToolStripMenuItem";
-            this.stockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stockToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.stockToolStripMenuItem.Text = "Stock";
             this.stockToolStripMenuItem.Click += new System.EventHandler(this.stockToolStripMenuItem_Click_1);
             // 
             // qiuoteToolStripMenuItem
             // 
             this.qiuoteToolStripMenuItem.Name = "qiuoteToolStripMenuItem";
-            this.qiuoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.qiuoteToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.qiuoteToolStripMenuItem.Text = "Quote";
             // 
             // outputToolStripMenuItem
             // 
             this.outputToolStripMenuItem.Name = "outputToolStripMenuItem";
-            this.outputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.outputToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.outputToolStripMenuItem.Text = "Output";
             // 
             // aboutToolStripMenuItem
@@ -436,7 +445,7 @@
             // Lst_Model
             // 
             this.Lst_Model.FormattingEnabled = true;
-            this.Lst_Model.Location = new System.Drawing.Point(12, 80);
+            this.Lst_Model.Location = new System.Drawing.Point(48, 80);
             this.Lst_Model.Name = "Lst_Model";
             this.Lst_Model.Size = new System.Drawing.Size(260, 21);
             this.Lst_Model.TabIndex = 16;
@@ -444,19 +453,33 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 64);
+            this.label1.Location = new System.Drawing.Point(45, 64);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(36, 13);
             this.label1.TabIndex = 17;
             this.label1.Text = "Model";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
-            // anullerRetourGpToolStripMenuItem
+            // progressBar1
             // 
-            this.anullerRetourGpToolStripMenuItem.Name = "anullerRetourGpToolStripMenuItem";
-            this.anullerRetourGpToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
-            this.anullerRetourGpToolStripMenuItem.Text = "Annuler RetourGp";
-            this.anullerRetourGpToolStripMenuItem.Click += new System.EventHandler(this.anullerRetourGpToolStripMenuItem_Click);
+            this.progressBar1.Location = new System.Drawing.Point(82, 384);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(209, 13);
+            this.progressBar1.TabIndex = 18;
+            this.progressBar1.Visible = false;
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
+            // 
+            // progresslabel
+            // 
+            this.progresslabel.AutoSize = true;
+            this.progresslabel.BackColor = System.Drawing.Color.Transparent;
+            this.progresslabel.Location = new System.Drawing.Point(79, 368);
+            this.progresslabel.Name = "progresslabel";
+            this.progresslabel.Size = new System.Drawing.Size(35, 13);
+            this.progresslabel.TabIndex = 19;
+            this.progresslabel.Text = "label2";
+            this.progresslabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.progresslabel.Visible = false;
             // 
             // AlmaCam_Clipper_Form
             // 
@@ -467,6 +490,8 @@
             this.BackgroundImage = global::AlmaCamTrainingTest.Properties.Resources.FONDExport;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(371, 441);
+            this.Controls.Add(this.progresslabel);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Lst_Model);
             this.Controls.Add(this.InfosLabel);
@@ -536,6 +561,8 @@
         private System.Windows.Forms.ToolStripMenuItem qiuoteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem outputToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem anullerRetourGpToolStripMenuItem;
+        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Label progresslabel;
     }
 }
 

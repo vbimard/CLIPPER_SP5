@@ -74,8 +74,9 @@
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Wpm.Implement.Manager.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Wpm.Implement.Processor, Version=2.1.4.62957, Culture=neutral, PublicKeyToken=null">
-      <Private>False</Private>
+    <Reference Include="Wpm.Implement.Processor, Version=2.1.5.39421, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Wpm.Implement.Processor.dll</HintPath>
     </Reference>
     <Reference Include="Wpm.Schema.Kernel, Version=2.1.3.58419, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
@@ -93,6 +94,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy C:\AlmaCAM\Bin\AlmaCamUser1.exe  C:\AlmaCAM\Bin\AF_IMPORT_ODBC.exe
-copy C:\AlmaCAM\Bin\AlmaCamUser1.exe  C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_IMPORT_ODBC.exe</PostBuildEvent>
+copy C:\AlmaCAM\Bin\AlmaCamUser1.exe  C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\AF_IMPORT_ODBC.exe
+copy C:\AlmaCAM\Bin\AlmaCamUser1.exe  "\\ALMA-FILES\Technique-AS\SOFT\AlmaCam\Template\Clipper\DEBUG_CLIPPER\debug_DLL\AF_IMPORT_ODBC.exe"
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

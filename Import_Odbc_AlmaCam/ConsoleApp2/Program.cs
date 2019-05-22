@@ -35,11 +35,24 @@ namespace ConsoleApp2
             IContext contextlocal = null;
             contextlocal=AlmaCamTool.GetContext(contextlocal);
 
+
             
+           Clipper_Import_Matiere matiere = new Clipper_Import_Matiere();
+           matiere.Import(contextlocal);
+           /*
+            Clipper_Import_Toles_Processor Toles = new Clipper_Import_Toles_Processor();
+            Toles.Import(contextlocal);
+
+            */
+
+            //Toles.Import(contextlocal);
+
+            //test import matiere
+            /*
             Clipper_Import_Matiere matiere = new Clipper_Import_Matiere();
             matiere.Import(contextlocal);
-            
-
+            */
+            //
             /*
             Clipper_Import_Fournitures_Divers_Processor FournitureImporter = new Clipper_Import_Fournitures_Divers_Processor();
             FournitureImporter.Import(contextlocal);

@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AF_ActcutClipperApi", "..\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AF_ImportTools", "..\..\GENERIQUE\AF_ImportTools\AF_ImportTools.csproj", "{49768C4B-0F89-40E8-943E-2977EF65834F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Actcut.QuoteModelApi", "..\Actcut.QuoteModelApi\Actcut.QuoteModelApi.csproj", "{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,18 @@ Global
 		{49768C4B-0F89-40E8-943E-2977EF65834F}.x86|Any CPU.Build.0 = x86|Any CPU
 		{49768C4B-0F89-40E8-943E-2977EF65834F}.x86|x86.ActiveCfg = x86|x86
 		{49768C4B-0F89-40E8-943E-2977EF65834F}.x86|x86.Build.0 = x86|x86
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.Debug|x86.Build.0 = Debug|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.Release|x86.ActiveCfg = Release|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.Release|x86.Build.0 = Release|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.x86|Any CPU.ActiveCfg = Release|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.x86|Any CPU.Build.0 = Release|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.x86|x86.ActiveCfg = Release|Any CPU
+		{57004F8A-AE6A-49B0-8A7A-E2DB43BB1E23}.x86|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

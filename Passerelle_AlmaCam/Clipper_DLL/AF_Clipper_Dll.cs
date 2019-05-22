@@ -566,7 +566,7 @@ namespace AF_Clipper_Dll
                 Get_bool_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary, true);
 
                 //description import
-                parametre_name = "ACTIVATE_SHEET_ON_SEND_TO_WSHOP";
+                parametre_name = "AF_ACTIVATE_SHEET_ON_SENDTOWSHOP";
                 Get_bool_Parameter_Dictionary_Value(context, parametersetkey, parametre_name, "", ref Parameters_Dictionnary, true);
                 
 
@@ -918,7 +918,7 @@ namespace AF_Clipper_Dll
         /// </returns>
         public static bool GetSheetAutoValidationMode()
         {
-            string key = "ACTIVATE_SHEET_ON_SEND_TO_WSHOP";
+            string key = "AF_ACTIVATE_SHEET_ON_SENDTOWSHOP";
             //GetlistParam(context);//
             if (Parameters_Dictionnary.ContainsKey(key)) { return (bool)Parameters_Dictionnary[key]; } else { return false; }
 
@@ -3566,13 +3566,13 @@ namespace AF_Clipper_Dll
 
                                 break;
 
-                            case "NUMMATLOT":
+                            //case "NUMMATLOT":
                                 //on recuepere  le numero de matiere lotie 
                                 //on le copie dans le numero de coulées
 
 
-                                stock.SetFieldValue(field.Key, field.Value);
-                                stock.SetFieldValue("_HEAT_NUMBER", field.Value);
+                                //stock.SetFieldValue(field.Key, field.Value);
+                                //stock.SetFieldValue("_HEAT_NUMBER", field.Value);
 
 
 
@@ -4667,9 +4667,7 @@ namespace AF_Clipper_Dll
                                      clipperpart.Height + Separator +
                                      clipperpart.Width + Separator +
                                      String.Format(Clipper_Param.Get_string_format_double(), clipperpart.Part_Balanced_Weight * clipperpart.Nested_Quantity / (currentnestinfos.Tole_Nesting.Sheet_Weight * currentnestinfos.Tole_Nesting.Mutliplicity)) + Separator +// * Tole_Nesting.Mutliplicity)) + Separator +
-                                                                                                                                                                                                                                                                      // clipperpart.Width + Separator;//+
-                                                                                                                                                                                                                                                                      //String.Format(Clipper_Param.get_string_format_double(), clipperpart.Part_Balanced_Weight * clipperpart.Nested_Quantity / (currentnestinfos.Tole_Nesting.Sheet_Weight * currentnestinfos.Tole_Nesting.Mutliplicity)) + Separator +
-                                    String.Format(Clipper_Param.Get_string_format_double(), clipperpart.Weight * 0.001) + Separator +
+                                     String.Format(Clipper_Param.Get_string_format_double(), clipperpart.Weight * 0.001) + Separator +
                                     ///String.Format(Clipper_Param.get_string_format_double(), clipperpart.Part_Time * clipperpart.Nested_Quantity / currentnestinfos.Calculus_Parts_Total_Time);//current_clipper_nestinfos.Nesting_TotalTime);
                                     //CuttingTime;
                                     String.Format(Clipper_Param.Get_string_format_double(), CuttingTime);
@@ -6535,12 +6533,53 @@ namespace AF_Clipper_Dll
             //
             try
             {
+
+
                 ///////////////////////////////////////////////////////////////////////////
-                ///matiere exits?
+                //les quantités negatives sont interdites
+                //comptatibilité sp4
                 //IEntityList materials;
                 Boolean result = true;
                 //string nuance_name = null;
                 string currenfieldsname;
+
+                currenfieldsname = "_QUANTITY";
+                if (line_dictionnary.ContainsKey(currenfieldsname))
+                {
+                    if ((int)line_dictionnary[currenfieldsname] < 0)
+                    {
+                        Alma_Log.Error(line_dictionnary["_NAME"] + ":_QUANTITY non detecté sur la ligne a importée, line ignored", MethodBase.GetCurrentMethod().Name);
+                        Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ":" + line_dictionnary["_NAME"] + ":_QUANTITY non detecté sur la ligne a importée, line ignored");
+                        result = false;
+                    }
+                }
+               
+                else
+                {
+
+                    currenfieldsname = "_REST_QUANTITY";
+                    if (line_dictionnary.ContainsKey(currenfieldsname))
+                    {
+
+                        if ((int)line_dictionnary[currenfieldsname] < 0)
+                        {
+                            Alma_Log.Error("_QUANTITY non detecté sur la ligne a importée, line ignored", MethodBase.GetCurrentMethod().Name);
+                            Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ":" + "_QUANTITY non detecté sur la ligne a importée, line ignored");
+                            result = false;
+                        }
+
+                        
+                    }
+                   
+
+
+                 }
+                
+
+
+                ///////////////////////////////////////////////////////////////////////////
+                ///matiere exits?
+               
 
                 currenfieldsname = "_MATERIAL";
                 if (line_dictionnary.ContainsKey(currenfieldsname))
@@ -6548,7 +6587,7 @@ namespace AF_Clipper_Dll
 
                     ///////////////////////////////////////////////////////////////////////////
                     //les matiere
-                    //string nuance_name = line_dictionnary["_MATERIAL"].ToString().Replace('§', '*');
+                    //
                     string nuance = null;
                     string material_name = null;
                     double thickness = 0;
@@ -6565,7 +6604,9 @@ namespace AF_Clipper_Dll
                         Alma_Log.Write_Log("TOLE " + line_dictionnary["IDCLIP"] + " : " + nuance + " " + thickness + "mm :" + line_dictionnary["_NAME"] + " matiere non existante, line ignored"); result = false;
                     }
                 }
+
                 else
+
                 { result = false; }
 
                 ///////////////////////////////////////////////////////////////////////////
@@ -6580,35 +6621,7 @@ namespace AF_Clipper_Dll
                     }
                 }
                 else { result = false; }
-                ///////////////////////////////////////////////////////////////////////////
-                //les quantités negatives sont interdites
-                //comptatibilité sp4
-                currenfieldsname = "_QUANTITY";
-                if (line_dictionnary.ContainsKey(currenfieldsname)  )
-                {
-                    if ((int)line_dictionnary[currenfieldsname] < 0)
-                    {
-                        Alma_Log.Error(line_dictionnary["_NAME"] + ":_QUANTITY non detecté sur la ligne a importée, line ignored", MethodBase.GetCurrentMethod().Name);
-                        Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ":" + line_dictionnary["_NAME"] + ":_QUANTITY non detecté sur la ligne a importée, line ignored"); result = false;
-                    }
-                }
-                else if(line_dictionnary.ContainsKey("_REST_QUANTITY"))
-                {
-                    result = true;
-                }
-                else { result = false; }
-                ///////////////////////////////////////////////////////////////////////////
-                //les quantités negatives sont interdites
-                currenfieldsname = "_REST_QUANTITY";
-                if (line_dictionnary.ContainsKey(currenfieldsname))
-                {
-                    if ((int)line_dictionnary[currenfieldsname] < 0)
-                    {
-                        Alma_Log.Error(line_dictionnary["_NAME"] + ":_QUANTITY non detecté sur la ligne a importée, line ignored", MethodBase.GetCurrentMethod().Name);
-                        Alma_Log.Write_Log(MethodBase.GetCurrentMethod().Name + ":" + line_dictionnary["_NAME"] + ":_QUANTITY non detecté sur la ligne a importée, line ignored"); result = false;
-                    }
-                }
-                else { result = false; }
+                
                 ///////////////////////////////////////////////////////////////////////////
                 //les longeur negative ou egales a 0  sont interdites
                 currenfieldsname = "_WIDTH";
@@ -7489,10 +7502,10 @@ namespace AF_Clipper_Dll
                                 break;
                             case "_MATERIAL":
                                 break;
-                            case "NUMMATLOT":
+                            //case "NUMMATLOT":
 
-                                stock.SetFieldValue(field.Key, field.Value);
-                                stock.SetFieldValue("_HEAT_NUMBER", field.Value);
+                                //stock.SetFieldValue(field.Key, field.Value);
+                                //stock.SetFieldValue("_HEAT_NUMBER", field.Value);
 
                                 break;
 
@@ -7577,10 +7590,10 @@ namespace AF_Clipper_Dll
                                 break;
                             case "_MATERIAL":
                                 break;
-                            case "NUMMATLOT":
+                            //case "NUMMATLOT":
 
-                                stock.SetFieldValue(field.Key, field.Value);
-                                stock.SetFieldValue("_HEAT_NUMBER", field.Value);
+                                //stock.SetFieldValue(field.Key, field.Value);
+                                //stock.SetFieldValue("_HEAT_NUMBER", field.Value);
 
                                 break;
 

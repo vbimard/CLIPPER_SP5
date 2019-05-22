@@ -227,7 +227,8 @@ namespace AF_Export_Devis_Clipper
 
     #region export api
     ///internal class CreateTransFile : IQuoteGpExporter
-    internal class CreateTransFile : IQuoteGpExporter
+    //internal class CreateTransFile : IQuoteGpExporter
+    internal class CreateTransFile : QuoteGpExporter
     {
         private IDictionary<IEntity, KeyValuePair<string, string>> _ReferenceIdList = new Dictionary<IEntity, KeyValuePair<string, string>>();
         private IDictionary<string, string> _ReferenceList = new Dictionary<string, string>();
@@ -580,7 +581,7 @@ namespace AF_Export_Devis_Clipper
         /// <param name="QuoteList"></param>
         /// <param name="CustomExportDirectory"></param>
         /// <returns></returns>
-        public bool Export(IContext Context, IEnumerable<IQuote> QuoteList, string CustomExportDirectory)
+        public override bool Export(IContext Context, IEnumerable<IQuote> QuoteList, string CustomExportDirectory)
         {
             try {
                 bool rst = false;
@@ -648,76 +649,79 @@ namespace AF_Export_Devis_Clipper
             catch (MissingCustomerReference ie) { return false; }
             catch (Exception ie) { System.Windows.Forms.MessageBox.Show(ie.Message); return false; }
         }
-
+        public override bool Export(IContext Context, IEnumerable<IQuote> QuoteList, string CustomExportDirectory, string filename)
+        {
+            return Export(Context, QuoteList, CustomExportDirectory);
+        }
         #region IQuoteGpExporter Membres
 
 
-        public bool Export(IContext contextlocal, IEnumerable<IQuote> QuoteList, string ExportDirectory, string FileName)
-        {
-            try
-            {
+        //public bool Export(IContext contextlocal, IEnumerable<IQuote> QuoteList, string ExportDirectory, string FileName)
+        //{
+        //    try
+        //    {
 
 
-                bool rst = false;
-                string FullPath_FileName = "";
+        //        bool rst = false;
+        //        string FullPath_FileName = "";
 
-                //verification de l'integrité des données
+        //        //verification de l'integrité des données
 
-                //check_database_Integerity
-                Validate_Context(contextlocal);
-                //preparing export
-                PrepareExportDirectory(contextlocal);
+        //        //check_database_Integerity
+        //        Validate_Context(contextlocal);
+        //        //preparing export
+        //        PrepareExportDirectory(contextlocal);
 
-                if (QuoteList.Count() == 1)
-                {
-                    if (string.IsNullOrEmpty(FileName))
-                    {
-                        IQuote quote = QuoteList.FirstOrDefault();
-                        //verification du devis 
-                        if (Validate_Quote(quote)) {
-                            //FileName = "Trans_" + QuoteList.First().QuoteInformation.IncNo.ToString("####") + ".txt";
+        //        if (QuoteList.Count() == 1)
+        //        {
+        //            if (string.IsNullOrEmpty(FileName))
+        //            {
+        //                IQuote quote = QuoteList.FirstOrDefault();
+        //                //verification du devis 
+        //                if (Validate_Quote(quote)) {
+        //                    //FileName = "Trans_" + QuoteList.First().QuoteInformation.IncNo.ToString("####") + ".txt";
 
-                            FileName = "Trans_" + GetTransFileName(contextlocal, QuoteList.First().QuoteEntity.Id).ToString("####") + ".txt";
+        //                    FileName = "Trans_" + GetTransFileName(contextlocal, QuoteList.First().QuoteEntity.Id).ToString("####") + ".txt";
 
-                        }
-                        else
-                        {
-                            Environment.Exit(0);
+        //                }
+        //                else
+        //                {
+        //                    Environment.Exit(0);
 
-                        }
-
-
-                    }
-                    else
-                    {
-
-                    }
-
-                    FullPath_FileName = Path.Combine(ExportDirectory, FileName);
-                    rst = InternalExport(contextlocal, QuoteList, FullPath_FileName);
-                }
-                else { rst = false; }
-
-                return rst;
-
-            }
-            catch (UnvalidatedQuoteStatus)
-            {
-                return false;
-            }
-            catch (DirectoryNotFoundException dirEx)
-            {
-                // directory not found --> on quit
-                System.Windows.Forms.MessageBox.Show(dirEx.Message);
-                Environment.Exit(0);
-                return false;
-            }
+        //                }
 
 
+        //            }
+        //            else
+        //            {
 
-            catch (Exception ie) { System.Windows.Forms.MessageBox.Show(ie.Message); return false; }
+        //            }
 
-        }
+        //            FullPath_FileName = Path.Combine(ExportDirectory, FileName);
+        //            rst = InternalExport(contextlocal, QuoteList, FullPath_FileName);
+        //        }
+        //        else { rst = false; }
+
+        //        return rst;
+
+        //    }
+        //    catch (UnvalidatedQuoteStatus)
+        //    {
+        //        return false;
+        //    }
+        //    catch (DirectoryNotFoundException dirEx)
+        //    {
+        //        // directory not found --> on quit
+        //        System.Windows.Forms.MessageBox.Show(dirEx.Message);
+        //        Environment.Exit(0);
+        //        return false;
+        //    }
+
+
+
+        //    catch (Exception ie) { System.Windows.Forms.MessageBox.Show(ie.Message); return false; }
+
+        //}
 
         #endregion
         /// <summary>
@@ -832,7 +836,7 @@ namespace AF_Export_Devis_Clipper
             data[i++] = "IDDEVIS";
             data[i++] = GetQuoteNumber(quoteEntity); //N° devis
             data[i++] = "1"; //Pour le moment l'indice est forcé a 1 car l'import des devis ne supporte pas le text dans l'interface d'import des devis clip
-            data[i++] = ordernumber;
+            data[i++] = ""; //ordernumber;// -> pour avoir la numero de commande dans le numero de commande interne //
             data[i++] = cocli; ///code client
             data[i++] = EmptyString(clientEntity.GetFieldValueAsString("_NAME")); // nom client
             data[i++] = EmptyString(quoteEntity.GetFieldValueAsString("_DELIVERY_ADDRESS")); //Ligne adresse 1
@@ -2819,10 +2823,14 @@ namespace AF_Export_Devis_Clipper
                         }
                     }
                 }
+                
                 //recuperation et construction du chemin des parts
                 /// piece dpr existantes passées par l'assistant dpr
+                //ATTENTION LES GENERATION DES DPR DEPEND DE LA LICENCE/ IL FAUT UNE QUOTE CUT 
+                //SINON IL S4AGIT DE PIECES ALMACAM
+                //recuperation des emf par defaut
 
-                if (assistantType.Contains("DprAssistant") && isGenericDpr)
+                if (assistantType.Contains("DprAssistant") || isGenericDpr)
                 {
                     //on recupere toujours le chemin d'origine
                     emfFile = partEntity.GetFieldValueAsString("_FILENAME") + ".emf";

@@ -129,6 +129,14 @@
     <value>AF_ImportTube.Log</value>
     <comment>contient les logs d'import des tubes</comment>
   </data>
+  <data name="Import_Sheet_Mono" xml:space="preserve">
+    <value>AF_ImportSheetMono.Log</value>
+    <comment>contient les logs d'import des sheet monodim</comment>
+  </data>
+  <data name="Import_Sheet_Multi" xml:space="preserve">
+    <value>AF_ImportSheetMulti.Log</value>
+    <comment>contient les logs d'import des sheet multidim</comment>
+  </data>
   <data name="jsonimportclipper" xml:space="preserve">
     <value>AF_import-clipper.json</value>
     <comment>contient les requetes sql d'import</comment>

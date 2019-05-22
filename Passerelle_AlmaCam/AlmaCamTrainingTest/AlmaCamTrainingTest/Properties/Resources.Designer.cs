@@ -61,30 +61,6 @@ namespace AlmaCamTrainingTest.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à using System;
-        ///using System.IO;
-        ///using System.Collections.Generic;
-        ///using System.Windows.Forms;
-        ///using Wpm.Schema.Kernel;
-        ///using Wpm.Implement.Manager;
-        ///using Wpm.Implement.ModelSetting;
-        ///using Alma.BaseUI.DescriptionEditor;
-        ///
-        ///namespace Wpm.Implement.ModelSetting
-        ///{
-        ///    public partial class ImportCustomizedFormulaEventType : ScriptModelCustomization, IScriptModelCustomization
-        ///    {
-        ///        public override bool Execute(IContext context, IContext hostContext)
-        ///        {
-        ///            ITransaction transacti [le reste de la chaîne a été tronqué]&quot;;.
-        /// </summary>
-        public static string _event {
-            get {
-                return ResourceManager.GetString("_event", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Recherche une ressource localisée de type System.Byte[].
         /// </summary>
         public static byte[] AF_import_clipper {
@@ -185,6 +161,30 @@ namespace AlmaCamTrainingTest.Properties {
         public static string Entities3 {
             get {
                 return ResourceManager.GetString("Entities3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à using System;
+        ///using System.IO;
+        ///using System.Collections.Generic;
+        ///using System.Windows.Forms;
+        ///using Wpm.Schema.Kernel;
+        ///using Wpm.Implement.Manager;
+        ///using Wpm.Implement.ModelSetting;
+        ///using Alma.BaseUI.DescriptionEditor;
+        ///
+        ///namespace Wpm.Implement.ModelSetting
+        ///{
+        ///    public partial class ImportCustomizedFormulaEventType : ScriptModelCustomization, IScriptModelCustomization
+        ///    {
+        ///        public override bool Execute(IContext context, IContext hostContext)
+        ///        {
+        ///            ITransaction transacti [le reste de la chaîne a été tronqué]&quot;;.
+        /// </summary>
+        public static string event2 {
+            get {
+                return ResourceManager.GetString("event2", resourceCulture);
             }
         }
         

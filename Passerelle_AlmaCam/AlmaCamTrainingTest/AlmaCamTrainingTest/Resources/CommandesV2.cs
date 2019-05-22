@@ -424,7 +424,7 @@ namespace Wpm.Implement.ModelSetting
 
                         {
                         IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
-                        parameterDescription.Key = "ACTIVATE_SHEET_ON_SEND_TO_WSHOP";
+                        parameterDescription.Key = "AF_ACTIVATE_SHEET_ON_SENDTOWSHOP";
                         parameterDescription.Name = "Validation des chutes à l'envoie à la coupe";
                         parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
                         parameterDescription.DefaultValue = false;
@@ -436,6 +436,16 @@ namespace Wpm.Implement.ModelSetting
                         IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
                         parameterDescription.Key = "VERBOSE_LOG";
                         parameterDescription.Name = "Log verbeux";
+                        parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
+                        parameterDescription.DefaultValue = true;
+                        commandTypeFactory.ParameterList.Add(parameterDescription);
+
+                        }
+
+                        {
+                        IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
+                        parameterDescription.Key = "AF_FAVORISE_MULTIDIM";
+                        parameterDescription.Name = "Favoriser le Multidim";
                         parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
                         parameterDescription.DefaultValue = true;
                         commandTypeFactory.ParameterList.Add(parameterDescription);

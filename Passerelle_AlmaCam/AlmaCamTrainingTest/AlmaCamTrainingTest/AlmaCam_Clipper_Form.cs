@@ -765,23 +765,25 @@ namespace AlmaCamTrainingTest
 
         }
 
-
+       
 
         private void preparerLaBasePourClipperToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ///
-            //detection des composants odbc 
-
+            //import de la machine clipper
+            
 
 
             //IList<CustomizedCommandItem> customizedItemList = GetCustomizedCommandTypeList(context);
 
             IModelsRepository modelsRepository = new ModelsRepository();
 
+            IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);
+            
             List<Tuple<string, string>> CustoFileCsList = new List<Tuple<string, string>>();
 
             CustoFileCsList.Add(new Tuple<string, string>("Entities", Properties.Resources.Entities3));
-            CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources._event));
+            CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources.event2));
             CustoFileCsList.Add(new Tuple<string, string>("Commandes", Properties.Resources.CommandesV2));
 
             foreach (Tuple<string, string> CustoFileCs in CustoFileCsList)
@@ -792,8 +794,10 @@ namespace AlmaCamTrainingTest
                 string cs = CustoFileCs.Item1;
                 SimplifiedMethods.NotifyMessage("Updating Database", CustoFileCs.Item1);
                 ModelManager modelManager = new ModelManager(modelsRepository);
+                //detection des composants odbc 
+                activateProgressBar(" Updating "+ CustoFileCs.Item1+" in "+_Context.Connection.DatabaseName);
                 modelManager.CustomizeModel(CommandCsPath, Lst_Model.Text, false);
-
+                desactivateProgressBar();
 
                 File.Delete(CommandCsPath);
             }
@@ -806,10 +810,10 @@ namespace AlmaCamTrainingTest
 
             //ouverture du context
 
-            IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
+            //IContext _Context = modelsRepository.GetModelContext(Lst_Model.Text);  //nom de la base;
 
-            //import de la machine clipper
 
+            //import machineè
             ImportMachine();
 
 
@@ -820,8 +824,9 @@ namespace AlmaCamTrainingTest
             //mise a jour des champs
             Update_DefaultValues(_Context);
             //
+            
 
-            MessageBox.Show("Database Prepared for clipper");
+            MessageBox.Show("Database "+_Context.Connection.DatabaseName +" Prepared for clipper");
 
         }
 
@@ -834,11 +839,15 @@ namespace AlmaCamTrainingTest
                 MachineManager machineManager = new MachineManager();
                 IModelsRepository modelsRepository = new ModelsRepository();
 
+                
+
+                
+
                 _Context = modelsRepository.GetModelContext(Lst_Model.Text);
                 string ZipFileName = null;
 
-
-
+                
+                activateProgressBar(" Updating Machine in " + _Context.Connection.DatabaseName);
                 //
                 IEntityList Current_MachineList = _Context.EntityManager.GetEntityList("_CUT_MACHINE_TYPE", "_NAME", ConditionOperator.Equal, "Clipper");
                 Current_MachineList.Fill(false);
@@ -858,7 +867,7 @@ namespace AlmaCamTrainingTest
 
                     importMachineEntity.ReadZipFile(ZipFileName);
                     importMachineEntity.ImportMachine();
-                    Update_DefaultValues(_Context);
+                    //Update_DefaultValues(_Context);
 
                     File.Delete(ZipFileName);
                 }
@@ -867,7 +876,7 @@ namespace AlmaCamTrainingTest
 
                 machineManager = null;
                 modelsRepository = null;
-
+                desactivateProgressBar();
             }
 
 
@@ -885,7 +894,9 @@ namespace AlmaCamTrainingTest
         public void Update_Clipper_Parameters(IContext _Context)
         {
 
-
+            activateProgressBar(" Updating " + "Parameters dans "+ _Context.Connection.DatabaseName);
+          
+            
             SimplifiedMethods.NotifyMessage("Updating Database", "Updating Clipper Parameters values...");
             ITransaction transaction = _Context.CreateTransaction();
             IParameterValue parameterValue;
@@ -1054,6 +1065,7 @@ namespace AlmaCamTrainingTest
             //creation des entités par defaut
             SimplifiedMethods.NotifyMessage("Updating Defautl data", "Updating Parameters DONE...");
 
+            desactivateProgressBar();
 
         }
 
@@ -1061,7 +1073,7 @@ namespace AlmaCamTrainingTest
         {
 
             SimplifiedMethods.NotifyMessage("Almacam_Clipper", " mise à jour des entités de stock de stock pour clipper.");
-
+            activateProgressBar("Updating Stock on " + _Context.Connection.DatabaseName);
 
             //set value 
             IEntityList stocks = _Context.EntityManager.GetEntityList("_STOCK");
@@ -1133,6 +1145,8 @@ namespace AlmaCamTrainingTest
 
 
                 stock.Save();
+
+                desactivateProgressBar();
             }
             SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Done.");
 
@@ -1145,6 +1159,7 @@ namespace AlmaCamTrainingTest
         {
 
             SimplifiedMethods.NotifyMessage("Almacam_Clipper", "Definition des valeurs par defaut.");
+            activateProgressBar("Updating default values from "+_Context.Connection.DatabaseName);
 
             IEntity ClipCFEntity = null;
             IEntity SuperUserEntity = null;
@@ -1189,6 +1204,10 @@ namespace AlmaCamTrainingTest
 
             if (machineList.Count() > 0)
             {// non ttraite
+                //machineList.FirstOrDefault.try
+                //machineList.FirstOrDefault().SetFieldValue()
+                IField v;
+                if(machineList.FirstOrDefault().EntityType.FieldList.TryGetValue("CENTREFRAIS_MACHINE",out v )==true)
                 machineList.FirstOrDefault().SetFieldValue("CENTREFRAIS_MACHINE", ClipCFEntity);
             }
 
@@ -1231,7 +1250,7 @@ namespace AlmaCamTrainingTest
             ///
 
 
-
+            desactivateProgressBar();
 
             ///
 
@@ -1319,7 +1338,23 @@ namespace AlmaCamTrainingTest
             _Context = null;
         }
 
+        private void activateProgressBar(string text)
+        {
+            progresslabel.Visible = true;
+            progresslabel.Text = text;
+            progressBar1.Visible = true;
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            progressBar1.MarqueeAnimationSpeed = 30;
+        }
 
+        private void desactivateProgressBar()
+        {
+            progresslabel.Visible = false;
+            progresslabel.Text = "";
+            progressBar1.Visible = false;
+            progressBar1.Style = ProgressBarStyle.Continuous;
+            progressBar1.MarqueeAnimationSpeed = 0;
+        }
 
         private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
         {
@@ -1443,7 +1478,7 @@ namespace AlmaCamTrainingTest
             List<Tuple<string, string>> CustoFileCsList = new List<Tuple<string, string>>();
 
 
-            CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources._event));
+            CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources.event2));
 
 
             foreach (Tuple<string, string> CustoFileCs in CustoFileCsList)
@@ -1587,6 +1622,11 @@ namespace AlmaCamTrainingTest
             _Context = null;
 
             
+        }
+
+        private void progressBar1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 
