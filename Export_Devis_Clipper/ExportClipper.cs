@@ -2823,7 +2823,7 @@ namespace AF_Export_Devis_Clipper
                         }
                     }
                 }
-                
+                //
                 //recuperation et construction du chemin des parts
                 /// piece dpr existantes passées par l'assistant dpr
                 //ATTENTION LES GENERATION DES DPR DEPEND DE LA LICENCE/ IL FAUT UNE QUOTE CUT 
