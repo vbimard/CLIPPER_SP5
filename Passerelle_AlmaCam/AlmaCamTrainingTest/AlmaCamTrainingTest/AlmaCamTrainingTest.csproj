@@ -193,9 +193,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Resources\AF_import-clipper.json" />
     <None Include="Resources\Clipper.zip" />
-    <None Include="Resources\Entities3.cs" />
-    <None Include="Resources\CommandesV2.cs" />
-    <None Include="Resources\event.cs" />
+    <None Include="Resources\Commandes_Clip.cs" />
+    <None Include="Resources\temp\CommandesV2.cs" />
+    <None Include="Resources\temp\Entities3.cs" />
+    <None Include="Resources\temp\event.cs" />
+    <None Include="Resources\event_Clip.cs" />
+    <None Include="Resources\Entities_Clip.cs" />
     <Compile Include="Start.cs">
       <SubType>Form</SubType>
     </Compile>

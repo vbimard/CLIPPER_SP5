@@ -782,9 +782,9 @@ namespace AlmaCamTrainingTest
             
             List<Tuple<string, string>> CustoFileCsList = new List<Tuple<string, string>>();
 
-            CustoFileCsList.Add(new Tuple<string, string>("Entities", Properties.Resources.Entities3));
-            CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources.event2));
-            CustoFileCsList.Add(new Tuple<string, string>("Commandes", Properties.Resources.CommandesV2));
+            CustoFileCsList.Add(new Tuple<string, string>("Entities", Properties.Resources.Entities_Clip));
+            CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources.event_Clip));
+            CustoFileCsList.Add(new Tuple<string, string>("Commandes", Properties.Resources.Commandes_Clip));
 
             foreach (Tuple<string, string> CustoFileCs in CustoFileCsList)
             {
@@ -822,7 +822,7 @@ namespace AlmaCamTrainingTest
             Update_Clipper_Stock(_Context);
             //
             //mise a jour des champs
-            Update_DefaultValues(_Context);
+           Update_DefaultValues(_Context);
             //
             
 
@@ -1478,7 +1478,7 @@ namespace AlmaCamTrainingTest
             List<Tuple<string, string>> CustoFileCsList = new List<Tuple<string, string>>();
 
 
-            CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources.event2));
+            CustoFileCsList.Add(new Tuple<string, string>("FormulasAndEvents", Properties.Resources.event_Clip));
 
 
             foreach (Tuple<string, string> CustoFileCs in CustoFileCsList)
@@ -1503,7 +1503,7 @@ namespace AlmaCamTrainingTest
             List<Tuple<string, string>> CustoFileCsList = new List<Tuple<string, string>>();
 
 
-            CustoFileCsList.Add(new Tuple<string, string>("Commandes", Properties.Resources.CommandesV2));
+            CustoFileCsList.Add(new Tuple<string, string>("Commandes", Properties.Resources.Commandes_Clip));
 
             foreach (Tuple<string, string> CustoFileCs in CustoFileCsList)
             {
@@ -1526,7 +1526,7 @@ namespace AlmaCamTrainingTest
 
             List<Tuple<string, string>> CustoFileCsList = new List<Tuple<string, string>>();
 
-            CustoFileCsList.Add(new Tuple<string, string>("Entities", Properties.Resources.Entities3));
+            CustoFileCsList.Add(new Tuple<string, string>("Entities", Properties.Resources.event_Clip));
 
 
             foreach (Tuple<string, string> CustoFileCs in CustoFileCsList)

@@ -210,43 +210,7 @@ namespace Wpm.Implement.ModelSetting
                     }
                 }
             }
-            /*
-			{
-            if (CommmandeExists(context,"IMPORT_CLIPPER_FOURNITURES")==false)
-				{
-					{
-						ICommandTypeFactory commandTypeFactory = new CommandTypeFactory(context, 1, null, false);
-						commandTypeFactory.Key = "IMPORT_CLIPPER_FOURNITURES";
-						commandTypeFactory.Name = "Import Fournitures";
-						commandTypeFactory.PlugInFileName = @"AF_Import_ODBC_Clipper_AlmaCam.dll";
-						commandTypeFactory.PlugInNameSpace = "AF_Import_ODBC_Clipper_AlmaCam";
-						commandTypeFactory.PlugInClassName = "Clipper_Import_Fournitures_Divers_Processor";
-						commandTypeFactory.Shortcut = Shortcut.None;
-						commandTypeFactory.WorkOnEntityTypeKey = "_SIMPLE_SUPPLY";
-						commandTypeFactory.LargeImage = true;
-
-                        if (File.Exists(@"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png"))
-                        {
-                            commandTypeFactory.ImageFile = @"C:\AlmaCAM\Bin\Icones\Clipper\" + commandTypeFactory.Key + ".png";
-                        }
-                        else
-                        {
-                            commandTypeFactory.ImageFile = "";
-                        }
-
-                        if (!commandTypeFactory.UpdateModel())
-						{
-							foreach (ModelSettingError error in commandTypeFactory.ErrorList)
-							{
-								hostContext.TraceLogger.TraceError(error.Message, true);
-							}
-							return false;
-						}
-						
-					}
-				}
-			}
-            */
+           
             #endregion
 
             #region CLIP Configuration
@@ -277,7 +241,7 @@ namespace Wpm.Implement.ModelSetting
                     {
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "IMPORT_CDA";
-							parameterDescription.Name = "Chemin complet vers le cahier d'affaire ";
+							parameterDescription.Name = "Chemin complet vers le cahier d affaire ";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
 							parameterDescription.DefaultValue = @"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Import_OF\CAHIER_AFFAIRE.csv";
 							commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -295,7 +259,7 @@ namespace Wpm.Implement.ModelSetting
 						{
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "EXPORT_Rp";
-							parameterDescription.Name = "Dossier d'export des retours GP";
+							parameterDescription.Name = "Dossier d export des retours GP";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
 							parameterDescription.DefaultValue = @"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Export_GPAO";
 							commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -304,7 +268,7 @@ namespace Wpm.Implement.ModelSetting
 						{
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "EXPORT_Dt";
-							parameterDescription.Name = "Dossier d'export des clotures";
+							parameterDescription.Name = "Dossier d export des clotures";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
 							parameterDescription.DefaultValue = @"C:\AlmaCAM\Bin\AlmaCam_Clipper\_Clipper\Export_DT";
 							commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -313,7 +277,7 @@ namespace Wpm.Implement.ModelSetting
 						{
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "IMPORT_AUTO";
-							parameterDescription.Name = "Activer l' import Auto";
+							parameterDescription.Name = "Activer l import Auto";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
 							parameterDescription.DefaultValue = true;
 							commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -351,7 +315,7 @@ namespace Wpm.Implement.ModelSetting
 						{
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "MODEL_PATH";
-							parameterDescription.Name = "Model Chemin d'export";
+							parameterDescription.Name = "Model Chemin d export";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
 							parameterDescription.DefaultValue = @"0#TECHNOLOGIE#string;1#ImportCda#string;0#ImportDM#string;2#ExportRp#string;3#ExportDT#string;4#Centredefrais#string;5#Destination_Path#string;6#Source_Path#string";
 							commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -370,7 +334,7 @@ namespace Wpm.Implement.ModelSetting
 						{
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "CLIPPER_MACHINE_CF";
-							parameterDescription.Name = "centre de frais machien clipper";
+							parameterDescription.Name = "centre de frais machine clipper";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
 							parameterDescription.DefaultValue = @"CLIP";
 							commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -388,7 +352,7 @@ namespace Wpm.Implement.ModelSetting
 						{
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "ALMACAM_EDITOR_NAME";
-							parameterDescription.Name = "Nom de l'editeur AlmaCam";
+							parameterDescription.Name = "Nom de l editeur AlmaCam";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
 							parameterDescription.DefaultValue = @"Wpm.Implement.Editor.exe";
 							commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -406,7 +370,7 @@ namespace Wpm.Implement.ModelSetting
 						{
 							IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
 							parameterDescription.Key = "EXPLODE_MULTIPLICITY";
-							parameterDescription.Name = "Explosion de fichiers de retours sur mutliplicité";
+							parameterDescription.Name = "Explosion de fichiers de retours sur mutliplicite";
 							parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
 							parameterDescription.DefaultValue = true;
 							commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -425,7 +389,7 @@ namespace Wpm.Implement.ModelSetting
                         {
                         IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
                         parameterDescription.Key = "AF_ACTIVATE_SHEET_ON_SENDTOWSHOP";
-                        parameterDescription.Name = "Validation des chutes à l'envoie à la coupe";
+                        parameterDescription.Name = "Validation des chutes à l envoie a la coupe";
                         parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
                         parameterDescription.DefaultValue = false;
                         commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -444,7 +408,7 @@ namespace Wpm.Implement.ModelSetting
 
                         {
                         IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
-                        parameterDescription.Key = "AF_FAVORISE_MULTIDIM";
+                        parameterDescription.Key = "AF_MULTIDIM_MODE";
                         parameterDescription.Name = "Favoriser le Multidim";
                         parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
                         parameterDescription.DefaultValue = true;

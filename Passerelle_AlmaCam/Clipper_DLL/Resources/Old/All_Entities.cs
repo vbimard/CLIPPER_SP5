@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using Wpm.Schema.Kernel;
@@ -12,7 +12,7 @@ namespace Wpm.Implement.ModelSetting
     {
         public override bool Execute(IContext context, IContext hostContext)
         {
-            #region Tôles
+            #region Toles
             
             {
                 IEntityType entityType = context.Kernel.GetEntityType("_SHEET");
@@ -306,7 +306,7 @@ namespace Wpm.Implement.ModelSetting
                 {
                     IFieldDescription fieldDescription = new FieldDescription(context.Kernel.UnitSystem, true);
                     fieldDescription.Key = "AF_PIECE_TOLERANCES";
-                    fieldDescription.Name = "Tolérances";
+                    fieldDescription.Name = "Tolerances";
                     fieldDescription.Editable = FieldDescriptionEditableType.AllSection;
                     fieldDescription.Visible = FieldDescriptionVisibilityType.Invisible;
                     fieldDescription.Mandatory = false;
@@ -465,7 +465,7 @@ namespace Wpm.Implement.ModelSetting
                 IEntityType entityType = context.Kernel.GetEntityType("_TO_PRODUCE_REFERENCE");
                 IEntityTypeFactory entityTypeFactory = new EntityTypeFactory(context, 1, entityType , null, "_ACTCUT", null);
                 entityTypeFactory.Key = "_TO_PRODUCE_REFERENCE";
-                entityTypeFactory.Name = "Pièces à produire";
+                entityTypeFactory.Name = "Pieces a produire";
                 entityTypeFactory.DefaultDisplayKey = "_NAME";
                 entityTypeFactory.ActAsEnvironment = false;
                 
@@ -639,7 +639,7 @@ namespace Wpm.Implement.ModelSetting
                 {
                     IFieldDescription fieldDescription = new FieldDescription(context.Kernel.UnitSystem, true);
                     fieldDescription.Key = "LEVQA";
-                    fieldDescription.Name = "*Qualité";
+                    fieldDescription.Name = "*Qualite";
                     fieldDescription.Editable = FieldDescriptionEditableType.AllSection;
                     fieldDescription.Visible = FieldDescriptionVisibilityType.AllSection;
                     fieldDescription.Mandatory = false;
@@ -661,7 +661,7 @@ namespace Wpm.Implement.ModelSetting
                 {
                     IFieldDescription fieldDescription = new FieldDescription(context.Kernel.UnitSystem, true);
                     fieldDescription.Key = "DELAIS_INT";
-                    fieldDescription.Name = "*Délais interne";
+                    fieldDescription.Name = "*Delais interne";
                     fieldDescription.Editable = FieldDescriptionEditableType.AllSection;
                     fieldDescription.Visible = FieldDescriptionVisibilityType.AllSection;
                     fieldDescription.Mandatory = false;
@@ -672,7 +672,7 @@ namespace Wpm.Implement.ModelSetting
                 {
                     IFieldDescription fieldDescription = new FieldDescription(context.Kernel.UnitSystem, true);
                     fieldDescription.Key = "MACHINE_FROM_CF";
-                    fieldDescription.Name = "*Machine suggérée par l of";
+                    fieldDescription.Name = "*Machine suggeree par l of";
                     fieldDescription.Editable = FieldDescriptionEditableType.NoEditable;
                     fieldDescription.Visible = FieldDescriptionVisibilityType.AllSection;
                     fieldDescription.Mandatory = false;
@@ -718,7 +718,7 @@ namespace Wpm.Implement.ModelSetting
                 {
                     IFieldDescription fieldDescription = new FieldDescription(context.Kernel.UnitSystem, true);
                     fieldDescription.Key = "GEOMETRY_FROM_OF";
-                    fieldDescription.Name = "*Géometrie de l'of";
+                    fieldDescription.Name = "*Geometrie de l'of";
                     fieldDescription.Editable = FieldDescriptionEditableType.NoEditable;
                     fieldDescription.Visible = FieldDescriptionVisibilityType.AllSection;
                     fieldDescription.Mandatory = false;

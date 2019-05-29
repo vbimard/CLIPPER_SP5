@@ -36,18 +36,28 @@ namespace ConsoleApp2
             contextlocal=AlmaCamTool.GetContext(contextlocal);
 
 
+            Clipper8_ImportTubes_Processor tubes  = new Clipper8_ImportTubes_Processor(true,true,true,true,true,false,false,false);
+            tubes.Import(contextlocal);
             
-           Clipper_Import_Matiere matiere = new Clipper_Import_Matiere();
-           matiere.Import(contextlocal);
-           /*
+
+            //public Clipper_ImportTubes_Processor(bool import_matiere, bool tube_rond, bool rond, bool tube_rectangle, bool tube_carre, bool tube_flat, bool tube_speciaux, bool fourniture)
+
+
+            /* 
+            Clipper_Import_Matiere matiere = new Clipper_Import_Matiere(contextlocal);
+            matiere.Import();
+             */
+
+
+
+            /*
             Clipper_Import_Toles_Processor Toles = new Clipper_Import_Toles_Processor();
             Toles.Import(contextlocal);
-
             */
 
             //Toles.Import(contextlocal);
-
             //test import matiere
+
             /*
             Clipper_Import_Matiere matiere = new Clipper_Import_Matiere();
             matiere.Import(contextlocal);

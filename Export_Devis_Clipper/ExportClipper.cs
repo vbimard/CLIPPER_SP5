@@ -141,6 +141,7 @@ namespace AF_Export_Devis_Clipper
             ///on passe par une liste de iquote
             ///
             try {
+                //IQuote //q = contextelocal.iquo
                 List<IQuote> quotelist = new List<IQuote>();
                 quotelist.Add(iquote);
                 //creation du fichier trans

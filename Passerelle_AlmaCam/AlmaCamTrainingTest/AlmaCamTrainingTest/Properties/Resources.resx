@@ -127,15 +127,6 @@
   <data name="Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Entities3" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Entities3.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="CommandesV2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\CommandesV2.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="event2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\event.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="Import_client_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\import_client.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
@@ -165,5 +156,14 @@
   </data>
   <data name="AF_import_clipper" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AF_import-clipper.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Commandes_Clip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Commandes_Clip.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="event_Clip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\event_Clip.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Entities_Clip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Entities_Clip.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
 </root>

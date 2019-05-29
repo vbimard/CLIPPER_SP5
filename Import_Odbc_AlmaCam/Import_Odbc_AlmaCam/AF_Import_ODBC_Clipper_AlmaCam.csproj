@@ -37,6 +37,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\Actcut.CommonModel.dll</HintPath>
     </Reference>
+    <Reference Include="AF_Clipper_Dll, Version=2.1.5.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\AF_Clipper_Dll.dll</HintPath>
+    </Reference>
     <Reference Include="AF_ImportTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\AlmaCAM\Bin\AF_ImportTools.dll</HintPath>

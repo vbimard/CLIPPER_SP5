@@ -114,13 +114,7 @@ namespace AF_Export_Devis_Clipper
                     contextlocal = Context;//
 
                     Console.WriteLine("conecting database...");
-                    //quotelist = contextlocal.EntityManager.GetEntityList("_QUOTE_SENT", "_REFERENCE", ConditionOperator.Equal, quoteNumber);
-                    //quotelist.Fill(false);
-                    //quote = quotelist.FirstOrDefault();//contextlocal.EntityManager.GetEntity(Convert.ToInt64(quoteNumber), "_QUOTE_REQUEST");
-                    //quote = contextlocal.EntityManager.GetEntity(Convert.ToInt64(quoteNumber), "_QUOTE_REFERENCE");
-                   // if (quote.Id == -1) {
-                    //    Console.WriteLine("le devis n'existe pas");
-                    //}
+                   
                    
 
                     //
@@ -129,15 +123,7 @@ namespace AF_Export_Devis_Clipper
                         IEntity quoteEntity = quoteManagerUI.GetQuoteEntity(contextlocal, quoteNumber);
                         ret = quoteManagerUI.AccepQuote(contextlocal, quoteEntity, orderNumber, exportFile);
 
-                    //ret = quoteManagerUI.AccepQuote(contextlocal, quoteEntity, orderNumber,"");
-                        //ret = quoteManagerUI.AccepQuote(contextlocal, quoteEntity, orderNumber);
-                    //   return (ret ? true : false);
-
-                    //
-                    //AF_ImportTools.SimplifiedMethods.GetFirtOfList(quotes);
-                    //ITransaction transaction = contextlocal.CreateTransaction();
-                    //IQuote iquote = new Quote(transaction, quote);
-                    //bool status = AF_Export_Devis_Clipper.ExportQuote.ExportQuoteRequest(Context, iquote);
+                   
 
                     Environment.ExitCode = (ret ? 0 : -1);
                 }

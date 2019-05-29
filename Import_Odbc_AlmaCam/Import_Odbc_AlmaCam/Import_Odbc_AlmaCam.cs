@@ -15,11 +15,12 @@ using Microsoft.Win32;
 using System.Runtime.Serialization;
 using System.Data.Common;
 using Actcut.CommonModel;
+using AF_Clipper_Dll;
 
 namespace AF_Import_ODBC_Clipper_AlmaCam
 
 {
-   
+
     #region  commandes
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -34,10 +35,11 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
         public override bool Execute()
         {
-            
-            try {
 
-                
+            try
+            {
+
+
                 Import(Context);
                 return base.Execute();
             }
@@ -45,7 +47,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             {
                 return base.Execute();
             }
-           
+
         }
 
         /////////////////////////////////////////////////////////////////
@@ -56,19 +58,19 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// 
         public void Import(IContext contextcontextlocal)
         {
-           
+
             TextWriterTraceListener logFile;
             try
             {
                 //creation des logs
-                using (Clipper_Import_Matiere Update_Material = new Clipper_Import_Matiere())
+                using (Clipper_Import_Matiere Update_Material = new Clipper_Import_Matiere(contextcontextlocal))
                 {
                     try
                     {
 
                         Cursor.Current = Cursors.WaitCursor;
 
-                        Update_Material.Import(Context);
+                        Update_Material.Import();
 
                         Cursor.Current = Cursors.Default;
 
@@ -79,10 +81,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
             }
-            catch(Exception ie)
+            catch (Exception ie)
             {
                 MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-               
+
             }
         }
     }
@@ -137,10 +139,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             catch { return false; }
         }
     }
-        /// <summary>
-        /// bouton d'import des vis
-        /// </summary>
-        public class Clipper_Import_Fournitures_Divers_Processor : CommandProcessor
+    /// <summary>
+    /// bouton d'import des vis
+    /// </summary>
+    public class Clipper_Import_Fournitures_Divers_Processor : CommandProcessor
     {
 
         public override bool Execute()
@@ -189,10 +191,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
     }
-      
+
     /// </summary>
     ///bouton import des tubes
-    public class Clipper_ImportTubes_Processor : CommandProcessor
+    public class Clipper8_ImportTubes_Processor : CommandProcessor
     {
 
         Boolean Import_Matiere = true;
@@ -217,17 +219,17 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// <param name="Tube_Speciaux">true ou false pour declencher l'import</param>
         /// <param name="Fourniture">true ou false pour declencher l'import</param>
         /// 
-        public Clipper_ImportTubes_Processor(bool import_matiere, bool tube_rond, bool rond, bool tube_rectangle,  bool tube_carre, bool tube_flat, bool tube_speciaux,bool fourniture)
+        public Clipper8_ImportTubes_Processor(bool import_matiere, bool tube_rond, bool rond, bool tube_rectangle, bool tube_carre, bool tube_flat, bool tube_speciaux, bool fourniture)
         {
 
-                                    Import_Matiere = import_matiere;
-                                    Tube_Rond = tube_rond;
-                                    Rond = rond;
-                                    Tube_Rectangle = tube_rectangle;
-                                    Tube_Carre = tube_carre;
-                                    Tube_Flat = tube_flat;
-                                    Tube_Speciaux = tube_speciaux;
-                                    Fourniture = fourniture;
+            Import_Matiere = import_matiere;
+            Tube_Rond = tube_rond;
+            Rond = rond;
+            Tube_Rectangle = tube_rectangle;
+            Tube_Carre = tube_carre;
+            Tube_Flat = tube_flat;
+            Tube_Speciaux = tube_speciaux;
+            Fourniture = fourniture;
 
 
         }
@@ -238,11 +240,11 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             try
             {
                 //creation des logs
-                TextWriterTraceListener logFile;
+                //TextWriterTraceListener logFile;
 
 
 
-                IContext contextlocal = Context;
+                //IContext contextlocal = Context;
                 Import(Context);
                 return base.Execute();
             }
@@ -258,24 +260,25 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             //creation des logs
             TextWriterTraceListener logFile;
             try
-            {   
+            {
                 //detection du contexte
                 Cursor.Current = Cursors.WaitCursor;
                 //creation des logs
                 //creation du listener
                 ////
-                if (Import_Matiere) { 
-                using (Clipper_Import_Matiere Update_Material = new Clipper_Import_Matiere())
+                if (Import_Matiere)
                 {
-                    try
+                    using (Clipper_Import_Matiere Update_Material = new Clipper_Import_Matiere(contextlocal))
                     {
+                        try
+                        {
                             //Update_Material.Almacam_Update_Material(contextlocal);
-                            Update_Material.Import(contextlocal);
-                        //Update_Material.Close();
-                        Cursor.Current = Cursors.Default;
+                            Update_Material.Import();
+                            //Update_Material.Close();
+                            Cursor.Current = Cursors.Default;
+                        }
+                        catch { Cursor.Current = Cursors.Default; }
                     }
-                    catch { Cursor.Current = Cursors.Default; }
-                }
 
                 }
 
@@ -292,7 +295,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                             tubesronds.Close();
 
                         }
-                        catch (Exception ie) {
+                        catch (Exception ie)
+                        {
                             MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                         }
@@ -302,106 +306,115 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
 
-                if (Tube_Rond) { 
-                        using (Clipper_Import_Tube_Rond tubesronds = new Clipper_Import_Tube_Rond(contextlocal))
+                if (Tube_Rond)
+                {
+                    using (Clipper_Import_Tube_Rond tubesronds = new Clipper_Import_Tube_Rond(contextlocal))
+                    {
+                        try
                         {
-                            try
-                            {
 
-                                tubesronds.ReadTubes();
-                                tubesronds.WriteTubes();
-                                tubesronds.Close();
+                            tubesronds.ReadTubes();
+                            tubesronds.WriteTubes();
+                            tubesronds.Close();
 
-                            }
-                            catch (Exception ie) {
-                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
-                    
-                        }
-                }
-
-                if (Rond) { 
-                        using (Clipper_Import_Rond tubesronds = new Clipper_Import_Rond(contextlocal))
+                        catch (Exception ie)
                         {
-                            try
-                            {
-
-
-                                tubesronds.ReadTubes();
-                                tubesronds.WriteTubes();
-                                tubesronds.Close();
-
-                            }
-                            catch (Exception ie) {
-                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                        }
-
-                        }
-                }
-
-                if (Tube_Rectangle) { 
-
-                        using (Clipper_Import_Tube_Rectangle tubesrectangle = new Clipper_Import_Tube_Rectangle(contextlocal))
-                        {
-                            try
-                            {
-                                tubesrectangle.ReadTubes();
-                                tubesrectangle.WriteTubes();
-                                tubesrectangle.Close();
-
-                            }
-                            catch (Exception ie) {
                             MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
 
-
-                        }
-                }
-                if (Tube_Carre) {
-                        using (Clipper_Import_Tube_Carre tubescar = new Clipper_Import_Tube_Carre(contextlocal))
-                        {
-                            try
-                            {
-                                tubescar.ReadTubes();
-                                tubescar.WriteTubes();
-                                tubescar.Close();
-
-                            }
-                            catch (Exception ie) {
-                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-
-
-                        }
-                }
-
-                if (Tube_Flat) { 
-                    using (Clipper_Import_Tube_Flat  tubesflats = new Clipper_Import_Tube_Flat (contextlocal))
-                        {
-                            try
-                            {
-                                tubesflats.ReadTubes();
-                                tubesflats.WriteTubes();
-                                tubesflats.Close();
-
-                            }
-                            catch (Exception ie) { MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error); }
-
-                       
                     }
                 }
 
-                
+                if (Rond)
+                {
+                    using (Clipper_Import_Rond tubesronds = new Clipper_Import_Rond(contextlocal))
+                    {
+                        try
+                        {
+
+
+                            tubesronds.ReadTubes();
+                            tubesronds.WriteTubes();
+                            tubesronds.Close();
+
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        }
+
+                    }
+                }
+
+                if (Tube_Rectangle)
+                {
+
+                    using (Clipper_Import_Tube_Rectangle tubesrectangle = new Clipper_Import_Tube_Rectangle(contextlocal))
+                    {
+                        try
+                        {
+                            tubesrectangle.ReadTubes();
+                            tubesrectangle.WriteTubes();
+                            tubesrectangle.Close();
+
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
+
+                    }
+                }
+                if (Tube_Carre)
+                {
+                    using (Clipper_Import_Tube_Carre tubescar = new Clipper_Import_Tube_Carre(contextlocal))
+                    {
+                        try
+                        {
+                            tubescar.ReadTubes();
+                            tubescar.WriteTubes();
+                            tubescar.Close();
+
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
+
+                    }
+                }
+
+                if (Tube_Flat)
+                {
+                    using (Clipper_Import_Tube_Flat tubesflats = new Clipper_Import_Tube_Flat(contextlocal))
+                    {
+                        try
+                        {
+                            tubesflats.ReadTubes();
+                            tubesflats.WriteTubes();
+                            tubesflats.Close();
+
+                        }
+                        catch (Exception ie) { MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+
+                    }
+                }
+
+
             }
             catch
             {
-               
+
             }
 
         }
     }
-//////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>
     #region enum, class objets
 
@@ -425,11 +438,11 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     /// </summary>
     //section des commandes
     public enum SheetType
-    {      
+    {
         ToleNeuve = 0,
         Chute = 1,
-       
-     }
+
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -445,7 +458,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     }
 
     #endregion
- //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
     ///json   
     #region json
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -454,35 +467,37 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     /// </summary>
     //section JSON
     public class JsonTools
+    {
+        //recupee le fichier json dans le dossier de la dll
+        private string PATH = Directory.GetCurrentDirectory() + "\\" + Properties.Resources.jsonimportclipper;//"import-clipper.json";
+
+        public string getJsonStringParametres(string ParameterName)
         {
-            //recupee le fichier json dans le dossier de la dll
-            private string PATH = Directory.GetCurrentDirectory()+"\\"+ Properties.Resources.jsonimportclipper;//"import-clipper.json";
 
-            public string getJsonStringParametres(string ParameterName)
+            try
             {
-                
-            try {
-                        string returnvalue = "";
-                        using (StreamReader file = File.OpenText(this.PATH))
-                        {
-                   
-                   
-                            using (JsonTextReader reader = new JsonTextReader(file))
-                            {
-                                JObject o = (JObject)JToken.ReadFrom(reader);
-                                returnvalue = (string)o.SelectToken(ParameterName);
-                            }
-                    
+                string returnvalue = "";
+                using (StreamReader file = File.OpenText(this.PATH))
+                {
 
-                        }
 
-                        return returnvalue;
+                    using (JsonTextReader reader = new JsonTextReader(file))
+                    {
+                        JObject o = (JObject)JToken.ReadFrom(reader);
+                        returnvalue = (string)o.SelectToken(ParameterName);
+                    }
+
+
                 }
 
+                return returnvalue;
+            }
 
-            catch (Exception ie) {
 
-                MessageBox.Show(ie.Message,"JsonTools Class" ,MessageBoxButtons.OK, MessageBoxIcon.Error );
+            catch (Exception ie)
+            {
+
+                MessageBox.Show(ie.Message, "JsonTools Class", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
 
 
@@ -491,30 +506,30 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         }
 
 
-        }
+    }
     #endregion
 
-//////////////////////////////////////////////////////////////////////////////////////////
- /// <summary>
- ///   class Clipper_Material.. class de stockage des matieres
- ///   les codes articles mutlidim sont recuperés dans le champs code article matiere
- /// </summary>
-    public class Clipper_Material 
-        {
+    //////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    ///   class Clipper_Material.. class de stockage des matieres
+    ///   les codes articles mutlidim sont recuperés dans le champs code article matiere
+    /// </summary>
+    public class Clipper_Material : Clipper_Article, IDisposable
+    {
         //initialisation des parametres
         //definiton de l'objetc material
-            public string Coarti = "UNDEF"; //code etat (nuance epaisseur)
-            public double Prixart=0;// prixart
-            public double Densite=1;//
-            public string Nuance= "UNDEF";
-            public string Etat = "";//code nuance
-            public int Type = 0;
-            public bool IsMultiDim = false;
-            public string Quality; //quality
-            public double Thickness = 0;  //DIM1
-            public string Materialname = "UNDEF";
-            public string Comments = "";
-            public string Uidkey;
+        //public string Coarti = "UNDEF"; //code etat (nuance epaisseur)
+        //public double Prixart=0;// prixart
+        //public double Densite=1;//
+        //public string Nuance= "UNDEF";
+        //public string Etat = "";//code nuance
+        //public int Type = 0;
+        //public bool IsMultiDim = false;
+        //public string Quality; //quality
+        //public double Thickness = 0;  //DIM1
+        //public string Materialname = "UNDEF";
+        public string Comments = "";
+        public string Uidkey;
 
         /// <summary>
         /// retourne un nom normalisé pour la nuance Nuance*Etat;
@@ -532,22 +547,22 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// update material name
         /// </summary>
         public void setMaterialName()
-            {   //setuid de l'objet
-                Uidkey = getMaterial_Uidkey(getQualityName(Nuance, Etat), Thickness,Type);
-                if (Etat != string.Empty)
-                {
-                            Quality = Nuance + "*" + Etat;
-                            Materialname = Nuance + "*" + Etat + " " + Thickness + " mm";
-                }
-                else
-                {
-                        Quality = Nuance ;
-                        Materialname = Nuance + " " + Thickness + " mm";
-                }
-            
+        {   //setuid de l'objet
+            Uidkey = getMaterial_Uidkey(getQualityName(Nuance, Etat), Thickness, Type);
+            if (Etat != string.Empty)
+            {
+                Quality = Nuance + "*" + Etat;
+                Materialname = Nuance + "*" + Etat + " " + Thickness + " mm";
+            }
+            else
+            {
+                Quality = Nuance;
+                Materialname = Nuance + " " + Thickness + " mm";
+            }
+
             //cle unique pour eviter les doublons
             //Uidkey = Nuance.Trim() + "*" + Etat.Trim() + " " + Thickness;
-            
+
 
             // return Materialname ;
         }
@@ -557,11 +572,11 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// <param name="qualityname">nuance*etant generalement</param>
         /// <param name="Thickness">epaisseure</param>
         /// <returns></returns>
-        public static string getMaterial_Uidkey(string qualityname, double Thickness,int type)
+        public static string getMaterial_Uidkey(string qualityname, double Thickness, int type)
         {
             string uidkey;
-            
-             uidkey = qualityname + "*" + Thickness.ToString()+"_"+type;
+
+            uidkey = qualityname + "*" + Thickness.ToString() + "_" + type;
 
             return uidkey;
 
@@ -571,7 +586,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// recupere le nomde la qualité Nuance*Etat*epaisseur
         /// </summary>
         /// <returns></returns>
-        public string getQualityName(string Nuance,string Etat) {
+        public string getQualityName(string Nuance, string Etat)
+        {
 
             string qualityname;
             //cle unique pour eviter les doublons non stockée
@@ -586,85 +602,105 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// recupere le nom matiere Nuance*Etat*epaisseur
         /// </summary>
         /// <returns></returns>
-        public string getMaterialName() {return  Materialname; }
+        public string getMaterialName() { return Materialname; }
 
+        /// <summary>
+        /// dispose
+        /// </summary>
+        public void Dispose()
+        {
+            //Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+    }
     /// <summary>
     ///   class Clipper_IMport matiere.. derive de clipper article
     /// </summary>
     public class Clipper_Import_Matiere : IDisposable
-        {
-            private string DSN;
-            private string SQL;
-            private string SQL_NUANCE_ETAT;
-            private JsonTools JSTOOLS;
-            private OdbcDataReader TABLE_ARTICLEM_TOLE;
-            private OdbcConnection DbConnection;
-            private OdbcCommand DbCommand;
-            IList<Clipper_Material> CLIPPER_MATERIAL_LIST = new List<Clipper_Material>();
-            //recuperation des parametres
-            //creation du listener
-           TextWriterTraceListener logFile = new TextWriterTraceListener(System.IO.Path.GetTempPath() +"\\"+ Properties.Resources.ImportMatiereLog);
-           public IList<Clipper_Material> GetMaterial_List() { return CLIPPER_MATERIAL_LIST; }
+    {
+        private string DSN;
+        private string SQL;
+        private string SQL_NUANCE_ETAT;
+        private JsonTools JSTOOLS;
+        private OdbcDataReader TABLE_ARTICLEM_TOLE;
+        private OdbcConnection DbConnection;
+        private OdbcCommand DbCommand;
+        private IContext ContextLocal;
+        private bool _FAVORISE_MULTIDIM = true;
+        IList<Clipper_Material> CLIPPER_MATERIAL_LIST = new List<Clipper_Material>(); //liste des matieres clipper
+        //IList<Flat> CLIPPER_TOLE_LIST = new List<Flat>();    //liste des toles clipper
+        IList<Clipper_Material> CLIPPER_TOLE_LIST = new List<Clipper_Material>();    //liste des toles clipper
+        //recuperation des parametres
+        //creation du listener
+        TextWriterTraceListener logFile = new TextWriterTraceListener(System.IO.Path.GetTempPath() + "\\" + Properties.Resources.ImportMatiereLog);
+        public IList<Clipper_Material> GetMaterial_List() { return CLIPPER_MATERIAL_LIST; }
 
-            public void Dispose()
-            {
-                //Dispose(true);
-                GC.SuppressFinalize(this);
-            }
+        public void Dispose()
+        {
+            //Dispose(true);
+            GC.SuppressFinalize(this);
+        }
         //constructeur
         #region constructeur
-        public Clipper_Import_Matiere()
-            {
-                logFile.Write("debut import matiere ");
-                Init();
-            }
-            public Clipper_Import_Matiere(string dsn, string sqlTole)
-            {
+        public Clipper_Import_Matiere(IContext contextlocal)
+        {
+            this.ContextLocal = contextlocal;
+            logFile.Write("debut import matiere ");
+            Init();
+        }
+        [Obsolete]
+        public Clipper_Import_Matiere(IContext contextlocal, string dsn, string sqlTole)
+        {
             //material matiere;                       
             DSN = dsn;
             SQL = sqlTole;
             Init();
-            }
+        }
+
         #endregion
         private void Init()
-            {    ///premier paramertre dsn = clipper dsn= data source name
+        {    ///premier paramertre dsn = clipper dsn= data source name
                     //var DbConnection =new OdbcConnection("DSN=" + DSN);
             try
-                {
-                   logFile.WriteLine("initialisatin de la methode");
-                    //lecture du fichier json
-                    logFile.WriteLine("lecture du fichier Json");
-                    // Material matiere = new material(); //
-                    JSTOOLS = new JsonTools();
-                    //recup parametre dsn //
-                    /************/
-                    //le dsn est le nom de la connextion odbc paramétre par l'installateur clipper
-                    //cette info est paramétrable dans le fichier json
-                    DSN = JSTOOLS.getJsonStringParametres("dsn");
-                    /************/
-                    logFile.WriteLine("DSN demandé"+ DSN);
-              
+            {
+                logFile.WriteLine("initialisatin de la methode");
+                //lecture du fichier json
+                logFile.WriteLine("lecture du fichier Json");
+                // Material matiere = new material(); //
+                JSTOOLS = new JsonTools();
+                //recup parametre dsn //
+                /************/
+                //le dsn est le nom de la connextion odbc paramétre par l'installateur clipper
+                //cette info est paramétrable dans le fichier json
+                DSN = JSTOOLS.getJsonStringParametres("dsn");
+                /************/
+                logFile.WriteLine("DSN demandé" + DSN);
+
                 if (AlmaCamTool.Is_Odbc_Exists(DSN))
-                    
+
                 {
-                    DbConnection = new OdbcConnection("DSN=" + DSN);                    
+                    DbConnection = new OdbcConnection("DSN=" + DSN);
                     DbConnection.Open();
                     DbCommand = DbConnection.CreateCommand();
                     logFile.WriteLine("etat de la connexion " + DbConnection.State.ToString());
-                    Get_Clippper_Material();
+                    Get_Clipper_Material(ContextLocal);
                 }
-                else{ throw new Missing_Obdc_Exception(DSN); }
+                else { throw new Missing_Obdc_Exception(DSN); }
 
-     
+
+                //recuperaiton de lca configuiraiton client parama_clipper//
+
+
+
 
 
             }
 
             catch (Exception ie)
-                {
+            {
                 logFile.WriteLine("ERREUR : " + ie.Message.ToString());
-                }
+            }
             finally
             {
                 //DbConnection.Close();
@@ -672,89 +708,118 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             }
 
 
-            }
+        }
 
         /// <summary>
         ///  recupere dans une table CLIPPER_MATERIAL_LIST
+        ///  la requete est sql.nuance_etat
         /// </summary>
-        private void Get_Clippper_Material()
-            {
-                //IList <Material> materialist = new List<Material>();
-                //string prefix; // prefixe article matiere
-                //string grade;//code nuance
-                //string name; //code etat (nuance epaisseur)
-                //double price; // prix
-                //double densité;
-                //double Thickness;
-                int ii = 0;
-            logFile.WriteLine("paramétrage de la requete du fichier json " );
+        private void Get_Clipper_Material(IContext contextlocal)
+        {
+
+            //recuperation des paramètres almaquote
+
+            Clipper_Param.GetlistParam(contextlocal);
+
+            //IList <Material> materialist = new List<Material>();
+            //string prefix; // prefixe article matiere
+            //string grade;//code nuance
+            //string name; //code etat (nuance epaisseur)
+            //double price; // prix
+            //double densité;
+            //double Thickness;
+            int ii = 0;
+            logFile.WriteLine("paramétrage de la requete du fichier json ");
             logFile.WriteLine("monodim = " + JSTOOLS.getJsonStringParametres("multidim"));
             //recuperation des nuance etat--> 304L*DKP
             //on recherche toutes les matieres mono et multidim
 
-           
+
             this.SQL_NUANCE_ETAT = JSTOOLS.getJsonStringParametres("sql.nuance_etat");
-                                                                                      //coupel nuance etat
-                                                                                      //Material matiere = new material();
-                                                                                      //getJsonParametres();
+            //coupel nuance etat
+            //Material matiere = new material();
+            //getJsonParametres();
             this.DbCommand.CommandText = this.SQL_NUANCE_ETAT;
             logFile.WriteLine("requete utilisée = " + this.SQL_NUANCE_ETAT);
             // requete type matiere recuperer dans la section nuance_etat //
             TABLE_ARTICLEM_TOLE = DbCommand.ExecuteReader();
 
-                while (TABLE_ARTICLEM_TOLE.Read())
-                {
-                    ii++;
-                    Clipper_Material material = new Clipper_Material();
-                    material.Nuance = TABLE_ARTICLEM_TOLE["CODENUANCE"].ToString().Trim();
-                    material.Etat = TABLE_ARTICLEM_TOLE["CODEETAT"].ToString().Trim();
-                    material.Prixart = Convert.ToDouble(TABLE_ARTICLEM_TOLE["PRIXART"]);
-                    material.Densite = Convert.ToDouble(TABLE_ARTICLEM_TOLE["DENSITE"]);
-                    material.Type = Convert.ToInt32(TABLE_ARTICLEM_TOLE["TYPE"]);
-                    material.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM_TOLE["MULTIDIM"]);
-                
+            while (TABLE_ARTICLEM_TOLE.Read())
+            {
+                ii++;
+                Clipper_Material material = new Clipper_Material();
+                //Clipper_Article current_article = new Clipper_Article();
+                material.Nuance = TABLE_ARTICLEM_TOLE["CODENUANCE"].ToString().Trim();
+                material.Etat = TABLE_ARTICLEM_TOLE["CODEETAT"].ToString().Trim();
+                material.PRIXART = Convert.ToDouble(TABLE_ARTICLEM_TOLE["PRIXART"]);
+                material.Densite = Convert.ToDouble(TABLE_ARTICLEM_TOLE["DENSITE"]);
+                material.Type = Convert.ToInt32(TABLE_ARTICLEM_TOLE["TYPE"]);  //type article 3,4,5
+                material.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM_TOLE["MULTIDIM"]);
+
+
                 //attention pour les tole monodim l'epaisseur est stock en dim3.
                 //recuperation des codes multidim par defaut
 
-                if (material.IsMultiDim) {
+                if (material.IsMultiDim)
+                {
                     material.Thickness = Convert.ToDouble(TABLE_ARTICLEM_TOLE["EPAISSEUR"]);
-                    material.Coarti = TABLE_ARTICLEM_TOLE["COARTI"].ToString().Trim();
+                    //material.COARTI = TABLE_ARTICLEM_TOLE["COARTI"].ToString().Trim();
                 }
-                else {
+
+                else
+                {
+
                     material.Thickness = Convert.ToDouble(TABLE_ARTICLEM_TOLE["DIM3"]);
-                    material.Coarti = string.Empty;
+                    material.COARTI = string.Empty;
                 }
 
-
-                //on voit dans la liste le code article
-                material.Comments ="" ;//TABLE_ARTICLEM_TOLE["MATERIAL_COMMENTS"].ToString().Trim();
-                //issue du tube ou non
-                if (TABLE_ARTICLEM_TOLE["TYPE"].ToString().Trim() == "3")
+                material.COARTI = TABLE_ARTICLEM_TOLE["COARTI"].ToString().Trim();
+                //on voit dans la liste le code article //
+                material.Comments = TABLE_ARTICLEM_TOLE["MATERIAL_COMMENTS"].ToString().Trim();
+                //issue du tube ou non//
+                //le controle des matieres est obligatoire
+                if (TABLE_ARTICLEM_TOLE["TYPE"].ToString().Trim() == "3" && CheckDataintegrity(material) == true)
 
                 {   //plats
                     material.Comments = TABLE_ARTICLEM_TOLE["MATERIAL_COMMENTS"].ToString().Trim();
-                    material.setMaterialName();
-                }
-                else {
-                    //tube et autres
-                    material.Comments = "Matiere_Tube " + TABLE_ARTICLEM_TOLE["MATERIAL_COMMENTS"].ToString().Trim(); }
-                    material.setMaterialName();
-                //teste d'integrite sur la matiere
-               if (CheckDataintegrity(material))
+                    //creation de la liste  des articiel tole mono et multidims
+                    //on ajoute toutes les toles clip en dso differentes de nulless
+                    //current_article
+                    CLIPPER_TOLE_LIST.Add(material);
 
-                {
-                    // on controle les doublons ici //
-                    if (CLIPPER_MATERIAL_LIST.Where(m => m.Uidkey == material.Uidkey).Count() == 0)
-                    { CLIPPER_MATERIAL_LIST.Add(material); }
-                    else
-                    {
-                        logFile.WriteLine("doublon detecter sur la matiere, la matiere ne sera pas ajouté " + material.Uidkey);
-                    }
                 }
+
+                else
+                {
+                    //tube et autres
+                    material.Comments = "Matiere_Tube " + TABLE_ARTICLEM_TOLE["MATERIAL_COMMENTS"].ToString().Trim();
+
+                }
+                material.setMaterialName();
+                //teste d'integrite sur la matiere
+                //if (CheckDataintegrity(material))
+
+                //{
+                // on controle les doublons ici //
+                if (CLIPPER_MATERIAL_LIST.Where(m => m.Uidkey == material.Uidkey).Count() == 0)
+                { CLIPPER_MATERIAL_LIST.Add(material); }
+                else
+                {
+                    logFile.WriteLine("doublon detecter sur la matiere, la matiere ne sera pas ajouté " + material.Uidkey);
+                }
+
+                // on rempli la table des prix ecrit les prix
+                //CLIPPER_TOLE_LIST//
+                //liste article tole//
+                //CLIPPER_TOLE_LIST.Add();
+
+
+
+                //  }
 
             };
-            logFile.WriteLine("reconstitution de la table des matieres terminés : " + this.CLIPPER_MATERIAL_LIST.Count().ToString()+ " trouvées ");
-          
+            logFile.WriteLine("reconstitution de la table des matieres terminés : " + this.CLIPPER_MATERIAL_LIST.Count().ToString() + " trouvées ");
+
 
         }
         /// <summary>
@@ -762,217 +827,311 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// </summary>
 
         public void Close()
+        {
+
+            // reader.Close();
+
+            DSN = "";
+            SQL = "";
+
+            if (TABLE_ARTICLEM_TOLE != null)
             {
+                TABLE_ARTICLEM_TOLE.Close();
 
-                // reader.Close();
+            }
 
-                DSN = "";
-                SQL = "";
+            DbConnection.Dispose();
+            DbCommand.Dispose();
+            CLIPPER_MATERIAL_LIST = null;
+            DbCommand.Dispose();
+            DbConnection.Close();
+            //destroy list
 
-                if (TABLE_ARTICLEM_TOLE != null)
-                {
-                    TABLE_ARTICLEM_TOLE.Close();
+            CLIPPER_TOLE_LIST = null;
+            CLIPPER_MATERIAL_LIST = null;
 
-                }
-
-                DbConnection.Dispose();
-                DbCommand.Dispose();
-                CLIPPER_MATERIAL_LIST = null;
-                DbCommand.Dispose();
-                DbConnection.Close();
-
-                logFile.Close();
+            //
+            logFile.Close();
 
         }
-        
+
         /// <summary>
         /// phase d'import
         /// ecrit les nouvelles matieres dans almacam
         /// </summary>
         /// <param name="contextlocal"></param>
-        
-        public void Import(IContext contextlocal)
+
+        public void Import()
         {
-            //  logFile.WriteLine("mise a jour des matieres dans la base " + contextlocal.Model.DatabaseName);
-            //ecrirture de la liste des matiere//
-            //recuperation de la liste des matiere almacam
-                IEntityList qualityentitylist = contextlocal.EntityManager.GetEntityList("_QUALITY");
+
+
+            try
+            {
+                //  logFile.WriteLine("mise a jour des matieres dans la base " + contextlocal.Model.DatabaseName);
+                //ecrirture de la liste des matiere//
+                //recuperation de la liste des matiere almacam
+                IEntityList qualityentitylist = ContextLocal.EntityManager.GetEntityList("_QUALITY");
+                IEntityList materialentitylist = ContextLocal.EntityManager.GetEntityList("_MATERIAL");
                 IList<string> qualities_To_Create = new List<string>();
                 qualityentitylist.Fill(false);
-
                 IList<IEntity> qualitylist = new List<IEntity>();
-
                 //select distincte supprime les doublons
                 qualitylist = qualityentitylist.Distinct().ToList();
                 bool newdatabase = qualitylist.Count == 0;
                 ////liste des qualité de materiaux
-                IDictionary<long,string> updatedstringqualitylist = new Dictionary<long,string>();
+                IDictionary<long, string> updatedstringqualitylist = new Dictionary<long, string>();
 
-            //////
-            ///////detection des qualités a creer//// 
-            logFile.WriteLine("creation dela liste des qualités de clipper ");
-            foreach (Clipper_Material m in CLIPPER_MATERIAL_LIST)
-            {
-          
-                if (qualities_To_Create.Contains(m.Quality)==false)
-                {  qualities_To_Create.Add(m.Quality);  }
-               
-
-            }
-            logFile.WriteLine(qualities_To_Create.Count().ToString()+" qualités trouvées ");
-            
-            ///////////
-            ///creation des qualité dans la base si necessaire
-                        
-            foreach (string quality in qualities_To_Create)
-            {
-
-                // Find material           
-                IEntity currentQuality = qualitylist.Where(q => q.DefaultValue.Equals(quality)).FirstOrDefault();
-
-                if (currentQuality == null)
-                { 
-                    //creation de la nuance et sauvegarde// ou retour de la qualité courente
-                    currentQuality = contextlocal.EntityManager.CreateEntity("_QUALITY");
-                    currentQuality.SetFieldValue("_NAME", quality);
-                    logFile.WriteLine("creation de la nouvelle qualité  "+ quality);
-                    currentQuality.Save();
-
+                //////
+                ///////detection des qualités a creer//// 
+                logFile.WriteLine("creation de la liste des qualités de clipper ");
+                foreach (Clipper_Material m in CLIPPER_MATERIAL_LIST)
+                {
+                    if (qualities_To_Create.Contains(m.Quality) == false)
+                    { qualities_To_Create.Add(m.Quality); }
                 }
+                logFile.WriteLine(qualities_To_Create.Count().ToString() + " qualités trouvées ");
 
+                ///////////
+                ///creation des qualités dans la base si necessaire
+                //////////            
+                foreach (string quality in qualities_To_Create)
+                {
 
+                    // Find material           
+                    IEntity currentQuality = qualitylist.Where(q => q.DefaultValue.Equals(quality)).FirstOrDefault();
 
-
-            }
-
-            logFile.WriteLine( " qualités crées ");
-            qualityentitylist.Fill(false);
-            qualitylist = qualityentitylist.ToList();
-
-            ///////////
-            ///creation des matieres assocées au qualités
-            //mise a jour de la liste des matiere
-            // on ne prends que les matiere de type 3  (tole/plat)         
-
-            foreach (Clipper_Material m in CLIPPER_MATERIAL_LIST) {
-
-                // Find material           
-                IEntity currentQuality = qualitylist.Where(q => q.DefaultValue.Equals(m.Quality)).FirstOrDefault();
-                //update
-                currentQuality.SetFieldValue("_NAME", m.Quality);
-                currentQuality.SetFieldValue("_DENSITY", (m.Densite)/1000);
-                //calcul du prix moyen toutes epaisseurs confondues
-                currentQuality.SetFieldValue("_BUY_COST",( CLIPPER_MATERIAL_LIST.Average(p => p.Prixart)));
-                currentQuality.SetFieldValue("_OFFCUT_COST", (CLIPPER_MATERIAL_LIST.Average(p => p.Prixart)/1000));
-                currentQuality.SetFieldValue("_COMMENTS", m.Comments); 
-                currentQuality.Save();
-                //on rempli la liste des qualités
-                if (currentQuality != null) { 
-                        if (!updatedstringqualitylist.ContainsKey(currentQuality.Id) )
-                        {
-                            updatedstringqualitylist.Add(currentQuality.Id,m.Quality);
-                        }
-                }
-
-            }
-
-
-            //création des matieres   ---> pas d'unicité (voir dans la requete)
-            //on rempli une liste de keypair de type uidkey,ientity matiere pour detecter les doublons uidkey est une cle interne a l'obkey clipper matierial
-            //
-            logFile.WriteLine("creation des matieres assocées aux qualités  ");
-            foreach (var currentstringquality in updatedstringqualitylist)
-            {
-                {   //recuperation de la lisre de matieres associée a la qualité choisie
-                                     
-                    IEntityList almacam_materialentitylist = contextlocal.EntityManager.GetEntityList("_MATERIAL", "_QUALITY", ConditionOperator.Equal, currentstringquality.Key);
-                    almacam_materialentitylist.Fill(false);
-
-                    //construction de la liste des keypair (voir pour mettre un distionnaire si trop lent)
-                    IList<IEntity> almacam_material_list = new List<IEntity>();
-                    almacam_material_list = almacam_materialentitylist.ToList();
-                    //detection des doublons
-                    List<KeyValuePair<string,IEntity >> almacam_material_UiKey = new List<KeyValuePair<string,IEntity>>();                   
-                    foreach (Entity e in almacam_material_list)
+                    if (currentQuality == null)
                     {
-                        string quality = e.GetFieldValueAsEntity("_QUALITY").GetFieldValueAsString("_NAME");
-                        double thickness = e.GetFieldValueAsDouble("_THICKNESS");
-                        //Clipper_Material.getMaterial_Uidkey(quality, thickness);
-                        almacam_material_UiKey.Add(new KeyValuePair<string,IEntity>(quality +"*"+thickness,e));
+                        //creation de la nuance et sauvegarde// ou retour de la qualité courente
+                        currentQuality = ContextLocal.EntityManager.CreateEntity("_QUALITY");
+                        currentQuality.SetFieldValue("_NAME", quality);
+                        logFile.WriteLine("creation de la nouvelle qualité  " + quality);
+                        currentQuality.Save();
+
                     }
 
-                    //on se limite aux matiere des plats/toles
-                    foreach (Clipper_Material m in this.CLIPPER_MATERIAL_LIST.Where(t => t.Type == 3))
+
+
+
+                }
+
+                logFile.WriteLine(" qualités crées ");
+                qualityentitylist.Fill(false);
+                qualitylist = qualityentitylist.ToList();
+
+                ///////////
+                ///creation des matieres assocées au qualités
+                //mise a jour de la liste des matiere
+                // on ne prends que les matiere de type 3  (tole/plat)         
+
+                foreach (Clipper_Material m in CLIPPER_MATERIAL_LIST)
+                {
+
+                    // Find material           
+                    IEntity currentQuality = qualitylist.Where(q => q.DefaultValue.Equals(m.Quality)).FirstOrDefault();
+                    //update
+                    currentQuality.SetFieldValue("_NAME", m.Quality);
+                    currentQuality.SetFieldValue("_DENSITY", (m.Densite) / 1000);
+                    //calcul du prix moyen toutes epaisseurs confondues
+                    currentQuality.SetFieldValue("_BUY_COST", (CLIPPER_MATERIAL_LIST.Average(p => p.PRIXART)));
+                    currentQuality.SetFieldValue("_OFFCUT_COST", (CLIPPER_MATERIAL_LIST.Average(p => p.PRIXART) / 1000));
+                    currentQuality.SetFieldValue("_COMMENTS", m.Comments);
+                    currentQuality.Save();
+                    //on rempli la liste des qualités
+
+                    if (currentQuality != null)
                     {
-                        if (m.Quality == currentstringquality.Value && m.Type==3)
+                        if (!updatedstringqualitylist.ContainsKey(currentQuality.Id))
                         {
+                            updatedstringqualitylist.Add(currentQuality.Id, m.Quality);
+                        }
+                    }
 
-                            IEntity currentmaterial = null;
+                }
 
-                            //IEntity currentmaterial = almacam_material_list.Where(q => q.GetFieldValueAsString("_NAME").Equals(m.getMaterialName())).FirstOrDefault();
-                            //si la clé est retrouvé alors c'est un update sinon c'est une creation
-                            if (almacam_material_UiKey.Where(kvp => kvp.Key== m.Uidkey.Split('_')[0]).Count()>0)
+
+                //création des matieres   ---> pas d'unicité (voir dans la requete)
+                //on rempli une liste de keypair de type uidkey,ientity matiere pour detecter les doublons uidkey est une cle interne a l'obkey clipper matierial
+                //
+                logFile.WriteLine("creation des matieres assocées aux qualités  ");
+                foreach (var currentstringquality in updatedstringqualitylist)
+                {
+                    {   //recuperation de la lisre de matieres associée a la qualité choisie
+
+                        IEntityList almacam_materialentitylist = ContextLocal.EntityManager.GetEntityList("_MATERIAL", "_QUALITY", ConditionOperator.Equal, currentstringquality.Key);
+                        almacam_materialentitylist.Fill(false);
+
+                        //construction de la liste des keypair (voir pour mettre un distionnaire si trop lent)
+                        IList<IEntity> almacam_material_list = new List<IEntity>();
+                        almacam_material_list = almacam_materialentitylist.ToList();
+                        //detection des doublons
+                        List<KeyValuePair<string, IEntity>> almacam_material_UiKey = new List<KeyValuePair<string, IEntity>>();
+                        foreach (Entity e in almacam_material_list)
+                        {
+                            string quality = e.GetFieldValueAsEntity("_QUALITY").GetFieldValueAsString("_NAME");
+                            double thickness = e.GetFieldValueAsDouble("_THICKNESS");
+                            //Clipper_Material.getMaterial_Uidkey(quality, thickness);
+                            almacam_material_UiKey.Add(new KeyValuePair<string, IEntity>(quality + "*" + thickness, e));
+                        }
+
+                        //on se limite aux matiere des plats/toles
+                        foreach (Clipper_Material m in this.CLIPPER_MATERIAL_LIST.Where(t => t.Type == 3))
+                        {
+                            if (m.Quality == currentstringquality.Value && m.Type == 3)
                             {
-                                currentmaterial = almacam_material_UiKey.First(kvp => kvp.Key == m.Uidkey.Split('_')[0]).Value;
-                            }
-                           
 
-                            //creation
-                            if (currentmaterial == null)
-                            { 
-                                //creation de la matiere et sauvegarde//
-                                currentmaterial = contextlocal.EntityManager.CreateEntity("_MATERIAL");
-                                logFile.WriteLine("creation de la matieres   " + m.getMaterialName());
-                                currentmaterial.Save();
+                                IEntity currentmaterial = null;
 
-                            }
+                                //IEntity currentmaterial = almacam_material_list.Where(q => q.GetFieldValueAsString("_NAME").Equals(m.getMaterialName())).FirstOrDefault();
+                                //si la clé est retrouvé alors c'est un update sinon c'est une creation
+                                if (almacam_material_UiKey.Where(kvp => kvp.Key == m.Uidkey.Split('_')[0]).Count() > 0)
+                                {
+                                    currentmaterial = almacam_material_UiKey.First(kvp => kvp.Key == m.Uidkey.Split('_')[0]).Value;
+                                }
 
-                            //update and save
+
+                                //creation
+                                if (currentmaterial == null)
+                                {
+                                    //creation de la matiere et sauvegarde//
+                                    currentmaterial = ContextLocal.EntityManager.CreateEntity("_MATERIAL");
+                                    logFile.WriteLine("creation de la matieres   " + m.getMaterialName());
+                                    currentmaterial.Save();
+
+                                }
+
+                                //update and save
                                 logFile.WriteLine("mise à jour de la matiere :   " + m.getMaterialName());
-                           
+
                                 currentmaterial.SetFieldValue("_NAME", m.getMaterialName());
                                 currentmaterial.SetFieldValue("_QUALITY", currentstringquality.Key);
                                 currentmaterial.SetFieldValue("_THICKNESS", m.Thickness);
-                                currentmaterial.SetFieldValue("_BUY_COST", (m.Prixart)/1000);
-                                currentmaterial.SetFieldValue("_CLIPPER_CODE_ARTICLE", m.Coarti);
-                                currentmaterial.SetFieldValue("_COMMENTS",m.Comments);
-                                
-                            currentmaterial.Save();
-                            //on set le nom standard
-                            CommonModelBuilder.ComputeMaterialName(currentmaterial.Context, currentmaterial.GetFieldValueAsEntity("_QUALITY"), currentmaterial);
-                            currentmaterial.Save();
+                                currentmaterial.SetFieldValue("_BUY_COST", (m.PRIXART) / 1000);
+                                currentmaterial.SetFieldValue("_CLIPPER_CODE_ARTICLE", m.COARTI);
+
+                                IEntityList currentstocks = ContextLocal.EntityManager.GetEntityList("_STOCK", "_NAME", ConditionOperator.Equal, m.COARTI);
+                                currentstocks.Fill(false);
+
+
+                                if (currentstocks.Count() > 0)
+                                {
+                                    IEntity currentSheet = currentstocks.FirstOrDefault().GetFieldValueAsEntity("_SHEET");
+                                    currentmaterial.SetFieldValue("AF_DEFAULT_SHEET", currentSheet);
+                                    currentSheet = null;
+                                }
+
+                                currentmaterial.SetFieldValue("_COMMENTS", m.Comments);
+                                currentmaterial.Save();
+
+                                //on set le nom standard
+                                CommonModelBuilder.ComputeMaterialName(currentmaterial.Context, currentmaterial.GetFieldValueAsEntity("_QUALITY"), currentmaterial);
+                                currentmaterial.Save();
+                            }
                         }
+
+
+
+
+
+
+
+                        //pas utils mais au cas ou
+                        almacam_materialentitylist = null;
+                        almacam_material_list = null;
+
+
+                    }
+                }
+
+
+
+
+                ///Update material price
+                ///mise a jour des prix matiere sur les toles multi et monodim//
+                foreach (var t in CLIPPER_TOLE_LIST)
+                {
+
+
+                    //pour le momelnt on ne trie pas sur les toles deja traitées.List<long> TreatedSheetList = new List<long>();
+                    // Find material           
+                    IEntityList currentstocks = ContextLocal.EntityManager.GetEntityList("_STOCK", "_NAME", ConditionOperator.Equal, t.COARTI);
+                    currentstocks.Fill(false);
+
+                    if (currentstocks.Count() > 0)
+                    {
+                        //sheet
+
+                        //IEntity currentstock = currentstocks.FirstOrDefault();
+                        foreach (var currentstock in currentstocks)
+                        {
+
+
+                            IEntity currentSheet = currentstock.GetFieldValueAsEntity("_SHEET");
+                            currentSheet.SetFieldValue("_BUY_COST", t.PRIXART);
+                            currentSheet.SetFieldValue("_AS_SPECIFIC_COST", !t.IsMultiDim);
+                            currentSheet.Save();
+
+                            //stock
+                            currentstock.SetFieldValue("AF_IS_MULTIDIM", t.IsMultiDim);
+
+                            currentstock.Save();
+                            currentSheet = null;
+
+                        }
+
                     }
 
-                    //pas utils mais au cas ou
-                    almacam_materialentitylist = null;
-                    almacam_material_list = null;
+
+
+
 
 
                 }
-            
 
 
 
+
+                //*//
+
+                logFile.Flush();
+
+                this.Close();
             }
-            //*//
+            catch (Exception ie)
+            {
+                logFile.WriteLine("creation de la liste des qualités de clipper ");
+                //MessageBox.Show(ie.Message);
+            }
+            finally
+            {
 
-            logFile.Flush();
+                logFile.WriteLine("Import ended ");
+            }
 
-            this.Close();
         }
+        /// <summary>
+        /// verificaiton des matieres
+        /// </summary>
+        /// <param name="material"></param>
+        /// <returns></returns>
         public bool CheckDataintegrity(Clipper_Material material)
-            {   //epaisseur max
-                //si l'article existe deja on le 'import pas
-                bool integrity = true;
-            //cette matiere existe deja selon les clitter clippers
-            //if (CLIPPER_MATERIAL_LIST.Select(m => m.Materialname == material.Materialname).Count() > 0)
-            //foreach (Clipper_Material_)
-            //{ integrity = false; }
-          
+        {
+            bool integrity = true;
+
             return integrity;
         }
 
+        /// <summary>
+        /// verification si la matier existe dans la base cam
+        /// </summary>
+        /// <param name="material"></param>
+        /// <returns></returns>
+        public bool Material_Exists(Clipper_Material material)
+        {
+            bool integrity = true;
+
+            return integrity;
+        }
 
 
 
@@ -984,7 +1143,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     /// 
     /// 
     /// 
-    
+
 
 
     /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1009,10 +1168,23 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public string UnitePrix = "u";
         public string COARTI = "UNDEF"; //code etat (nuance epaisseur)
         public double PRIXART;// prixart
+        public int Type = 0;  // type d'article --> famille 
+
+        /*-- famille.DIMENSIONS=3 tole/plat
+                    -- famille.DIMENSIONS=17 tube rectangulaire
+                    -- famille.DIMENSIONS=16 tube carre
+                    -- famille.DIMENSIONS=4 rond
+                    -- famille.DIMENSIONS=5 tube rond
+        */
+
         public double Densite;//
         public IEntity Material;
+        public string Quality; //quality
         public string Nuance;
         public string Etat = "";
+        public double Thickness = 0;  //DIM1
+        public string Materialname = "UNDEF";
+        public bool IsMultiDim = false;
 
         //codification
         public string Name = "UNDEF";
@@ -1025,27 +1197,26 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// <summary>
         /// conexion
         /// </summary>
-         public OdbcDataReader TABLE_ARTICLEM;//TABLE_ARTICLEM;
-         public OdbcConnection DbConnection;
-         public OdbcCommand DbCommand;
-         public JsonTools JSTOOLS;
+        public OdbcDataReader TABLE_ARTICLEM;//TABLE_ARTICLEM;
+        public OdbcConnection DbConnection;
+        public OdbcCommand DbCommand;
+        public JsonTools JSTOOLS;
 
         public void Dispose()
-            {
+        {
             TABLE_ARTICLEM = null;
             //TABLE_ARTICLEM_ROND = null;
             DSN = null;
-            }
-            
+        }
+
         IList<Clipper_Material> TUBE_LIST = new List<Clipper_Material>();
-        //IList<string> Articles = new List<string>();
-        //IList<Clipper_Material> SHEET_LIST = new List<Clipper_Material>();
+
         /// <summary>
         /// constructeur
         /// </summary>
         public Clipper_Article()
         {
-         // DIM = new Dictionary<string, double>();
+            // DIM = new Dictionary<string, double>();
 
         }
         /// <summary>
@@ -1054,7 +1225,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public virtual void Read()
         {
 
-            
+
         }
         /// <summary>
         /// ecriture dans cam et eventuelement maj
@@ -1062,7 +1233,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public virtual void Write()
         {
 
-           
+
         }
         /// <summary>
         /// maj dans cam 
@@ -1070,7 +1241,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public virtual void Update()
         {
 
-            
+
         }
 
         /// <summary>
@@ -1086,23 +1257,24 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 //recup parametre dsn
                 DSN = JSTOOLS.getJsonStringParametres("dsn");
 
-                if (AlmaCamTool.Is_Odbc_Exists(DSN)) { 
+                if (AlmaCamTool.Is_Odbc_Exists(DSN))
+                {
 
-                        //recupe requete
-                        DbConnection = null;
-                        DbCommand = null;
-                        this.DbConnection = new OdbcConnection("DSN=" + DSN);
-                        this.DbConnection.Open();
-                        this.DbCommand = DbConnection.CreateCommand();
-                        //contextlocal.TraceLogger.TraceInformation("Creation du lien ODBC..");
-                            //logFile.WriteLine("connexion ok    : " + DSN);
+                    //recupe requete
+                    DbConnection = null;
+                    DbCommand = null;
+                    this.DbConnection = new OdbcConnection("DSN=" + DSN);
+                    this.DbConnection.Open();
+                    this.DbCommand = DbConnection.CreateCommand();
+                    //contextlocal.TraceLogger.TraceInformation("Creation du lien ODBC..");
+                    //logFile.WriteLine("connexion ok    : " + DSN);
                 }
 
             }
             catch (Exception ex)
             {
                 string methode = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                MessageBox.Show(methode ,  ex.Message);
+                MessageBox.Show(methode, ex.Message);
                 Environment.Exit(0);
             }
         }
@@ -1146,7 +1318,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             try
             {
 
-               
+
 
 
             }
@@ -1175,9 +1347,9 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             catch (Exception ex)
             {
                 string methode = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                MessageBox.Show(methode, ex.Message   + fieldname + "Not found ");
+                MessageBox.Show(methode, ex.Message + fieldname + "Not found ");
                 return "0";
-               
+
             }
 
         }
@@ -1193,8 +1365,9 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             {
                 //string value;
                 if (TABLE_ARTICLEM[fieldname].ToString().Trim() == string.Empty) { return 0; }
-                else {
-                    string temp =  TABLE_ARTICLEM[fieldname].ToString().Trim();
+                else
+                {
+                    string temp = TABLE_ARTICLEM[fieldname].ToString().Trim();
                     return Convert.ToInt32(temp);
 
                 }
@@ -1213,7 +1386,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
         public void Close()
         {
-            
+
             DSN = "";
             //SQL = "";
             TABLE_ARTICLEM.Close();
@@ -1221,7 +1394,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             DbCommand.Dispose();
             DbCommand.Dispose();
             DbConnection.Close();
-           
+
             //logFile.WriteLine("connexion    : Fin" );
             //logFile.Close();
             //logFile.Flush();
@@ -1248,13 +1421,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 if (grades.Count() > 0)
                 {
                     grade = grades.FirstOrDefault();
-                
+
 
                 }
                 else
                 {
                     grade = null;
-                  
+
                 }
 
 
@@ -1299,13 +1472,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     #endregion
 
     #region class des fourniture (vis, ecrous.... cartons)
-   
+
     /// <summary>
     /// propriété specifiques founitures divers
     /// </summary>
     public class Founiture_Divers : Clipper_Article, IDisposable
     {
-      
+
     }
 
     #endregion
@@ -1317,7 +1490,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     /// </summary>
     public class Clipper_Article_Toles_MonoDim : Clipper_Article, IDisposable
     {
-     
+
         private string entityType = "_SHEET";
         public List<Flat> Clipper_articles_Stock;
         //public Dictionary<string, IEntity> Almacam_Stock;
@@ -1330,7 +1503,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             this.contextlocal = context;
             Odbc_Connexion();
             //getAlmacam_Existing_Format_List(entityType);
-            Almacam_Stock=getAlmacam_Stock_Format_List();
+            Almacam_Stock = getAlmacam_Stock_Format_List();
         }
 
 
@@ -1354,16 +1527,16 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 exclusionlist.Fill(false);
                 List<string> exclusion = new List<string>();
 
-               
+
                 foreach (IEntity ex in exclusionlist)
                 {
                     string uid = ex.GetFieldValueAsString("_REFERENCE").Trim();
                     if (uid != string.Empty)
                     {
-                        if (exclusion.Contains(uid) == false  )
+                        if (exclusion.Contains(uid) == false)
                         { exclusion.Add(uid); }
                     }
-                    
+
 
                 }
 
@@ -1385,7 +1558,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// <param name="entitype"></param>
         /// <param name="entity_uniquestring_field"></param>
         /// <returns>dicionnaire string entity sheet </returns>
-        public Dictionary<string,IEntity> getAlmacam_Stock_Format_List()
+        public Dictionary<string, IEntity> getAlmacam_Stock_Format_List()
         {
             try
             {
@@ -1395,23 +1568,23 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 IEntityList exclusionlist;
                 exclusionlist = contextlocal.EntityManager.GetEntityList(entitype);
                 exclusionlist.Fill(false);
-               //List<string> exclusion = new List<string>();
+                //List<string> exclusion = new List<string>();
 
                 //recuperation du format de chaque entity de stock
                 foreach (IEntity ex in exclusionlist)
                 {
                     string uid = ex.GetFieldValueAsString("_NAME").Trim();
                     IEntity e = ex.GetFieldInternalValueAsEntity("_SHEET");
-                    uid += "_"+e.Id;
+                    uid += "_" + e.Id;
                     if (uid != string.Empty)
                     {
                         IEntity rst = null;
                         sheetlist.TryGetValue(uid, out rst);
-                        if (rst==null)
-                        { sheetlist.Add(uid,e); }
+                        if (rst == null)
+                        { sheetlist.Add(uid, e); }
                     }
 
-                    
+
                 }
 
 
@@ -1421,8 +1594,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
 
-                
-                
+
+
                 return sheetlist;
 
 
@@ -1463,7 +1636,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         ///flat.commercial = true;
         ///
         /// </summary>
-        public override void  Read() {
+        public override void Read()
+        {
 
 
             Clipper_articles_Stock = new List<Flat>();
@@ -1471,7 +1645,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
             try
             {
-                
+
                 string sql_tube_rec = this.JSTOOLS.getJsonStringParametres("sql.All_Flat");
                 //logFileTubeRond.Write("requete utilisée pour l'import des tubes \r\n " + sql_tube_rec);
                 int ii = 0;
@@ -1487,13 +1661,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     flat.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     flat.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
-                    string nuance_etat= flat.Etat == "" ? flat.Nuance  : flat.Nuance + "*" + flat.Etat;
+                    string nuance_etat = flat.Etat == "" ? flat.Nuance : flat.Nuance + "*" + flat.Etat;
 
                     flat.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
                     bool multidim = TABLE_ARTICLEM["MULTIDIM"].ToString() == "0" ? false : true;
-                    flat.MultiDim = multidim;
+                    flat.IsMultiDim = multidim;
                     //recuperation des dimenssions
-                    if (flat.MultiDim)
+                    if (flat.IsMultiDim)
                     {
                         flat.Longueur = Convert.ToDouble(getSqlNumericValue("LOMULTIDIM"));
                         flat.Largeur = Convert.ToDouble(getSqlNumericValue("LAMULTIDIM"));
@@ -1506,16 +1680,18 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                         flat.Epaisseur = Convert.ToDouble(getSqlNumericValue("EPMONODIM"));
                     }
 
-                     flat.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
+                    flat.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
                     flat.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim();
 
                     flat.InternalName = nuance_etat + "*" + flat.Longueur + "*" + flat.Largeur + "*" + flat.Epaisseur;
 
                     //int type = TABLE_ARTICLEM["CHUTE"].ToString() == "N" ? 0 : 1;
-                    if (TABLE_ARTICLEM["CHUTE"].ToString() == "O") {
-                        flat.type= SheetType.Chute;
+                    if (TABLE_ARTICLEM["CHUTE"].ToString() == "O")
+                    {
+                        flat.type = SheetType.Chute;
                     }
-                    else if(TABLE_ARTICLEM["CHUTE"].ToString() == "1") {
+                    else if (TABLE_ARTICLEM["CHUTE"].ToString() == "1")
+                    {
                         flat.type = SheetType.ToleNeuve; //forcement tole neuve
                         flat.commercial = true;
                     }
@@ -1526,7 +1702,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     //condition d'ajout dans la liste ==> format commercial multidim
                     //format monodim  ce qui assure un code article unique
-                    if(flat.MultiDim=false || flat.commercial)
+                    if (flat.IsMultiDim = false || flat.commercial)
                     {
                         this.Clipper_articles_Stock.Add(flat);
 
@@ -1536,7 +1712,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 };
 
                 TABLE_ARTICLEM.Close();
-             
+
             }
 
             catch (Exception ie)
@@ -1544,7 +1720,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 Clipper_articles_Stock = null;
                 MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 logFilesheetMonodim.Close();
-                
+
             }
 
 
@@ -1591,12 +1767,14 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
         }
-        public  void UpdatePrice() {
+        public void UpdatePrice()
+        {
 
-             try {
+            try
+            {
                 //this.Clipper_articles_Stock; //liste du stock clip
                 //this.Almacam_Stock; liste du stock cam
-               if (Clipper_articles_Stock.Count>0 & Clipper_articles_Stock.Count()>0)
+                if (Clipper_articles_Stock.Count > 0 & Clipper_articles_Stock.Count() > 0)
                 {
                     foreach (Flat flat in Clipper_articles_Stock)
                     {
@@ -1618,17 +1796,18 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     //srtring coda = Clipper_articles_Stock[flat.COARTI]
 
 
-                } 
+                }
 
 
 
 
             }
-            catch {
+            catch
+            {
 
 
             }
-            
+
 
 
 
@@ -1644,14 +1823,14 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
         //private List<TubeRond>listeTubeRond;
         public SheetType type; // = SheetType.ToleNeuve;
-        public bool MultiDim = false;
+
         public bool commercial = false;
         public double Longueur = 0;
         public double Largeur = 0;
         public double Epaisseur = 0;
 
 
-        
+
 
     }
     #endregion
@@ -1663,7 +1842,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     /// <summary>
     ///   class Clipper_Article_Tube.. derive de clipper article
     /// </summary>
-    public class Clipper_Article_Tube :Clipper_Article, IDisposable
+    public class Clipper_Article_Tube : Clipper_Article, IDisposable
     {
         //string prefix; // prefixe article matiere
         //creation du listener
@@ -1671,11 +1850,12 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public string Section_Key; //"_SECTION_CIRCLE" or....
         public List<string> SectionExclusion = new List<string>();
         public List<string> TubeExclusion = new List<string>();
-       
-        
-      
+        public List<KeyValuePair<string, long>> TubeExclusion_WithId = new List<KeyValuePair<string, long>>();
+        private List<string> AlmaCam_Material_List = new List<string>();
 
-       /* public JsonTools JSTOOLS;*/
+
+
+        /* public JsonTools JSTOOLS;*/
 
         IList<Clipper_Material> TUBE_LIST = new List<Clipper_Material>();
 
@@ -1686,7 +1866,15 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         }
 
 
+        public void getAlmaCamMateriallist()
+        {
 
+            IEntityList AlmaCam_Material_List_entities = contextlocal.EntityManager.GetEntityList("_MATERIAL");
+            AlmaCam_Material_List_entities.Fill(false);
+
+            //AlmaCam_Material_List=AlmaCam_Material_List_entities.ToDictionary(x => x.GetFieldValueAsString("_NAME"), x );
+            AlmaCam_Material_List_entities = null;
+        }
         /// <summary>
         /// retourn une liste d'exclusion des sections ou des tubes
         /// </summary>
@@ -1748,12 +1936,18 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 //Entity currentQuality = qualitylist.Where(q => q.DefaultValue.Equals(quality)).FirstOrDefault();
                 foreach (IEntity ex in exclusionlist)
                 {
+
                     string uid = ex.GetFieldValueAsString(uid_field).Trim();
-
-                    ex.GetImplementEntity(Section_Key);
-                    if (exclusion.Contains(uid) == false)
-                    { exclusion.Add(uid); }
-
+                    if (uid != null)
+                    {
+                        ex.GetImplementEntity(Section_Key);
+                        if (exclusion.Contains(uid) == false)
+                        { exclusion.Add(uid); }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Certains articles tubes ont des reference nulles, merci de les remplir");
+                    }
                 }
 
 
@@ -1768,9 +1962,62 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
         }
-       
+        /// <summary>
+        /// retrourne la liste des entité barre a excluire de tout ajout avec les id des entités barre
+        /// </summary>
+        public List<KeyValuePair<string, long>> getExclusionList_WithId(string entitype, string uid_field)
+        {
+            try
+            {
+                var list = new List<KeyValuePair<string, long>>();
+                IEntityList exclusionlist;
+                exclusionlist = contextlocal.EntityManager.GetEntityList(entitype);
+                //exclusionlist[0].GetFieldValueAsEntity("_SECTION").ImplementedEntityType.Key
+                exclusionlist.Fill(false);
+                List<KeyValuePair<string, long>> exclusion = new List<KeyValuePair<string, long>>();
 
-        public long getExistingSection(string section_name,string section_key)
+                // Find material           
+                //Entity currentQuality = qualitylist.Where(q => q.DefaultValue.Equals(quality)).FirstOrDefault();
+                foreach (IEntity ex in exclusionlist)
+                {
+
+                    string uid = ex.GetFieldValueAsString(uid_field).Trim();
+                    if (uid != null)
+                    {
+
+                        KeyValuePair<string, long> v = new KeyValuePair<string, long>(null, 0);
+                        v = exclusion.SingleOrDefault(x => x.Key == uid);
+                        ex.GetImplementEntity(Section_Key);
+
+                        if (v.Key == null)
+                        {
+                            KeyValuePair<string, long> newtube = new KeyValuePair<string, long>(uid, ex.Id);
+                            exclusion.Add(newtube);
+
+
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Certains articles tubes ont des reference nulles, merci de les remplir");
+                    }
+                }
+
+
+                return exclusion;
+            }
+
+            catch
+            {
+
+                return null;
+            }
+
+
+        }
+
+        //recupération de l'existant
+        public long getExistingSection(string section_name, string section_key)
         {
 
             try
@@ -1779,8 +2026,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 //nous verrons
 
                 IExtendedEntityList sections;
-                IExtendedEntity section=null;
-                long section_id =0;
+                IExtendedEntity section = null;
+                long section_id = 0;
 
                 if (section_name != "")
                 {
@@ -1792,8 +2039,9 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     foreach (IExtendedEntity s in sections)
                     {
                         object o = s.GetFieldValue(section_key + "\\IMPLEMENT__SECTION\\_NAME");
-                        if (o.ToString() == section_name) {
-                            section_id = s.Id32;
+                        if (o.ToString() == section_name)
+                        {
+                            section_id = s.Id;
                             section = s;
                             break;
 
@@ -1805,15 +2053,63 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
                     return section_id;
-                 
+
                 }
                 else
                 { return 0; }
-             
+
 
 
             }
             catch (Exception ie) { MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error); return 0; }
+
+
+        }
+        public IEntity getExistingSectionEntity(string section_name, string section_key)
+        {
+
+            try
+            {
+                //en cas de lenteur on pourrais stocker toutes les gardes poour eviter de faire troo de requetes
+                //nous verrons
+
+                IExtendedEntityList sections;
+                IExtendedEntity section = null;
+                long section_id = 0;
+
+                if (section_name != "")
+                {
+                    //sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_NAME", name);
+
+                    sections = contextlocal.EntityManager.GetExtendedEntityList(contextlocal.Kernel.GetEntityType(section_key));
+                    sections.Fill(false);
+
+                    foreach (IExtendedEntity s in sections)
+                    {
+                        object o = s.GetFieldValue(section_key + "\\IMPLEMENT__SECTION\\_NAME");
+                        if (o.ToString() == section_name)
+                        {
+                            //section_id = s.Id;
+                            section = s;
+                            break;
+
+                        }
+                    }
+
+
+
+
+
+                    return section.Entity;
+
+                }
+                else
+                { return null; }
+
+
+
+            }
+            catch (Exception ie) { MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error); return null; }
 
 
         }
@@ -1837,19 +2133,19 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     sections.Fill(false);
 
                     foreach (IExtendedEntity s in sections)
-                    
+
                     {
                         object o = s.GetFieldValue(section_key + "\\IMPLEMENT__SECTION\\_NAME");
-                        object id= s.GetFieldValue(section_key + "\\IMPLEMENT__SECTION");
+                        object id = s.GetFieldValue(section_key + "\\IMPLEMENT__SECTION");
                         if (o.ToString() == section_name)
                         {
-                            section_id =(long) id;
+                            section_id = (long)id;
 
                             //section = s;
                             break;
 
                         }
-                        
+
                     }
 
 
@@ -1866,6 +2162,74 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
             }
             catch (Exception ie) { MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error); return 0; }
+
+
+        }
+        public IEntity get_Section_Quality(IEntity section, IEntity quality)
+        {
+
+            try
+            {
+                IEntity s = null;
+                IEntityList sections = contextlocal.EntityManager.GetEntityList("_SECTION_QUALITY", LogicOperator.And, "_SECTION", ConditionOperator.Equal, section.GetImplementEntity("_SECTION").Id, "_QUALITY", ConditionOperator.Equal, quality.Id);
+                sections.Fill(false);
+
+                if (sections.Count > 0)
+                {
+                    s = sections.FirstOrDefault();
+                }//creation
+                else
+                {
+                    //string key = Guid.NewGuid().ToString();
+                    //update prix article// prix au mettre /1000 pour obtenir le prix au mm
+
+                    s = contextlocal.EntityManager.CreateEntity("_SECTION_QUALITY");
+                    s.SetFieldValue("_SECTION", s.GetImplementEntity("_SECTION").Id);
+                    s.Save();
+                }
+                //s = contextlocal.EntityManager.CreateEntity(Section_Key); }
+
+
+                return s;
+            }
+            catch { return null; }
+        }
+        /// <summary>
+        /// retourne la section a modifier ou a ecrire 
+        /// </summary>
+        /// <param name="section_name"></param>
+        /// <param name="section_key">circle...</param>
+        /// <returns></returns>
+        public IEntity Create_Section_If_Not_Exists(string section_name, string section_key, string refrerence_field_name)
+        {
+
+
+            try
+            {
+                IEntity e = null;
+                IEntityList sections = null;
+                if (section_name != "")
+                {
+                    //sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_NAME", name);
+                    //IEntityType entity_type = contextlocal.Kernel.GetEntityType(section_key)
+
+                    sections = contextlocal.EntityManager.GetEntityList(section_key, refrerence_field_name, ConditionOperator.Equal, section_name);
+                    sections.Fill(false);
+
+                    if (sections.Count > 0)
+                    {
+                        e = sections.FirstOrDefault();
+                    }//creation
+                    else { e = contextlocal.EntityManager.CreateEntity(Section_Key); }
+
+
+                }
+                return e;
+            }
+
+            catch { return null; }
+            finally { }
+
 
 
         }
@@ -1887,10 +2251,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     /// </summary>
     public class TubeRond : Clipper_Article, IDisposable
     {
-        
+
 
         //private List<TubeRond>listeTubeRond;
-        private TypeTube type=TypeTube.Rond;
+        private TypeTube type = TypeTube.Rond;
         public double Diametre;
         public double Longueur;
         public double epaisseur;
@@ -1920,8 +2284,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public double Longueur;
         public string Section;
         public string Section_Spe_Key;
-        
-       
+
+
     }
 
 
@@ -1956,7 +2320,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             Section_Key = "_SECTION_CIRCLE";
             SectionExclusion = getSectionExclusionList(Section_Key);
             TubeExclusion = getExclusionList("_BARTUBE", "_REFERENCE");
-
+            TubeExclusion_WithId = getExclusionList_WithId("_BARTUBE", "_REFERENCE");
         }
 
         /// <summary>
@@ -1986,16 +2350,34 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     ii++;
                     TubeRond tuberond = new TubeRond();
                     tuberond.COARTI = TABLE_ARTICLEM["COARTI"].ToString().Trim();
+                    tuberond.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim();
                     tuberond.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     tuberond.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
                     tuberond.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
                     //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM_TUBE["EPAISSEUR"]);
                     tuberond.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
-                    tuberond.Longueur = Convert.ToDouble(getSqlNumericValue("LNG"));
-                    tuberond.Diametre = Convert.ToDouble(getSqlNumericValue("DIAM"));
-                    tuberond.epaisseur = Convert.ToDouble(getSqlNumericValue("EPAISSEUR"));
-                    tuberond.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim(); ;
-                    tuberond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + getSqlNumericValue("LNG");
+                    tuberond.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM["MULTIDIM"]);
+
+                    if (tuberond.IsMultiDim)
+                    {
+                        //multidim
+                        tuberond.Longueur = Convert.ToDouble(getSqlNumericValue("DIMENSIO_DIM1"));
+                        tuberond.Diametre = Convert.ToDouble(getSqlNumericValue("DIM2"));
+                        tuberond.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM1"));
+                        tuberond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberond.Longueur;
+
+                    }
+                    else
+                    {//monodim
+                        tuberond.Longueur = Convert.ToDouble(getSqlNumericValue("DIM1"));
+                        tuberond.Diametre = Convert.ToDouble(getSqlNumericValue("DIM3"));
+                        tuberond.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM2"));
+                        tuberond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim();
+                    }
+
+
+
+                    //tuberond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberond.Longueur;
                     this.List_Tube_Ronds.Add(tuberond);
                     logFileTubeRond.Write("Tube : " + tuberond.COARTI + " capturé");
 
@@ -2031,61 +2413,143 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     //creation de la section (type...)//
                     IEntity sectionEntity;
-                    string key = Guid.NewGuid().ToString();
-                    //creation de la section
-                    sectionEntity = contextlocal.EntityManager.CreateEntity(Section_Key);
+                    IEntity section;
+                    IEntity barreEntity;
+                    IEntity sectionQuality;
 
-                    IEntity sectionQuality = contextlocal.EntityManager.CreateEntity("_SECTION_QUALITY");
-                    sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_KEY", key);
                     string name = String.Format("Tube_Rond*{0}*{1}", tuberond.Diametre, tuberond.epaisseur);
-                    sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_NAME", name);// +"x"+ep.ToString());;
-
-
-                    sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_STANDARD", true);
-                    sectionEntity.SetFieldValue("_P_D", tuberond.Diametre);
-                    sectionEntity.SetFieldValue("_P_T", tuberond.epaisseur);
-                    //descpription //
-                    string description = String.Format("Tube Rond Diamete={0} mm Eaisseur={1} mm", tuberond.Diametre, tuberond.epaisseur);
-
-                    sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_DESCRIPTION", description);
-
-                    //sectionEntity.SetFieldValue("_P_T", this.ep);           
-                    sectionEntity.Complete = true;
-
-                    logFileTubeRond.Write("Tube : " + tuberond.COARTI + " sauvegarde");
-                    //creation de la qualité
-                    tuberond.Material = tuberond.GetGrade(contextlocal, tuberond.Nuance, tuberond.Etat);
-
+                    string description = String.Format("Tube Rond Diamete={0} mm Epaisseur={1} mm", tuberond.Diametre, tuberond.epaisseur);
                     //recuperation de la section
+                    //TubeExclusion_WithId
+                    //creation du tube
                     if (SectionExclusion.Contains(name) == false)
 
-                    {   //si n existe pas on recupere la nouvelle section //
+                    {
+
+                        string key = Guid.NewGuid().ToString();
+                        //creation conditionnelle de la section
+                        sectionEntity = contextlocal.EntityManager.CreateEntity(Section_Key);
+                        //sectionEntity = Create_Section_If_Not_Exists(tuberond.COARTI,Section_Key);
+                        //creation conditionnelle de la section
+                        sectionQuality = contextlocal.EntityManager.CreateEntity("_SECTION_QUALITY");
+                        sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_KEY", key);
+
+                        sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_NAME", name);// +"x"+ep.ToString());;
+                        sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_STANDARD", true);
+                        sectionEntity.SetFieldValue("_P_D", tuberond.Diametre);
+                        sectionEntity.SetFieldValue("_P_T", tuberond.epaisseur);
+                        //descpription //
+                        sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_DESCRIPTION", description);
+
+                        //sectionEntity.SetFieldValue("_P_T", this.ep);           
+                        sectionEntity.Complete = true;
+
+                        logFileTubeRond.Write("Tube : " + tuberond.COARTI + " sauvegarde");
+
+                        //creation de la qualité
+                        tuberond.Material = tuberond.GetGrade(contextlocal, tuberond.Nuance, tuberond.Etat);
+                        sectionQuality.SetFieldValue("_QUALITY", tuberond.Material.Id);
+
                         sectionEntity.Save();
-                        sectionQuality.SetFieldValue("_SECTION", sectionEntity.Id32);
+
                     }
                     else
                     //si elle existe deja on recupere la section //
-                    { sectionQuality.SetFieldValue("_SECTION", getExistingSection(name, Section_Key)); }
-
-
-                    if (TubeExclusion.Contains(tuberond.COARTI) == false)
                     {
-                        sectionQuality.SetFieldValue("_QUALITY", tuberond.Material.Id32);
-                        sectionQuality.SetFieldValue("_BUY_COST", tuberond.PRIXART);
-                        sectionQuality.Save();
-                        logFileTubeRond.Write("section " + description + " sauvegardée");
-                        //creation DE LA BARRE
-                        IEntity barreEntity;
-                        string keybar = Guid.NewGuid().ToString();
+
+                        //sectionEntity = contextlocal.EntityManager.GetEntity(getExistingSection(name, Section_Key), Section_Key);
+                        //sectionQuality.SetFieldValue("_SECTION", getExistingSection(name, Section_Key));
+                        sectionEntity = getExistingSectionEntity(name, Section_Key);
+                        sectionQuality = get_Section_Quality(sectionEntity, tuberond.GetGrade(contextlocal, tuberond.Nuance, tuberond.Etat));
+                        //recuperation de la qualité//
+
+                        //recuperation de lid de section dans la table des sections
+                        //section = sectionEntity.GetImplementEntity("_SECTION");
+                        //sectionQuality.SetFieldValue("_BUY_COST", tuberond.PRIXART / 1000);
+                        //section = sectionEntity.GetImplementEntity("_SECTION");
+
+                    }
+
+
+                    //dans le cas ou on a une exclusion --> on est en  mise a jour
+                    KeyValuePair<string, long> v = new KeyValuePair<string, long>(null, 0);
+
+                    if (TubeExclusion_WithId.Count != 0)
+                    {
+
+                        //if (TubeExclusion.Contains(tuberond.COARTI) == false)
+                        v = TubeExclusion_WithId.SingleOrDefault(x => x.Key == tuberond.COARTI);
+                        if (v.Key == null)
+                        {
+                            //creation
+                            barreEntity = contextlocal.EntityManager.CreateEntity("_BARTUBE");
+                            barreEntity.Save();
+                        }
+                        else
+                        {//mise a jour 
+
+                            barreEntity = contextlocal.EntityManager.GetEntity(v.Value, "_BARTUBE");
+                        }
+
+
+                    }//full creation
+                    else
+                    {
                         barreEntity = contextlocal.EntityManager.CreateEntity("_BARTUBE");
-                        barreEntity.SetFieldValue("_REFERENCE", tuberond.COARTI);
-                        barreEntity.SetFieldValue("_QUALITY", tuberond.Material.Id32);
-                        barreEntity.SetFieldValue("_LENGTH", tuberond.Longueur);
-                        //ATTENTION recuperation des infos de l'implemented section
-                        barreEntity.SetFieldValue("_SECTION", sectionEntity.GetImplementEntity("_SECTION").Id); //sectionEntity.GetImplementEntity("_SECTION").Id
                         barreEntity.Save();
                     }
-                    logFileTubeRond.Write("section " + description + "lng " + tuberond.Longueur + " sauvegardée");
+
+
+                    if (barreEntity != null)
+                    {
+                        //if (TubeExclusion.Contains(tuberond.COARTI) == false)
+                        {
+
+
+                            logFileTubeRond.Write("section " + description + " sauvegardée");
+                            //creation DE LA BARRE
+                            //IEntity barreEntity;
+                            string keybar = Guid.NewGuid().ToString();
+                            //barreEntity = contextlocal.EntityManager.CreateEntity("_BARTUBE");
+                            barreEntity.SetFieldValue("_REFERENCE", tuberond.COARTI);
+                            barreEntity.SetFieldValue("_QUALITY", tuberond.Material.Id32);
+                            barreEntity.SetFieldValue("_LENGTH", tuberond.Longueur);
+                            //ATTENTION recuperation des infos de l'implemented section
+                            barreEntity.SetFieldValue("_SECTION", sectionEntity.GetImplementEntity("_SECTION").Id); //sectionEntity.GetImplementEntity("_SECTION").Id
+
+                            if (tuberond.IsMultiDim == false)
+                            {  //monodim on declare les 
+                                barreEntity.SetFieldValue("_AS_SPECIFIC_COST", tuberond.IsMultiDim);
+                                barreEntity.SetFieldValue("_BUY_COST", tuberond.PRIXART);
+
+                               
+                            }
+                            else
+                            {
+                                //recuperation de lid de section dans la table des sections
+                                section = sectionEntity.GetImplementEntity("_SECTION");
+
+                                if (tuberond.IsMultiDim)
+                                {   //update prix article// prix au mettre /1000 pour obtenir le prix au mm
+                                    sectionQuality.SetFieldValue("_SECTION", section.Id);
+                                    sectionQuality.SetFieldValue("_BUY_COST", tuberond.PRIXART / 1000);
+                                    sectionQuality.Save();
+                                }
+                                //ATTENTION recuperation des infos de l'implemented sectio
+
+                            }
+
+
+
+
+                            barreEntity.Save();
+                        }
+                        logFileTubeRond.Write("section " + description + "lng " + tuberond.Longueur + " sauvegardée");
+                    }
+                    else
+                    {
+                        logFileTubeRond.Write("fail to import " + tuberond.Name + "lng " + tuberond.Longueur + " sauvegardée");
+                    }
                 }
             }
 
@@ -2930,8 +3394,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             catch (Exception ie)
             {
                 MessageBox.Show(ie.Message); return null;
-            
-                
+
+
             }
 
         }
@@ -3068,7 +3532,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
     #region Founitures
-   
+
 
     /// <summary>
     /// import specifique des vis
@@ -3094,7 +3558,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public Clipper_Import_Fournitures_Divers(IContext context)
         {
 
-            
+
 
             this.contextlocal = context;
             contextlocal.TraceLogger.TraceInformation("Test de Connection ODBC");
@@ -3123,7 +3587,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                 exclusionlist = contextlocal.EntityManager.GetEntityList(entitypekey);
                 exclusionlist.Fill(false);
-                Dictionary<long,string> exclusion = new Dictionary<long, string>();
+                Dictionary<long, string> exclusion = new Dictionary<long, string>();
                 // Find material           
                 //Entity currentQuality = qualitylist.Where(q => q.DefaultValue.Equals(quality)).FirstOrDefault();
                 foreach (IEntity ex in exclusionlist)
@@ -3135,7 +3599,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     if (exclusion.ContainsKey(uid) == false && string.IsNullOrEmpty(coarti) == false)
                     {
-                        exclusion.Add(uid,coarti);
+                        exclusion.Add(uid, coarti);
                     }
 
                 }
@@ -3163,7 +3627,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             try
             {
                 //creation de la liste des fournitures
-          
+
                 this.List_Fourniture = new List<Founiture_Divers>();
                 //recuperation des tube rectangluaires
                 string sql_vis = this.JSTOOLS.getJsonStringParametres("sql.Divers");
@@ -3178,8 +3642,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     ii++;
                     Founiture_Divers Fourniture = new Founiture_Divers();
                     ///cle unique clipper
-                    Fourniture.AMCLEUNIK= Convert.ToInt64( TABLE_ARTICLEM["AMCLEUNIK"]);
-                    Fourniture.COARTI= TABLE_ARTICLEM["COARTI"].ToString().Trim();
+                    Fourniture.AMCLEUNIK = Convert.ToInt64(TABLE_ARTICLEM["AMCLEUNIK"]);
+                    Fourniture.COARTI = TABLE_ARTICLEM["COARTI"].ToString().Trim();
                     Fourniture.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     Fourniture.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
                     Fourniture.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
@@ -3188,7 +3652,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     Fourniture.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim(); ;
                     Fourniture.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + getSqlNumericValue("LNG");
                     Fourniture.DESA1 = TABLE_ARTICLEM["DESA1"].ToString().Trim();
-                    
+
                     this.List_Fourniture.Add(Fourniture);
                     logFourniture.Write("Fourniture : " + Fourniture.COARTI + " capturé");
 
@@ -3224,27 +3688,29 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                 if (this.List_Fourniture.Any())
                 {
-                  
+
 
                     foreach (Founiture_Divers fourniture in this.List_Fourniture)
-                    {   
+                    {
 
-                        if (!Founiture_Divers_Exclusion.ContainsValue( fourniture.COARTI) ) {
-                         IEntity Fourniture_Entity;
-//
-                        Fourniture_Entity = contextlocal.EntityManager.CreateEntity(Key);
-                        Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_REFERENCE", fourniture.COARTI);
-                        Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_DESIGNATION", fourniture.DESA1 );
-                        Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_COMMENTS", fourniture.COFA);
-                        Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_BUY_COST", fourniture.PRIXART);
-                        Fourniture_Entity.Save();
+                        if (!Founiture_Divers_Exclusion.ContainsValue(fourniture.COARTI))
+                        {
+                            IEntity Fourniture_Entity;
+                            //
+                            Fourniture_Entity = contextlocal.EntityManager.CreateEntity(Key);
+                            Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_REFERENCE", fourniture.COARTI);
+                            Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_DESIGNATION", fourniture.DESA1);
+                            Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_COMMENTS", fourniture.COFA);
+                            Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_BUY_COST", fourniture.PRIXART);
+                            Fourniture_Entity.Save();
                         }
                         //update
-                        else {
+                        else
+                        {
                             IEntity Fourniture_Entity;
                             //recupere l'id et mets a jour les champs
                             //FirstOrDefault(x => x.Value == "one").Key; 
-                            long uid =Founiture_Divers_Exclusion.FirstOrDefault(x => x.Value == fourniture.COARTI).Key;
+                            long uid = Founiture_Divers_Exclusion.FirstOrDefault(x => x.Value == fourniture.COARTI).Key;
                             Fourniture_Entity = contextlocal.EntityManager.GetEntity(uid, "_SUPPLY");
                             Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_REFERENCE", fourniture.COARTI);
                             Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_DESIGNATION", fourniture.DESA1);
@@ -3289,11 +3755,11 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     {
                         IEntity Fourniture_Entity;
 
-                     
+
                         Fourniture_Entity = contextlocal.EntityManager.CreateEntity("_SUPPLY");
                         Fourniture_Entity.SetFieldValue("_REFERENCE", fourniture.Name);
                         Fourniture_Entity.SetFieldValue("_COMMENTS", "");
-                      
+
                         Fourniture_Entity.Save();
                     }
 
@@ -3344,21 +3810,21 @@ public class MissingJsonFile : Exception
 internal class Missing_Obdc_Exception : Exception
 
 {
-   
-      
-    
-        public Missing_Obdc_Exception( string nomodbc)
 
-        {
 
-            MessageBox.Show("la connexion odbc "+ nomodbc + " n'est pas configurée. Contactez Clipper pour ce point ou bien referez vous a la documentation d'installaitons");
-            Environment.Exit(0);
 
-        }
+    public Missing_Obdc_Exception(string nomodbc)
 
-       
+    {
 
-    
+        MessageBox.Show("la connexion odbc " + nomodbc + " n'est pas configurée. Contactez Clipper pour ce point ou bien referez vous a la documentation d'installaitons");
+        Environment.Exit(0);
+
+    }
+
+
+
+
 }
 
 
@@ -3368,7 +3834,7 @@ internal class Missing_Obdc_Exception : Exception
 #region Tools
 public static class AlmaCamTool
 {
-    
+
     /// <summary>
     /// recupere un context almacam
     /// </summary>
@@ -3395,41 +3861,45 @@ public static class AlmaCamTool
                 return context;
             }
         }
-        catch (Exception ie) {
+        catch (Exception ie)
+        {
 
             string methode = System.Reflection.MethodBase.GetCurrentMethod().Name;
             MessageBox.Show(ie.Message);
 
-            return null; }
+            return null;
+        }
     }
 
     /// <summary>
-   /// verifie si la connexion odbc est possible
-   /// </summary>
-   /// <param name="DSN"></param>
-   /// <returns></returns>
+    /// verifie si la connexion odbc est possible
+    /// </summary>
+    /// <param name="DSN"></param>
+    /// <returns></returns>
     public static bool Is_Odbc_Exists(string DSN)
     {
         bool rst = true;
         var mDbConnection = new OdbcConnection("DSN=" + DSN);
 
-        try {
-            
+        try
+        {
 
-            
-         
+
+
+
             using (mDbConnection)
             {
                 mDbConnection.Open();
 
                 rst = true;
             }
-            
+
 
             return rst;
 
 
-        } catch(Exception ie)
+        }
+        catch (Exception ie)
         {
             return false;
         }

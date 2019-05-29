@@ -15,7 +15,7 @@ namespace Wpm.Implement.ModelSetting
         {
             ITransaction transaction = context.CreateTransaction();
             IParameterValue parameterValue;
-            #region Formule pour le champ "Référence" d'un devis
+            #region Formule pour le champ "Reference" d'un devis
             
             {
                 parameterValue = context.ParameterSetManager.GetParameterValue("_EVENT_FORMULA_HANDLER", "_QUOTE_REFERENCE_TYPE");

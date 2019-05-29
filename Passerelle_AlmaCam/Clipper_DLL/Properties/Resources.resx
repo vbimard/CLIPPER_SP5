@@ -117,16 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="All_Commandes" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\All_Commandes.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="All_Entities" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\All_Entities.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="All_Events" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\All_Events.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="Almcam_Version" xml:space="preserve">
     <value>2.1.5</value>
   </data>

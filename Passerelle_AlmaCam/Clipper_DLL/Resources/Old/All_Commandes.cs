@@ -128,7 +128,7 @@ namespace Wpm.Implement.ModelSetting
                 {
                     IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
                     parameterDescription.Key = "CLIPPER_MACHINE_CF";
-                    parameterDescription.Name = "centre de frais machien clipper";
+                    parameterDescription.Name = "centre de frais machine clipper";
                     parameterDescription.ParameterDescriptionType = ParameterDescriptionType.String;
                     parameterDescription.DefaultValue = @"CLIP";
                     commandTypeFactory.ParameterList.Add(parameterDescription);
@@ -164,7 +164,7 @@ namespace Wpm.Implement.ModelSetting
                 {
                     IParameterDescription parameterDescription = new ParameterDescription(context.Kernel.UnitSystem, true);
                     parameterDescription.Key = "EXPLODE_MULTIPLICITY";
-                    parameterDescription.Name = "Explosion de fichiers de retours sur mutliplicité";
+                    parameterDescription.Name = "Explosion de fichiers de retours sur mutliplicite";
                     parameterDescription.ParameterDescriptionType = ParameterDescriptionType.Boolean;
                     parameterDescription.DefaultValue = false;
                     commandTypeFactory.ParameterList.Add(parameterDescription);

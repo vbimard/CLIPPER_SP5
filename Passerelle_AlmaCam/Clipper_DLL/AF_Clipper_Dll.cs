@@ -966,10 +966,6 @@ namespace AF_Clipper_Dll
 
         }
 
-
-
-
-
         public static string Get_application1()
         {
             string key = "APPLICATION1";
@@ -982,13 +978,21 @@ namespace AF_Clipper_Dll
             string key = "VERBOSE_LOG"; //log verbeux
             if (Parameters_Dictionnary.ContainsKey(key)) { return (bool)Parameters_Dictionnary[key]; } else { return true; }
         }
-
+        
         public static string Get_Clipper_Machine_Cf()
         {
             string key = "CLIPPER_MACHINE_CF"; //log verbeux
             //GetlistParam(context);//
             if (Parameters_Dictionnary.ContainsKey(key)) { return (string)Parameters_Dictionnary[key]; } else { return "Undef clipper machine"; }
 
+        }
+
+        //retourne le get_mutlidim//
+        //retourne la valeur de la case a cocher is_mutlidim
+        public static bool Get_MULTIDIM_MODE()
+        {
+            string key = "AF_MULTIDIM_MODE"; //multidim
+            if (Parameters_Dictionnary.ContainsKey(key)) { return (bool)Parameters_Dictionnary[key]; } else { return true; }
         }
 
         /// <summary>
@@ -9555,6 +9559,8 @@ namespace AF_Clipper_Dll
     #endregion
 
     #region Integration
+
+        /*
     public class Clipper_8_integrate : ScriptModelCustomization, IScriptModelCustomization
     {
 
@@ -9637,6 +9643,8 @@ namespace AF_Clipper_Dll
         }
 
     }
+
+    */
     #endregion
 
 

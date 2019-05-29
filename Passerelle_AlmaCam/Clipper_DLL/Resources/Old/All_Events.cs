@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -15,7 +15,7 @@ namespace Wpm.Implement.ModelSetting
         {
             ITransaction transaction = context.CreateTransaction();
             IParameterValue parameterValue;
-            #region Formule pour le champ "Référence" d'un devis
+            #region Formule pour le champ "Reference" d'un devis
             
             {
                 parameterValue = context.ParameterSetManager.GetParameterValue("_EVENT_FORMULA_HANDLER", "_QUOTE_REFERENCE_TYPE");
@@ -70,7 +70,7 @@ namespace Actcut.QuoteModelManager
             }
             
             #endregion
-            #region Evénement après l'envoi à la coupe
+            #region Evenement apres l'envoi à la coupe
             
             {
                 parameterValue = context.ParameterSetManager.GetParameterValue("_EVENT_FORMULA_HANDLER", "_AFTER_SEND_TO_WORKSHOP_EVENT_TYPE");
@@ -88,7 +88,7 @@ namespace Actcut.QuoteModelManager
             }
             
             #endregion
-            #region Evénement après la fin de la coupe
+            #region Evénement apres la fin de la coupe
             
             {
                 parameterValue = context.ParameterSetManager.GetParameterValue("_EVENT_FORMULA_HANDLER", "_AFTER_END_CUTTING_EVENT_TYPE");

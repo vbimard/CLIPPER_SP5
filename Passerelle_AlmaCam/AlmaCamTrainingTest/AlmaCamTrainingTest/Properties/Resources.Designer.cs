@@ -132,9 +132,9 @@ namespace AlmaCamTrainingTest.Properties {
         ///{
         ///    public partial class ImportUserCommandType : ScriptModelCustomization, IScriptMode [le reste de la chaîne a été tronqué]&quot;;.
         /// </summary>
-        public static string CommandesV2 {
+        public static string Commandes_Clip {
             get {
-                return ResourceManager.GetString("CommandesV2", resourceCulture);
+                return ResourceManager.GetString("Commandes_Clip", resourceCulture);
             }
         }
         
@@ -153,14 +153,14 @@ namespace AlmaCamTrainingTest.Properties {
         ///    {
         ///        public override bool Execute(IContext context, IContext hostContext)
         ///        {
-        ///        
-        ///            
-        ///		  //preparation du dictionnaire //
-        ///            / [le reste de la chaîne a été tronqué]&quot;;.
+        ///
+        ///
+        ///            //preparation du dictionnaire //
+        ///            // champs des [le reste de la chaîne a été tronqué]&quot;;.
         /// </summary>
-        public static string Entities3 {
+        public static string Entities_Clip {
             get {
-                return ResourceManager.GetString("Entities3", resourceCulture);
+                return ResourceManager.GetString("Entities_Clip", resourceCulture);
             }
         }
         
@@ -182,9 +182,9 @@ namespace AlmaCamTrainingTest.Properties {
         ///        {
         ///            ITransaction transacti [le reste de la chaîne a été tronqué]&quot;;.
         /// </summary>
-        public static string event2 {
+        public static string event_Clip {
             get {
-                return ResourceManager.GetString("event2", resourceCulture);
+                return ResourceManager.GetString("event_Clip", resourceCulture);
             }
         }
         
