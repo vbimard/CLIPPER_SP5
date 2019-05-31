@@ -145,66 +145,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     public class Clipper_Import_Fournitures_Divers_Processor : CommandProcessor
     {
 
-        public override bool Execute()
-        {
 
-            try
-            {
-                //creation des logs
-                TextWriterTraceListener logFile;
-                Import(Context);
-                return base.Execute();
-            }
-            catch
-            {
-                return base.Execute();
-            }
-
-        }
-
-        public bool Import(IContext contextlocal)
-        {
-            try
-            {
-                using (Clipper_Import_Fournitures_Divers UpdateFourniture = new Clipper_Import_Fournitures_Divers(contextlocal))
-                {
-                    try
-                    {
-
-
-                        Cursor.Current = Cursors.WaitCursor;
-
-
-                        UpdateFourniture.Read();
-                        UpdateFourniture.Write();
-                        UpdateFourniture.Close();
-
-                        Cursor.Current = Cursors.Default;
-                    }
-                    catch { Cursor.Current = Cursors.Default; }
-                }
-
-                return true;
-            }
-            catch { return false; }
-        }
-
-
-    }
-
-    /// </summary>
-    ///bouton import des tubes
-    public class Clipper8_ImportTubes_Processor : CommandProcessor
-    {
-
-        Boolean Import_Matiere = true;
-        Boolean Tube_Rond = true;
-        Boolean Tube_Speciaux = true;
-        Boolean Rond = true;
-        Boolean Tube_Rectangle = true;
-        Boolean Tube_Carre = false;
-        Boolean Tube_Flat = true;
-        Boolean Fourniture = false;
 
         /// <summary>
         /// constructeur de l'import des tube, tu stock et des matieres.........
@@ -219,7 +160,16 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// <param name="Tube_Speciaux">true ou false pour declencher l'import</param>
         /// <param name="Fourniture">true ou false pour declencher l'import</param>
         /// 
-        public Clipper8_ImportTubes_Processor(bool import_matiere, bool tube_rond, bool rond, bool tube_rectangle, bool tube_carre, bool tube_flat, bool tube_speciaux, bool fourniture)
+        Boolean Import_Matiere = false;
+        Boolean Tube_Rond = false;
+        Boolean Tube_Speciaux = false;
+        Boolean Rond = false;
+        Boolean Tube_Rectangle = false;
+        Boolean Tube_Carre = false;
+        Boolean Tube_Flat = false;
+        Boolean Fourniture = true;
+
+        public Clipper_Import_Fournitures_Divers_Processor(bool import_matiere, bool tube_rond, bool rond, bool tube_rectangle, bool tube_carre, bool tube_flat, bool tube_speciaux, bool fourniture)
         {
 
             Import_Matiere = import_matiere;
@@ -234,20 +184,12 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
         }
 
-        public override bool Execute()
+        public Clipper_Import_Fournitures_Divers_Processor()
         {
 
-            try
-            {
-                Import(Context);
-                return base.Execute();
-            }
-            catch
-            {
-                return base.Execute();
-            }
-
         }
+
+
 
         public void Import(IContext contextlocal)
         {
@@ -266,10 +208,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     {
                         try
                         {
+
                             //Update_Material.Almacam_Update_Material(contextlocal);
                             Update_Material.Import();
+                            Update_Material.Dispose();
                             //Update_Material.Close();
                             Cursor.Current = Cursors.Default;
+
                         }
                         catch { Cursor.Current = Cursors.Default; }
                     }
@@ -286,6 +231,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                             tubesronds.ReadTubes();
                             tubesronds.WriteTubes();
                             tubesronds.Close();
+                            tubesronds.Dispose();
+
 
                         }
                         catch (Exception ie)
@@ -336,7 +283,6 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     }
                 }
-                               
                 ///toles --> flat
                 if (Tube_Flat)
                 {
@@ -347,14 +293,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                             tubesflats.ReadTubes();
                             tubesflats.WriteTubes();
                             tubesflats.Close();
-
+                            tubesflats.Dispose();
                         }
                         catch (Exception ie) { MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error); }
 
 
                     }
                 }
-
                 if (Tube_Speciaux)
                 {
                     using (Clipper_Import_Tube_Speciaux tubesspeciaux = new Clipper_Import_Tube_Speciaux(contextlocal))
@@ -365,7 +310,27 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                             tubesspeciaux.ReadTubes();
                             tubesspeciaux.WriteTubes();
                             tubesspeciaux.Close();
+                            tubesspeciaux.Dispose();
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
+                        }
+
+                    }
+                }
+                if (Fourniture)
+                {
+                    using (Clipper_Import_Fournitures_Divers fournitures = new Clipper_Import_Fournitures_Divers(contextlocal))
+                    {
+                        try
+                        {
+
+                            fournitures.Read();
+                            fournitures.Write();
+                            fournitures.Close();
+                            fournitures.Dispose();
                         }
                         catch (Exception ie)
                         {
@@ -377,6 +342,285 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 }
 
 
+            }
+            catch
+            {
+
+            }
+
+        }
+        public override bool Execute()
+        {
+
+            try
+            {
+                Import(Context);
+                AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT ", "Import terminé.");
+                return base.Execute();
+            }
+            catch (Exception ie)
+            {
+                AF_ImportTools.SimplifiedMethods.NotifyMessage("ERREUR IMPORT ", ie.Message);
+                return false;
+            }
+            finally
+            {
+
+            }
+
+        }
+
+
+
+
+        /*
+        public override bool Execute()
+        {
+
+            try
+            {
+                //creation des logs
+                TextWriterTraceListener logFile;
+                Import(Context);
+                return base.Execute();
+            }
+            catch
+            {
+                return base.Execute();
+            }
+
+        }*/
+        /*
+        public bool Import(IContext contextlocal)
+        {
+            try
+            {
+                using (Clipper_Import_Fournitures_Divers UpdateFourniture = new Clipper_Import_Fournitures_Divers(contextlocal))
+                {
+                    try
+                    {
+
+
+                        Cursor.Current = Cursors.WaitCursor;
+
+
+                        UpdateFourniture.Read();
+                        UpdateFourniture.Write();
+                        UpdateFourniture.Close();
+
+                        Cursor.Current = Cursors.Default;
+                    }
+                    catch { Cursor.Current = Cursors.Default; }
+                }
+
+                return true;
+            }
+            catch { return false; }
+        }*/
+
+
+    }
+
+    /// </summary>
+    ///bouton import des tubes
+    public class Clipper8_ImportTubes_Processor : CommandProcessor
+    {
+
+
+
+        /// <summary>
+        /// constructeur de l'import des tube, tu stock et des matieres.........
+        /// import_matiere,  tube_rond,  rond,  tube_rectangle,  tube_carre, tube_flat,  Tube_Speciaux
+        /// </summary>
+        /// <param name="import_matiere">true ou false pour declencher l'import</param>
+        /// <param name="tube_rond">true ou false pour declencher l'import</param>
+        /// <param name="rond">true ou false pour declencher l'import</param>
+        /// <param name="tube_rectangle">true ou false pour declencher l'import</param>
+        /// <param name="tube_carre">true ou false pour declencher l'import</param>
+        /// <param name="tube_flat">true ou false pour declencher l'import</param>
+        /// <param name="Tube_Speciaux">true ou false pour declencher l'import</param>
+        /// <param name="Fourniture">true ou false pour declencher l'import</param>
+        /// 
+        Boolean Import_Matiere = true;
+        Boolean Tube_Rond = true;
+        Boolean Tube_Speciaux = true;
+        Boolean Rond = true;
+        Boolean Tube_Rectangle = true;
+        Boolean Tube_Carre = false;
+        Boolean Tube_Flat = true;
+        Boolean Fourniture = false;
+
+        public Clipper8_ImportTubes_Processor(bool import_matiere, bool tube_rond, bool rond, bool tube_rectangle, bool tube_carre, bool tube_flat, bool tube_speciaux, bool fourniture)
+        {
+
+            Import_Matiere = import_matiere;
+            Tube_Rond = tube_rond;
+            Rond = rond;
+            Tube_Rectangle = tube_rectangle;
+            Tube_Carre = tube_carre;
+            Tube_Flat = tube_flat;
+            Tube_Speciaux = tube_speciaux;
+            Fourniture = fourniture;
+
+
+        }
+
+        public Clipper8_ImportTubes_Processor()
+        {
+
+
+
+        }
+        public void Import(IContext contextlocal)
+        {
+            //creation des logs
+            TextWriterTraceListener logFile;
+            try
+            {
+                //detection du contexte
+                Cursor.Current = Cursors.WaitCursor;
+                //creation des logs
+                //creation du listener
+                ////
+                if (Import_Matiere)
+                {
+                    using (Clipper_Import_Matiere Update_Material = new Clipper_Import_Matiere(contextlocal))
+                    {
+                        try
+                        {
+
+                            //Update_Material.Almacam_Update_Material(contextlocal);
+                            Update_Material.Import();
+                            Update_Material.Dispose();
+                            //Update_Material.Close();
+                            Cursor.Current = Cursors.Default;
+
+                        }
+                        catch { Cursor.Current = Cursors.Default; }
+                    }
+
+                }
+
+                if (Tube_Rond)
+                {
+                    using (Clipper_Import_Tube_Rond tubesronds = new Clipper_Import_Tube_Rond(contextlocal))
+                    {
+                        try
+                        {
+
+                            tubesronds.ReadTubes();
+                            tubesronds.WriteTubes();
+                            tubesronds.Close();
+                            tubesronds.Dispose();
+
+
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
+                    }
+                }
+                if (Rond)
+                {
+                    using (Clipper_Import_Rond ronds = new Clipper_Import_Rond(contextlocal))
+                    {
+                        try
+                        {
+
+
+                            ronds.ReadTubes();
+                            ronds.WriteTubes();
+                            ronds.Close();
+
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        }
+
+                    }
+                }
+                if (Tube_Rectangle)
+                {
+
+                    using (Clipper_Import_Tube_Rectangle tubesrectangle = new Clipper_Import_Tube_Rectangle(contextlocal))
+                    {
+                        try
+                        {
+                            tubesrectangle.ReadTubes();
+                            tubesrectangle.WriteTubes();
+                            tubesrectangle.Close();
+
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
+
+                    }
+                }
+                ///toles --> flat
+                if (Tube_Flat)
+                {
+                    using (Clipper_Import_Tube_Flat tubesflats = new Clipper_Import_Tube_Flat(contextlocal))
+                    {
+                        try
+                        {
+                            tubesflats.ReadTubes();
+                            tubesflats.WriteTubes();
+                            tubesflats.Close();
+                            tubesflats.Dispose();
+                        }
+                        catch (Exception ie) { MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+
+                    }
+                }
+                if (Tube_Speciaux)
+                {
+                    using (Clipper_Import_Tube_Speciaux tubesspeciaux = new Clipper_Import_Tube_Speciaux(contextlocal))
+                    {
+                        try
+                        {
+
+                            tubesspeciaux.ReadTubes();
+                            tubesspeciaux.WriteTubes();
+                            tubesspeciaux.Close();
+                            tubesspeciaux.Dispose();
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        }
+
+                    }
+                }
+                if (Fourniture)
+                {
+                    using (Clipper_Import_Fournitures_Divers fournitures = new Clipper_Import_Fournitures_Divers(contextlocal))
+                    {
+                        try
+                        {
+
+                            fournitures.Read();
+                            fournitures.Write();
+                            fournitures.Close();
+                            fournitures.Dispose();
+                        }
+                        catch (Exception ie)
+                        {
+                            MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        }
+
+                    }
+                }
+
 
             }
             catch
@@ -385,6 +629,28 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             }
 
         }
+        public override bool Execute()
+        {
+
+            try
+            {
+                Import(Context);
+                AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT ", "Import terminé.");
+                return base.Execute();
+            }
+            catch(Exception ie)
+            {
+                AF_ImportTools.SimplifiedMethods.NotifyMessage("ERREUR IMPORT ",  ie.Message  );
+                return false;
+            }
+            finally
+            {
+                
+            }
+
+        }
+
+       
     }
     //////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -636,6 +902,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     //var DbConnection =new OdbcConnection("DSN=" + DSN);
             try
             {
+                AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT MATIERE", "import des matieres en court...");
                 logFile.WriteLine("initialisatin de la methode");
                 //lecture du fichier json
                 logFile.WriteLine("lecture du fichier Json");
@@ -689,7 +956,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         private void Get_Clipper_Material(IContext contextlocal)
         {
 
-            //recuperation des paramètres almaquote
+           
 
             Clipper_Param.GetlistParam(contextlocal);
 
@@ -735,7 +1002,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 if (material.IsMultiDim)
                 {
                     material.Thickness = Convert.ToDouble(TABLE_ARTICLEM_TOLE["EPAISSEUR"]);
-                    //material.COARTI = TABLE_ARTICLEM_TOLE["COARTI"].ToString().Trim();
+                    
                 }
 
                 else
@@ -780,10 +1047,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     logFile.WriteLine("doublon detecter sur la matiere, la matiere ne sera pas ajouté " + material.Uidkey);
                 }
 
-                // on rempli la table des prix ecrit les prix
-                //CLIPPER_TOLE_LIST//
-                //liste article tole//
-                //CLIPPER_TOLE_LIST.Add();
+                
 
 
 
@@ -988,7 +1252,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                                 if (currentstocks.Count() > 0)
                                 {
                                     IEntity currentSheet = currentstocks.FirstOrDefault().GetFieldValueAsEntity("_SHEET");
-                                    currentmaterial.SetFieldValue("AF_DEFAULT_SHEET", currentSheet);
+                                    currentmaterial.SetFieldValue("AF_DEFAULT_SHEET", currentSheet.GetFieldValueAsString("_REFERENCE"));
                                     currentSheet = null;
                                 }
 
@@ -1356,6 +1620,54 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
         }
 
+        public List<string> CheckDoublonsInStringList(List<string> Listacontroler)
+        {
+            List<String> temps = new List<String>();
+            List<String> doublons = new List<String>();
+            try
+            {
+
+
+                foreach (string s in Listacontroler)
+                {
+                    if (!temps.Contains(s)) { temps.Add(s); }
+                    else { doublons.Add(s); }
+
+
+
+                }
+                temps.Clear();
+                return doublons;
+            }
+            catch { return null; }
+
+
+        }
+        public List<string> CheckDoublonsInkeypPairList(List<KeyValuePair<string, long>> Listkeypairacontroler)
+        {
+            List<String> temps = new List<String>();
+            List<String> doublons = new List<String>();
+
+            try
+            {
+
+
+                foreach (var v in Listkeypairacontroler)
+                {
+                    if (!temps.Contains(v.Key))
+                    { temps.Add(v.Key); }
+                    else
+                    {
+                        doublons.Add(v.Key);
+                    }
+                }
+                temps.Clear();
+                return doublons;
+            }
+            catch { return null; }
+
+
+        }
         public void Close()
         {
 
@@ -1409,7 +1721,12 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             }
             catch (Exception ie) { MessageBox.Show(ie.Message, System.Reflection.MethodBase.GetCurrentMethod().Name, MessageBoxButtons.OK, MessageBoxIcon.Error); return null; }
         }
-
+        /// <summary>
+        /// converti le prix en fonction de l'unité de gestion
+        /// </summary>
+        /// <param name="unitegestion">par longeur ou par kg ou par u ou par u100...</param>
+        /// <param name="price"></param>
+        /// <returns></returns>
         public double GetPrice(string unitegestion, double price)
         {
             try
@@ -1824,6 +2141,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public List<string> TubeExclusion = new List<string>();
         public List<KeyValuePair<string, long>> TubeExclusion_WithId = new List<KeyValuePair<string, long>>();
         public List<KeyValuePair<string, long>> SectionQualityExclusion_WithId = new List<KeyValuePair<string, long>>();
+        //pas de dictionnaire pour le moment
+        public List<KeyValuePair<string, long>> SpecificTubeList_WithId = new List<KeyValuePair<string, long>>();
         private List<string> AlmaCam_Material_List = new List<string>();
 
         public void CloseImport()
@@ -1832,13 +2151,17 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
             if (TubeExclusion != null)
             { TubeExclusion.Clear(); }
+            if (SpecificTubeList_WithId != null)
+            { TubeExclusion.Clear(); }
             if (TubeExclusion_WithId != null)
-                { TubeExclusion_WithId.Clear();}
+            { TubeExclusion_WithId.Clear(); }
             if (SectionQualityExclusion_WithId != null)
-                { SectionQualityExclusion_WithId.Clear(); }
+            { SectionQualityExclusion_WithId.Clear(); }
             if (AlmaCam_Material_List != null)
-                { AlmaCam_Material_List.Clear(); }
+            { AlmaCam_Material_List.Clear(); }
 
+
+           // AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT TUBE", "Import des " + Section_Key +" terminé.");
 
 
         }
@@ -1950,6 +2273,46 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
         }
+
+        //traduit du code article les inforamtions en decomposant le code article
+        //-->>peu fiable 
+        private TubeSpe getTubeInfosFrom_Coda(string coda)
+        {
+
+            try
+            {
+
+                TubeSpe sp = new TubeSpe();
+                string[] infos = null;
+
+                if (coda != null || coda != string.Empty)
+                    //recuperation de la section spe du tube
+
+                    infos = coda.Split('*');
+                long dim = infos.Count() - 1;
+                sp.Section = infos[0].Trim();
+                sp.Longueur = Convert.ToDouble(infos[dim]);
+                //section
+                if (sp.Section.Contains("IPN")) { sp.Section_Spe_Key = "_SECTION_IPN"; }
+                else if (sp.Section.Contains("IPE")) { sp.Section_Spe_Key = "_SECTION_IPE"; }
+                else if (sp.Section.Contains("UPN")) { sp.Section_Spe_Key = "_SECTION_UPN"; }
+                else if (sp.Section.Contains("UPE")) { sp.Section_Spe_Key = "_SECTION_UPE"; }
+                else if (sp.Section == "L") { sp.Section_Spe_Key = "_SECTION_L"; }
+                else if (sp.Section.Contains("LROUND")) { sp.Section_Spe_Key = "_SECTION_LROUND"; }
+                else { sp.Section_Spe_Key = string.Empty; }
+                sp.COARTI = coda;
+                return sp;
+
+            }
+
+            catch (Exception ie)
+            {
+                MessageBox.Show(ie.Message); return null;
+
+
+            }
+
+        }
         /// <summary>
         /// retrourne la liste des entité barre a excluire de tout ajout avec les id des entités barre
         /// </summary>
@@ -2000,6 +2363,97 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                 return null;
             }
+
+
+        }
+        /// <summary>
+        /// rempli la liste d'exeption, du tuebe spé pour limité le nombre de requetes
+        /// et accellerer le processus
+        /// </summary>
+        /// <returns></returns>
+        public List<KeyValuePair<string, long>> getSpecificTubeList()
+        {
+            try
+            {
+                var list = new List<KeyValuePair<string, long>>();
+                IEntityList specificTubeList;
+
+                specificTubeList = contextlocal.EntityManager.GetEntityList("_BARTUBE");
+                //pas de dictionnaire pour le moment
+                specificTubeList.Fill(false);
+                var specificsectionkeyList = new List<string>() { "_SECTION_IPN", "_SECTION_IPE", "_SECTION_UPN", "_SECTION_UPE", "_SECTION_L", "_SECTION_LROUND" };
+
+
+                List<KeyValuePair<string, long>> tubelist = new List<KeyValuePair<string, long>>();
+
+
+                foreach (IEntity tube in specificTubeList)
+                {
+
+
+                    {
+
+                        KeyValuePair<string, long> v = new KeyValuePair<string, long>(null, 0);
+                        string entitytypekey = tube.GetFieldValueAsEntity("_SECTION").ImplementedEntityType.Key;
+                        string tubereference = tube.GetFieldValueAsString("_REFERENCE");
+
+                        if (specificsectionkeyList.Contains(entitytypekey))
+                        {
+                            KeyValuePair<string, long> newtube = new KeyValuePair<string, long>(tubereference, tube.Id);
+                            tubelist.Add(newtube);
+                        }
+                    }
+
+
+                }
+
+
+                //check de doublons
+                var doublons = new List<string>();
+                doublons = CheckDoublonsInkeypPairList(tubelist);
+                if (doublons.Count() > 0)
+                {
+                    MessageBox.Show("Doublons detectées dans les tubes spécifiques, certaines données ne pourrons pas etre mise à jour.");
+                }
+                doublons.Clear();
+                return tubelist;
+            }
+
+            catch
+            {
+
+                return null;
+            }
+
+
+        }
+        public IEntity getTubeFromSpecifiTubeList(string Coda)
+        {
+            try
+            {
+                //dans le cas ou on a une exclusion --> on est en  mise a jour
+                KeyValuePair<string, long> v = new KeyValuePair<string, long>(null, 0);
+                IEntity barreEntity = null;
+
+                if (SpecificTubeList_WithId.Count != 0)
+                {
+
+                    //pas de gestion de double ici
+                    v = SpecificTubeList_WithId.SingleOrDefault(x => x.Key == Coda);
+                    if (v.Key != null)
+                    {
+
+                        barreEntity = contextlocal.EntityManager.GetEntity(v.Value, "_BARTUBE");
+                    }
+
+
+                }
+
+                return barreEntity;
+            }
+
+            catch { return null; }
+            finally { }
 
 
         }
@@ -2155,45 +2609,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
         /// <summary>
-        /// retourne la section a modifier ou a ecrire 
+        /// creation des section
+        /// si les entités existent alors elle sont retournées sinon une nouvelle entité est cree
         /// </summary>
         /// <param name="section_name"></param>
-        /// <param name="section_key">circle...</param>
+        /// <param name="section_key"></param>
+        /// <param name="created">retourne true si l'entitté est nouvelement cree a l'appel de la methode</param>
         /// <returns></returns>
-        /*
-        public IEntity Create_Section_If_Not_Exists_old(string section_name, string section_key, string refrerence_field_name)
-        {
-
-
-            try
-            {
-                IEntity e = null;
-                IEntityList sections = null;
-                if (section_name != "")
-                {
-                    //sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_NAME", name);
-                    //IEntityType entity_type = contextlocal.Kernel.GetEntityType(section_key)
-
-                    sections = contextlocal.EntityManager.GetEntityList(section_key, refrerence_field_name, ConditionOperator.Equal, section_name);
-                    sections.Fill(false);
-
-                    if (sections.Count > 0)
-                    {
-                        e = sections.FirstOrDefault();
-                    }//creation
-                    else { e = contextlocal.EntityManager.CreateEntity(Section_Key); }
-
-
-                }
-                return e;
-            }
-
-            catch { return null; }
-            finally { }
-
-
-
-        }*/
         public IEntity Create_Section_If_Not_Exists(string section_name, string section_key, out bool created)
         {
             created = false;
@@ -2309,7 +2731,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
         //check integrity
         ///
-        public  bool CheckTubeIntegrity(double longeurTube, IEntity quality)
+        public bool CheckTubeIntegrity(double longeurTube, IEntity quality)
         {
             bool rst = true;
             try
@@ -2406,12 +2828,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// <param name="context"></param>
         public Clipper_Import_Tube_Rond(IContext context)
         {
-
+            
             this.contextlocal = context;
             Section_Key = "_SECTION_CIRCLE";
             SectionExclusion = getSectionExclusionList(Section_Key);
             TubeExclusion = getExclusionList("_BARTUBE", "_REFERENCE");
             TubeExclusion_WithId = getExclusionList_WithId("_BARTUBE", "_REFERENCE");
+            AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT TUBE", "Import des section " + Section_Key);
         }
 
 
@@ -2453,7 +2876,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 logFileTubeRond.Write("requete utilisée pour l'import des tubes \r\n " + sql_tube_rec);
                 int ii = 0;
                 this.DbCommand.CommandText = sql_tube_rec;
-
+                long tubecaptured = 0;
                 TABLE_ARTICLEM = DbCommand.ExecuteReader();
 
                 while (TABLE_ARTICLEM.Read())
@@ -2492,14 +2915,17 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     if (CheckspecificTubeIntegrity(tuberond))
                     {
+                        tubecaptured++;
                         this.List_Tube_Ronds.Add(tuberond);
                     }
 
-                    logFileTubeRond.Write("Tube : " + tuberond.COARTI + " capturé");
+                    //logFileTubeRond.Write("Tube : " + tuberond.COARTI + " capturé");
 
                 };
 
                 TABLE_ARTICLEM.Close();
+
+                logFileTubeRond.Write("Tube : " + tubecaptured + " capturés");
                 //return listeTubeRond;
             }
 
@@ -2634,12 +3060,15 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 List_Tube_Ronds.Clear();
 
             }
+
             else
             {
                 logFileTubeRond.Write("fail to import tube rond : no tube found");
 
             }
 
+            this.CloseImport();
+           
 
         }
 
@@ -2834,12 +3263,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         {
 
 
-
+            
             this.contextlocal = context;
             Section_Key = "_SECTION_PLAIN_ROUND";
             SectionExclusion = getSectionExclusionList(Section_Key);
             TubeExclusion = getExclusionList("_BARTUBE", "_REFERENCE");
             TubeExclusion_WithId = getExclusionList_WithId("_BARTUBE", "_REFERENCE");
+            AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT TUBE", "Import des sections " + Section_Key);
             /*
             this.contextlocal = context;
             Section_Key = "_SECTION_PLAIN_ROUND";
@@ -2868,7 +3298,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 rst = rst & false;
             }
             //cas du diamtre null 
-           
+
 
 
             return rst;
@@ -2890,7 +3320,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 //recuperation des tube rectangluaires
                 string sql_tube_rec = this.JSTOOLS.getJsonStringParametres("sql.Rond");
                 logFileRond.Write("requete utilisée pour l'import des tubes \r\n " + sql_tube_rec);
-                int ii = 0;
+                long ii = 0;
+                long tubecaptured = 0;
                 this.DbCommand.CommandText = sql_tube_rec;
 
                 TABLE_ARTICLEM = DbCommand.ExecuteReader();
@@ -2913,7 +3344,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                         //multidim
                         rond.Longueur = Convert.ToDouble(getSqlNumericValue("DIMENSIO_DIM1"));
                         rond.Diametre = Convert.ToDouble(getSqlNumericValue("DIM1"));
-                        
+
                         rond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + rond.Longueur;
 
                     }
@@ -2921,23 +3352,25 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     {//monodim
                         rond.Longueur = Convert.ToDouble(getSqlNumericValue("DIM1"));
                         rond.Diametre = Convert.ToDouble(getSqlNumericValue("DIM2"));
-                        
+
                         rond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim();
                     }
 
 
-                    rond.Material =rond.GetGrade(contextlocal, rond.Nuance, rond.Etat);
+                    rond.Material = rond.GetGrade(contextlocal, rond.Nuance, rond.Etat);
                     //tuberond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberond.Longueur;
 
                     if (CheckspecificTubeIntegrity(rond))
                     {
+                        tubecaptured++;
                         this.List_Ronds.Add(rond);
                     }
 
-                    logFileRond.Write("Tube : " + rond.COARTI + " capturé");
+
 
                 };
 
+                logFileRond.Write("Tube : " + tubecaptured + " capturés");
                 TABLE_ARTICLEM.Close();
                 //logFileRond.Flush();
                 //logFileRond.Close();
@@ -2995,7 +3428,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                         sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_NAME", section_name);// +"x"+ep.ToString());;
                         sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_STANDARD", true);
                         sectionEntity.SetFieldValue("_P_D", rond.Diametre);
-                       
+
                         //descpription //
                         sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_DESCRIPTION", description);
 
@@ -3008,7 +3441,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                         //creation de la qualité
                         rond.Material = rond.GetGrade(contextlocal, rond.Nuance, rond.Etat);
                         //section = sectionEntity.GetImplementEntity("_SECTION");
-                        sectionQuality = Create_Section_Quality_If_Not_Exists(sectionEntity,rond.GetGrade(contextlocal,rond.Nuance, rond.Etat));
+                        sectionQuality = Create_Section_Quality_If_Not_Exists(sectionEntity, rond.GetGrade(contextlocal, rond.Nuance, rond.Etat));
                         sectionQuality.SetFieldValue("_QUALITY", rond.Material.Id);
                         sectionQuality.Save();
                     }
@@ -3184,6 +3617,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             Section_Key = "_SECTION_SHARP_RECTANGLE";
             SectionExclusion = getSectionExclusionList(Section_Key);
             TubeExclusion = getExclusionList("_BARTUBE", "_REFERENCE");
+            AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT TUBE", "Import des sections " + Section_Key);
         }
 
 
@@ -3200,7 +3634,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             logFileRec.Write(tr.COARTI);
             rst = CheckTubeIntegrity(tr.Longueur, tr.Material);
             //cas du diamtre null 
-            if (tr.Largeur*tr.Hauteur == 0)
+            if (tr.Largeur * tr.Hauteur == 0)
             {
                 logFileRec.Write("longeur ou largeur null ");
                 rst = rst & false;
@@ -3208,10 +3642,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             //cas de dimenssion inferieure a l'epaisseur
 
             //if (tr.Largeur < tr.Largeur )
-                var numbers = new List<double> { tr.Largeur, tr.Largeur };
-                double min = numbers.Min();                 
-                if (min - tr.epaisseur < 0) { rst = rst & false; logFileRec.Write("epaisseur trop importante ");}
-         
+            var numbers = new List<double> { tr.Largeur, tr.Largeur };
+            double min = numbers.Min();
+            if (min - tr.epaisseur < 0) { rst = rst & false; logFileRec.Write("epaisseur trop importante "); }
+
 
             return rst;
         }
@@ -3236,7 +3670,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 //recuperation des tube rectangluaires
                 string sql_tube_rec = this.JSTOOLS.getJsonStringParametres("sql.TubeRectangle");
                 logFileRec.Write("requete utilisée pour l'import des tubes \r\n " + sql_tube_rec);
-                int ii = 0;
+                long ii = 0;
+                long tubecaptured = 0;
                 this.DbCommand.CommandText = sql_tube_rec;
 
                 TABLE_ARTICLEM = DbCommand.ExecuteReader();
@@ -3255,10 +3690,12 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM["EPAISSEUR"]);
                     tuberec.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
                     tuberec.Material = tuberec.GetGrade(contextlocal, tuberec.Nuance, tuberec.Etat);
-                    if (tuberec.IsMultiDim) {
+                    if (tuberec.IsMultiDim)
+                    {
 
                         //cas du carre 14
-                        if (tuberec.Type == 14) { 
+                        if (tuberec.Type == 14)
+                        {
                             tuberec.Largeur = Convert.ToDouble(getSqlNumericValue("DIM1"));
                             tuberec.Hauteur = tuberec.Largeur; // Convert.ToDouble(getSqlNumericValue("HAUTEUR"));
                             tuberec.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM2"));
@@ -3297,19 +3734,21 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     }
 
 
-                   
-                        tuberec.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberec.Longueur;
+
+                    tuberec.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberec.Longueur;
 
                     if (CheckspecificTubeIntegrity(tuberec))
                     {
+                        tubecaptured++;
                         this.List_Recs.Add(tuberec);
                     }
 
-                    logFileRec.Write("Tube : " + tuberec.COARTI + " capturé");
+                    // logFileRec.Write("Tube : " + tuberec.COARTI + " capturé");
 
                 };
 
                 TABLE_ARTICLEM.Close();
+                logFileRec.Write("Tube : " + tubecaptured + " capturés");
                 //logFileRond.Flush();
                 //logFileRond.Close();
                 //return listeTubeRond;
@@ -3540,7 +3979,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
     /// </summary>
 
 
-
+    [Obsolete]
     public class Clipper_Import_Tube_Carre : Clipper_Article_Tube, IDisposable
     {
         //private List<TubeRond>listeTubeRond;
@@ -3559,6 +3998,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             Section_Key = "_SECTION_SHARP_RECTANGLE";
             SectionExclusion = getSectionExclusionList(Section_Key);
             TubeExclusion = getExclusionList("_BARTUBE", "_REFERENCE");
+            AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT TUBE", "Import des sections "+ Section_Key);
         }
 
         /// <summary>
@@ -3578,7 +4018,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 //recuperation des tube rectangluaires
                 string sql_tube_rec = this.JSTOOLS.getJsonStringParametres("sql.TubeCarre");
                 logFileCar.Write("requete utilisée pour l'import des tubes \r\n " + sql_tube_rec);
-                int ii = 0;
+                long ii = 0;
                 this.DbCommand.CommandText = sql_tube_rec;
 
                 TABLE_ARTICLEM = DbCommand.ExecuteReader();
@@ -3587,6 +4027,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 {
                     ii++;
                     TubeRec tuberec = new TubeRec();
+                    /*
                     tuberec.COARTI = TABLE_ARTICLEM["COARTI"].ToString().Trim();
                     tuberec.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     tuberec.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
@@ -3601,13 +4042,12 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     tuberec.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + getSqlNumericValue("LNG");
                     this.List_Recs.Add(tuberec);
                     logFileCar.Write("Tube : " + tuberec.COARTI + " capturé");
-
+                    */
                 };
 
                 TABLE_ARTICLEM.Close();
-                //logFileRond.Flush();
-                //logFileRond.Close();
-                //return listeTubeRond;
+                logFileCar.WriteLine(ii + " Flat Tube found");
+
             }
 
             catch (Exception ie)
@@ -3625,6 +4065,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         //public void create(IContext contextlocal,string section_name, double diam, double ep, double lng, double cost)
         public override void WriteTubes()
         {
+            /*
             if (List_Recs.Any())
             {
                 foreach (TubeRec tuberec in List_Recs)
@@ -3684,22 +4125,9 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                         logFileCar.Write("section " + name + "lng " + tuberec.Hauteur + " sauvegardée");
                     }
                 }
-            }
+            }*/
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     }
@@ -3728,6 +4156,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             Section_Key = "_SECTION_FLAT";
             SectionExclusion = getSectionExclusionList(Section_Key);
             TubeExclusion = getExclusionList("_BARTUBE", "_REFERENCE");
+            AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT TUBE", "Import des sections " + Section_Key);
         }
 
         TextWriterTraceListener logFileFlat = new TextWriterTraceListener(System.IO.Path.GetTempPath() + "\\" + "_FLAT_" + Properties.Resources.ImportTubeLog);
@@ -3754,7 +4183,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             //if (tr.Largeur < tr.Largeur )
             var numbers = new List<double> { tr.Largeur, tr.Hauteur };
             double max = numbers.Max();
-            if (max > seuil) { rst = rst & false; logFileFlat.Write(" tole detectée car dim > seuil=" +seuil); }
+            if (max > seuil) { rst = rst & false; logFileFlat.Write(" tole detectée car dim > seuil=" + seuil); }
 
 
             return rst;
@@ -3779,12 +4208,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 //recuperation des tube rectangluaires
                 string sql_tube_rec = this.JSTOOLS.getJsonStringParametres("sql.Flat");
                 logFileFlat.Write("requete utilisée pour l'import des tubes \r\n " + sql_tube_rec);
-                int ii = 0;
+                long ii = 0;
+                long tubecaptured = 0;
                 this.DbCommand.CommandText = sql_tube_rec;
 
                 TABLE_ARTICLEM = DbCommand.ExecuteReader();
 
-                
+
 
                 while (TABLE_ARTICLEM.Read())
                 {
@@ -3803,25 +4233,25 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     if (tuberec.IsMultiDim)
                     {
 
-                        
-                            tuberec.Hauteur = Convert.ToDouble(getSqlNumericValue("DIM1"));
-                            tuberec.Largeur = Convert.ToDouble(getSqlNumericValue("DIMENSIO_DIM2"));
-                            //tuberec.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM3"));
-                            tuberec.Longueur = Convert.ToDouble(getSqlNumericValue("DIMENSIO_DIM1"));
-                        
+
+                        tuberec.Hauteur = Convert.ToDouble(getSqlNumericValue("DIM1"));
+                        tuberec.Largeur = Convert.ToDouble(getSqlNumericValue("DIMENSIO_DIM2"));
+                        //tuberec.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM3"));
+                        tuberec.Longueur = Convert.ToDouble(getSqlNumericValue("DIMENSIO_DIM1"));
+
 
                     }
                     else
                     {
 
-                        
-                       
-                            tuberec.Hauteur = Convert.ToDouble(getSqlNumericValue("DIM3"));
-                            tuberec.Largeur = Convert.ToDouble(getSqlNumericValue("DIM2"));
-                            //tuberec.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM4"));
-                            tuberec.Longueur = Convert.ToDouble(getSqlNumericValue("DIM1"));
 
-                       
+
+                        tuberec.Hauteur = Convert.ToDouble(getSqlNumericValue("DIM3"));
+                        tuberec.Largeur = Convert.ToDouble(getSqlNumericValue("DIM2"));
+                        //tuberec.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM4"));
+                        tuberec.Longueur = Convert.ToDouble(getSqlNumericValue("DIM1"));
+
+
 
                     }
 
@@ -3831,6 +4261,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     if (CheckspecificTubeIntegrity(tuberec))
                     {
+                        tubecaptured++;
                         this.List_Recs.Add(tuberec);
                     }
 
@@ -3839,9 +4270,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 };
 
                 TABLE_ARTICLEM.Close();
-                //logFileRond.Flush();
-                //logFileRond.Close();
-                //return listeTubeRond;
+                logFileFlat.Write("Tube : " + tubecaptured + " capturés");
+
             }
 
             catch (Exception ie)
@@ -3896,7 +4326,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                             sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_STANDARD", true);
                             sectionEntity.SetFieldValue("_P_H", tuberec.Largeur);
                             sectionEntity.SetFieldValue("_P_B", tuberec.Hauteur);
-                            
+
 
                             //descpription //
                             sectionEntity.GetImplementEntity("_SECTION").SetFieldValue("_DESCRIPTION", description);
@@ -4010,20 +4440,22 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         public Clipper_Import_Tube_Speciaux(IContext context)
         {
             this.contextlocal = context;
+            SpecificTubeList_WithId = getSpecificTubeList();
+            AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT TUBE", "Import des sections spéciales..." );
             //string section_key;
             //TubeExclusion = new List<string>();
             // Section_Key = typeTube; // "_SECTION_FLAT";
             //construction de la liste d'exclusion sur les section ci dessous
             //getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE");
 
-              /*
-              getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_IPN"); 
-              getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_IPE"); 
-              getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_UPN"); 
-              getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_UPE"); 
-              getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_L"); 
-              getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_LROUND"); 
-              */
+            /*
+            getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_IPN"); 
+            getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_IPE"); 
+            getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_UPN"); 
+            getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_UPE"); 
+            getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_L"); 
+            getExclusionList(ref TubeExclusion, "_BARTUBE", "_REFERENCE", "SECTION_LROUND"); 
+            */
 
 
         }
@@ -4131,44 +4563,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
         }
-        //traduit du code article les inforamtions en decomposant le code article
-        private TubeSpe getTubeInfos(string coda)
-        {
 
-            try
-            {
-
-                TubeSpe sp = new TubeSpe();
-                string[] infos = null;
-
-                if (coda != null || coda != string.Empty)
-                    //recuperation de la section spe du tube
-
-                    infos = coda.Split('*');
-                long dim = infos.Count() - 1;
-                sp.Section = infos[0].Trim();
-                sp.Longueur = Convert.ToDouble(infos[dim]);
-                //section
-                if (sp.Section.Contains("IPN")) { sp.Section_Spe_Key = "_SECTION_IPN"; }
-                else if (sp.Section.Contains("IPE")) { sp.Section_Spe_Key = "_SECTION_IPE"; }
-                else if (sp.Section.Contains("UPN")) { sp.Section_Spe_Key = "_SECTION_UPN"; }
-                else if (sp.Section.Contains("UPE")) { sp.Section_Spe_Key = "_SECTION_UPE"; }
-                else if (sp.Section == "L") { sp.Section_Spe_Key = "_SECTION_L"; }
-                else if (sp.Section.Contains("LROUND")) { sp.Section_Spe_Key = "_SECTION_LROUND"; }
-                else { sp.Section_Spe_Key = string.Empty; }
-                sp.COARTI = coda;
-                return sp;
-
-            }
-
-            catch (Exception ie)
-            {
-                MessageBox.Show(ie.Message); return null;
-
-
-            }
-
-        }
 
         TextWriterTraceListener logFilSpe = new TextWriterTraceListener(System.IO.Path.GetTempPath() + "\\" + "_SPE_" + Properties.Resources.ImportTubeLog);
 
@@ -4242,7 +4637,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 //recuperation des tube rectangluaires
                 string sql_tube_rec = this.JSTOOLS.getJsonStringParametres("sql.Profilspeciaux");
                 logFilSpe.Write("requete utilisée pour l'import des tubes \r\n " + sql_tube_rec);
-                int ii = 0;
+                long ii = 0;
+                long tubecaptured = 0;
                 this.DbCommand.CommandText = sql_tube_rec;
 
                 TABLE_ARTICLEM = DbCommand.ExecuteReader();
@@ -4266,10 +4662,6 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     if (tubespe.IsMultiDim)
                     {
 
-                        
-                        //tuberec.Hauteur = Convert.ToDouble(getSqlNumericValue("DIM1"));
-                        //tuberec.Largeur = Convert.ToDouble(getSqlNumericValue("DIMENSIO_DIM2"));
-                        //tuberec.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM3"));
                         tubespe.Longueur = Convert.ToDouble(getSqlNumericValue("DIMENSIO_DIM1"));
                         tubespe.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tubespe.Longueur;
 
@@ -4279,9 +4671,6 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
                         tubespe.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim();
-                        //tuberec.Hauteur = Convert.ToDouble(getSqlNumericValue("DIM3"));
-                        //tuberec.Largeur = Convert.ToDouble(getSqlNumericValue("DIM2"));
-                        //tuberec.epaisseur = Convert.ToDouble(getSqlNumericValue("DIM4"));
                         tubespe.Longueur = Convert.ToDouble(getSqlNumericValue("DIM1"));
 
 
@@ -4290,17 +4679,19 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
 
-                    
+
 
                     if (CheckspecificTubeIntegrity(tubespe))
                     {
+                        tubecaptured++;
                         this.List_Recs.Add(tubespe);
                     }
 
-                    logFilSpe.Write("Tube : " + tubespe.COARTI + " capturé");
+
 
                 };
 
+                logFilSpe.Write("Tube : " + tubecaptured + " capturés");
                 TABLE_ARTICLEM.Close();
                 //logFileRond.Flush();
                 //logFileRond.Close();
@@ -4335,46 +4726,56 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     foreach (TubeRec tubespe in List_Recs)
                     {
                         //recuperation de l'article
-                        barreEntitys = contextlocal.EntityManager.GetEntityList("_BARTUBE", "_REFERENCE", ConditionOperator.Equal, tubespe.Name);//.CreateEntity("_BARTUBE");
-                        barreEntitys.Fill(false);
-
-
-                        if (barreEntitys.Count>0) {
-                            //doublons non supportés
-                            barreEntity = barreEntitys.FirstOrDefault();
+                        //barreEntitys = contextlocal.EntityManager.GetEntityList("_BARTUBE", "_REFERENCE", ConditionOperator.Equal, tubespe.Name);//.CreateEntity("_BARTUBE");
+                        //barreEntitys.Fill(false);
+                        //if (barreEntitys.Count>0) {
+                        //barreEntitys.FirstOrDefault();
+                        //doublons non supportés
+                        barreEntity = getTubeFromSpecifiTubeList(tubespe.Name);
+                        if (barreEntity != null)
+                        {
                             if (tubespe.IsMultiDim)
                             {
                                 //mettre a jour le prix section
-                                sectionEntity = barreEntity.GetFieldValueAsEntity("_SECTION");
-                                IEntity quality = tubespe.GetGrade(contextlocal, tubespe.Nuance, tubespe.Etat);
-                                //section = sectionEntity.GetImplementEntity("_SECTION");
-                                sectionQuality = Create_Spe_Section_Quality_If_Not_Exists(sectionEntity, tubespe.GetGrade(contextlocal, tubespe.Nuance, tubespe.Etat));
-                                sectionQuality.SetFieldValue("_QUALITY", tubespe.GetGrade(contextlocal, tubespe.Nuance, tubespe.Etat));
-                                sectionQuality.SetFieldValue("_SECTION", sectionEntity.Id);
-                                sectionQuality.SetFieldValue("_BUY_COST", tubespe.PRIXART / 1000);
-                                sectionQuality.Save();
+
+                               
+
+
+                                    sectionEntity = barreEntity.GetFieldValueAsEntity("_SECTION");
+
+                                    IEntity quality = tubespe.GetGrade(contextlocal, tubespe.Nuance, tubespe.Etat);
+                                    //section = sectionEntity.GetImplementEntity("_SECTION");
+                                    sectionQuality = Create_Spe_Section_Quality_If_Not_Exists(sectionEntity, tubespe.GetGrade(contextlocal, tubespe.Nuance, tubespe.Etat));
+                                    sectionQuality.SetFieldValue("_QUALITY", tubespe.GetGrade(contextlocal, tubespe.Nuance, tubespe.Etat));
+                                    sectionQuality.SetFieldValue("_SECTION", sectionEntity.Id);
+                                    sectionQuality.SetFieldValue("_BUY_COST", tubespe.PRIXART / 1000);
+                                    sectionQuality.Save();
+                               
 
                             }
                             else
                             {
                                 //mettre a jour le prix article
                                 //monodim on declare les 
-                                barreEntity.SetFieldValue("_AS_SPECIFIC_COST", true);
-                                barreEntity.SetFieldValue("_BUY_COST", tubespe.PRIXART);
-                                barreEntity.Save();
-                            }
 
+                               
+                                    barreEntity.SetFieldValue("_AS_SPECIFIC_COST", true);
+                                    barreEntity.SetFieldValue("_BUY_COST", tubespe.PRIXART);
+                                    barreEntity.Save();
+                              
+                            }
                         }
+                        /*}
                         else
                         {
 
                             logFilSpe.Write(tubespe.Name + " not found, check for spaces or add length for multidim articles [coda*lenght]");
                             
                         }
-                        
+                        */
 
 
-                       
+
 
 
 
@@ -4384,7 +4785,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
                 }
-            }catch(Exception ie) { MessageBox.Show(ie.Message); }
+                //purge mémoire
+                CloseImport();
+            }
+            catch (Exception ie) { MessageBox.Show(ie.Message); }
         }
 
 
@@ -4427,9 +4831,9 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
             contextlocal.TraceLogger.TraceInformation("Test de Connection ODBC");
             Key = "_SIMPLE_SUPPLY";
             Founiture_Divers_Exclusion = getExclusionList(Key);
-
             Odbc_Connexion();
             contextlocal.TraceLogger.TraceInformation("Connection ODBC ok");
+            AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT FOURINTURE DIVERS", "Import des fournitures vis.. " );
         }
 
 
@@ -4504,6 +4908,23 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 {
                     ii++;
                     Founiture_Divers Fourniture = new Founiture_Divers();
+
+
+                    Fourniture.COARTI = TABLE_ARTICLEM["COARTI"].ToString().Trim();
+                    Fourniture.AMCLEUNIK = Convert.ToInt64(TABLE_ARTICLEM["AMCLEUNIK"]);
+                    Fourniture.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim();
+                    Fourniture.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
+                    Fourniture.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
+                    //Fourniture.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    Fourniture.PRIXART = Math.Round(GetPrice(Fourniture.UnitePrix, Convert.ToDouble(getSqlNumericValue("PRIXART"))), 5);
+                    Fourniture.DESA1 = TABLE_ARTICLEM["DESA1"].ToString().Trim();
+                    //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM_TUBE["EPAISSEUR"]);
+                    //rond.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
+                    //rond.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM["MULTIDIM"]);
+
+
+
+                    /*
                     ///cle unique clipper
                     Fourniture.AMCLEUNIK = Convert.ToInt64(TABLE_ARTICLEM["AMCLEUNIK"]);
                     Fourniture.COARTI = TABLE_ARTICLEM["COARTI"].ToString().Trim();
@@ -4515,6 +4936,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     Fourniture.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim(); ;
                     Fourniture.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + getSqlNumericValue("LNG");
                     Fourniture.DESA1 = TABLE_ARTICLEM["DESA1"].ToString().Trim();
+                    */
+
 
                     this.List_Fourniture.Add(Fourniture);
                     logFourniture.Write("Fourniture : " + Fourniture.COARTI + " capturé");
@@ -4524,6 +4947,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                 TABLE_ARTICLEM.Close();
                 contextlocal.TraceLogger.TraceInformation("lecture des fournitures terminée");
                 //return listeTubeRond;
+                AF_ImportTools.SimplifiedMethods.NotifyMessage("IMPORT FOURINTURE DIVERS", "Import des fournitures terminé.. ");
             }
 
             catch (Exception ie)
@@ -4579,6 +5003,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                             Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_DESIGNATION", fourniture.DESA1);
                             Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_COMMENTS", fourniture.COFA);
                             Fourniture_Entity.GetImplementEntity("_SUPPLY").SetFieldValue("_BUY_COST", fourniture.PRIXART);
+                            Fourniture_Entity.Save();
 
                         }
                     }
@@ -4589,6 +5014,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
                 contextlocal.TraceLogger.TraceInformation("Import des fornitures terminé avec succes");
+
+
 
             }
 

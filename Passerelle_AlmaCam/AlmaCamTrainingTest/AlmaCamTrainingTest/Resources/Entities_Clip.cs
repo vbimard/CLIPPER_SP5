@@ -142,7 +142,8 @@ namespace Wpm.Implement.ModelSetting
             part_to_produce_Dictionnary.Add("GEOMETRY_FROM_OF", fielddesc);
 
             //matiere//
-            fielddesc = new NewField("AF_DEFAULT_SHEET", "matiere par default", FieldDescriptionEditableType.AllSection, FieldDescriptionVisibilityType.AllSection, FieldDescriptionType.Link, "_SHEET");
+            //fielddesc = new NewField("AF_DEFAULT_SHEET", "matiere par defaut", FieldDescriptionEditableType.AllSection, FieldDescriptionVisibilityType.AllSection, FieldDescriptionType.Link, "_SHEET");
+            fielddesc = new NewField("AF_DEFAULT_SHEET", "Reference matiere par defaut", FieldDescriptionEditableType.AllSection, FieldDescriptionVisibilityType.AllSection, FieldDescriptionType.String, "");
             matiere_Dictionnary.Add("AF_DEFAULT_SHEET", fielddesc);
             //
 
