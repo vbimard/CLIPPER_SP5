@@ -28,15 +28,13 @@ namespace ConsoleApp2
             bool tube_rectangle = false;
             bool tube_carre = false;
             bool tube_flat = false;
-            bool tube_speciaux = false;
+            bool tube_speciaux = true;
             bool Vis = false;
 
             
             IContext contextlocal = null;
             contextlocal=AlmaCamTool.GetContext(contextlocal);
-
-
-            Clipper8_ImportTubes_Processor tubes  = new Clipper8_ImportTubes_Processor(true,true,true,true,true,false,false,false);
+            Clipper8_ImportTubes_Processor tubes  = new Clipper8_ImportTubes_Processor(import_matiere, tube_rond, rond, tube_rectangle, tube_carre, tube_flat, tube_speciaux, false);
             tubes.Import(contextlocal);
             
 
