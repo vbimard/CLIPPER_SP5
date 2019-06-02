@@ -1727,7 +1727,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// <param name="unitegestion">par longeur ou par kg ou par u ou par u100...</param>
         /// <param name="price"></param>
         /// <returns></returns>
-        public double GetPrice(string unitegestion, double price)
+        public double GetPrice(string unitegestion, double price,double longeur,double poids)
         {
             try
             {
@@ -1742,12 +1742,12 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                         price = price / 10;
                         break;
                     default:
-                        //price = price;
+                        price = price/1;
                         break;
                 }
 
 
-                return price;
+                return Math.Round(price,5);
 
 
             }
@@ -2887,7 +2887,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     tuberond.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim();
                     tuberond.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     tuberond.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
-                    tuberond.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                   
                     //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM_TUBE["EPAISSEUR"]);
                     tuberond.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
                     tuberond.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM["MULTIDIM"]);
@@ -2912,6 +2912,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     tuberond.Material = tuberond.GetGrade(contextlocal, tuberond.Nuance, tuberond.Etat);
                     //tuberond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberond.Longueur;
+                    //modification prix
+                    double price = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    string unit = TABLE_ARTICLEM["UnitePrix"].ToString().Trim();
+                    tuberond.PRIXART = GetPrice(unit, price, tuberond.Longueur, 0);
 
                     if (CheckspecificTubeIntegrity(tuberond))
                     {
@@ -3334,7 +3338,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     rond.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim();
                     rond.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     rond.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
-                    rond.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    
                     //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM_TUBE["EPAISSEUR"]);
                     rond.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
                     rond.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM["MULTIDIM"]);
@@ -3358,6 +3362,12 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
 
                     rond.Material = rond.GetGrade(contextlocal, rond.Nuance, rond.Etat);
+
+                    //modification prix
+                    double price = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    string unit = TABLE_ARTICLEM["UnitePrix"].ToString().Trim();
+                    rond.PRIXART = GetPrice(unit, price, rond.Longueur, 0);
+
                     //tuberond.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberond.Longueur;
 
                     if (CheckspecificTubeIntegrity(rond))
@@ -3685,7 +3695,8 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     tuberec.Type = Convert.ToInt32(getSqlNumericValue("TYPE"));
                     tuberec.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     tuberec.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
-                    tuberec.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    
+                   
                     tuberec.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM["MULTIDIM"]);
                     //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM["EPAISSEUR"]);
                     tuberec.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
@@ -3733,7 +3744,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     }
 
-
+                    //definition du prix
+                    double price = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    string unit = TABLE_ARTICLEM["UnitePrix"].ToString().Trim();
+                    tuberec.PRIXART = GetPrice(unit, price, tuberec.Longueur, 0);
 
                     tuberec.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberec.Longueur;
 
@@ -4225,7 +4239,6 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     tuberec.Type = Convert.ToInt32(getSqlNumericValue("TYPE"));
                     tuberec.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     tuberec.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
-                    tuberec.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
                     tuberec.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM["MULTIDIM"]);
                     //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM["EPAISSEUR"]);
                     tuberec.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
@@ -4255,7 +4268,13 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
 
                     }
 
-
+                    //definition du prix
+                    //definition du prix
+                    double price = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    string unit = TABLE_ARTICLEM["UnitePrix"].ToString().Trim();
+                    tuberec.PRIXART = GetPrice(unit, price, tuberec.Longueur, 0);
+                    
+                  
 
                     tuberec.Name = TABLE_ARTICLEM["COARTI"].ToString().Trim() + "*" + tuberec.Longueur;
 
@@ -4653,8 +4672,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     tubespe.COFA = TABLE_ARTICLEM["COFA"].ToString().Trim(); ;
                     tubespe.Type = Convert.ToInt32(getSqlNumericValue("TYPE"));
                     tubespe.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
-                    tubespe.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
-                    tubespe.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    tubespe.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();                    
                     tubespe.IsMultiDim = Convert.ToBoolean(TABLE_ARTICLEM["MULTIDIM"]);
                     //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM["EPAISSEUR"]);
                     tubespe.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));
@@ -4678,7 +4696,10 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     }
 
 
-
+                    //modification prix
+                    double price = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    string unit = TABLE_ARTICLEM["UnitePrix"].ToString().Trim();
+                    tubespe.PRIXART = GetPrice(unit, price, 0, 0);
 
 
                     if (CheckspecificTubeIntegrity(tubespe))
@@ -4916,7 +4937,12 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                     Fourniture.Nuance = TABLE_ARTICLEM["CODENUANCE"].ToString().Trim(); //CODEETAT, Tech_NuanceMatiere.Nuance AS CODENUANCE
                     Fourniture.Etat = TABLE_ARTICLEM["CODEETAT"].ToString().Trim();
                     //Fourniture.PRIXART = Convert.ToDouble(getSqlNumericValue("PRIXART"));
-                    Fourniture.PRIXART = Math.Round(GetPrice(Fourniture.UnitePrix, Convert.ToDouble(getSqlNumericValue("PRIXART"))), 5);
+                    //Fourniture.PRIXART = Math.Round(GetPrice(Fourniture.UnitePrix, Convert.ToDouble(getSqlNumericValue("PRIXART"))), 5);
+                    //modification prix
+                    double price = Convert.ToDouble(getSqlNumericValue("PRIXART"));
+                    string unit = TABLE_ARTICLEM["UnitePrix"].ToString().Trim();
+                    Fourniture.PRIXART = GetPrice(unit, price, 0, 0);
+
                     Fourniture.DESA1 = TABLE_ARTICLEM["DESA1"].ToString().Trim();
                     //tuberond.Thickness = Convert.ToDouble(TABLE_ARTICLEM_TUBE["EPAISSEUR"]);
                     //rond.Densite = Convert.ToDouble(getSqlNumericValue("DENSITE"));

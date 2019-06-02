@@ -23,7 +23,7 @@ namespace ConsoleApp2
         static void Main(string[] args)
         {
             bool import_matiere = true;
-            bool tube_rond = false;
+            bool tube_rond = true;
             bool rond = false;
             bool tube_rectangle = false;
             bool tube_carre = false;
