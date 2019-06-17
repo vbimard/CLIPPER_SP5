@@ -755,8 +755,6 @@ namespace AF_Export_Devis_Clipper
                     filelist = ExportDprFiles(quote, "");
                 }
 
-
-
                 ///
                 _ReferenceIdList = new Dictionary<IEntity, KeyValuePair<string, string>>();
                 _ReferenceList = new Dictionary<string, string>();
@@ -766,9 +764,11 @@ namespace AF_Export_Devis_Clipper
                 //export des offres
                 QuoteOffre(ref file, quote, formatProvider);
                 //export des part
-                QuotePart(ref file, quote, "001", formatProvider);
+                //QuotePart(ref file, quote, "001", formatProvider);
+                QuotePartEx(ref file, quote, "001", formatProvider);
                 //export des ensembles
-                QuoteSet(ref file, quote, "001", formatProvider);
+                //QuoteSet(ref file, quote, "001", formatProvider);
+                QuoteSetEx(ref file, quote, "001", formatProvider);
 
                 file = file + "Fin d'enregistrement OK¤" + Environment.NewLine;
             }
@@ -1573,6 +1573,335 @@ namespace AF_Export_Devis_Clipper
             }
         }
 
+
+        private void QuotePartEx(ref string file, IQuote quote, string rang, NumberFormatInfo formatProvider)
+        {
+            //Debut du code:
+            //Récupération de l'entité devis:
+            IEntity quoteEntity = quote.QuoteEntity;
+
+            //Récupération des informations générales:
+            IEntity clientEntity = quoteEntity.GetFieldValueAsEntity("_FIRM");
+            string usercode = quoteEntity.GetFieldValueAsEntity("_QUOTER").GetFieldValueAsString("USER_NAME");
+
+            //récupérer la liste des pièces placées:
+            IEntityList nestedPartList = quoteEntity.Context.EntityManager.GetEntityList("_QUOTE_NESTED_PART", "_QUOTE_REQUEST", ConditionOperator.Equal, quoteEntity.Id);
+            nestedPartList.Fill(false);
+
+            //récupérer la liste des placements:
+            IEntityList nestingsList = quoteEntity.Context.EntityManager.GetEntityList("_QUOTE_NESTING", "_QUOTE_REQUEST", ConditionOperator.Equal, quoteEntity.Id);
+            nestingsList.Fill(false);
+
+            // PREPARATION:
+            // 0/ Récupérer liste des formats des placements dans laquelle la pièce est placée
+            //But: obtenir une liste de pièces du devis avec les formats (_SHEET) associés sur lesquels la pièce est placée.
+            List<QuotePartEx_QuotePartSheetList> NestingsByQuotePartList = new List<QuotePartEx_QuotePartSheetList>();
+            foreach (IEntity partEntity in quote.QuotePartList)
+            {
+                //Pour chaque pièce:
+                //Créer un item à remplir
+                QuotePartEx_QuotePartSheetList listOfSheetsbyQuotePart = new QuotePartEx_QuotePartSheetList();
+                listOfSheetsbyQuotePart.QuotePartEntityId = partEntity.Id;
+                listOfSheetsbyQuotePart.NestedPartListEntity = new List<IEntity>();
+                listOfSheetsbyQuotePart.NestingListEntity = new List<IEntity>();
+                listOfSheetsbyQuotePart.SheetListEntity = new List<IEntity>();
+                foreach (IEntity nestedPart in nestedPartList)
+                {
+                    // Pour chaque pièce placée du devis, chercher les pièces placées:
+                    if (nestedPart.GetFieldValueAsLong("_QUOTE_PART") == partEntity.Id)
+                    {
+                        //1. La pièce placée correspond à la pièce du devis, la rajouter                     
+                        listOfSheetsbyQuotePart.NestedPartListEntity.Add(nestedPart);
+
+                        //2. Rechercher si le format correspondant au nesting existe dans listOfNestingsbyQuotePart.ListOfSheetEntity
+                        IEntity quotePartNesting = nestedPart.GetFieldValueAsEntity("_QUOTE_NESTING");
+                        IEntity quotePartNestingSheet = quotePartNesting.GetFieldValueAsEntity("_SHEET");
+                        bool sheetFound = false;
+                        foreach (IEntity sheet in listOfSheetsbyQuotePart.SheetListEntity)
+                        {
+                            if (sheet.Id == quotePartNestingSheet.Id)
+                            {
+                                //Le format existe déjà dans la liste
+                                //s'arrêter, ignorer et passer à la pièce suivant
+                                sheetFound = true;
+                                break;
+                            }
+                        }
+                        if (sheetFound == false)
+                        {
+                            // Le format n'existe pas, le rajouter (et rajouter le nesting)
+                            listOfSheetsbyQuotePart.NestingListEntity.Add(quotePartNesting);
+                            listOfSheetsbyQuotePart.SheetListEntity.Add(quotePartNestingSheet);
+                        }
+                    }
+                }
+                //Ajouter l'item à la liste avant de passer à la pièce suivante.
+                NestingsByQuotePartList.Add(listOfSheetsbyQuotePart);
+            }
+
+            // pour chaque pièce du devis
+            foreach (IEntity partEntity in quote.QuotePartList)
+            {
+                // 1/ Récupérer la matière de la pièce
+                IEntity partMaterial = partEntity.GetFieldValueAsEntity("_MATERIAL");
+
+                // 2/ Récupérer format par défaut dans matière
+                String materialDefaultSheetName = partMaterial.GetFieldValueAsString("AF_DEFAULT_SHEET");
+                IEntityList materialDefaultSheetList = quoteEntity.Context.EntityManager.GetEntityList("_SHEET", "_REFERENCE", ConditionOperator.Equal, materialDefaultSheetName);
+                materialDefaultSheetList.Fill(false);
+                IEntity materialDefaultSheet = null;
+                if (materialDefaultSheetList.Count > 0)
+                {
+                    materialDefaultSheet = materialDefaultSheetList.First();
+                }
+                //MessageBox.Show("MaterialDefaultSheetList.Count=" + materialDefaultSheetList.Count.ToString());
+
+                // 3/ Générer la liste des _STOCK avec les tôles du format par défaut
+                IEntityList stockList = null;
+                if (materialDefaultSheet != null)
+                {
+                    stockList = quote.Context.EntityManager.GetEntityList("_STOCK", "_SHEET", ConditionOperator.Equal, materialDefaultSheet.Id);
+                    stockList.Fill(false);
+                    if (stockList.Count <= 0) { stockList = null; }
+                }
+
+                // 4/ Analyser si la pièce est en mode placement ou pas (mode placement = 1)
+                // Analyse de la pièce pour savoir si on est en mode placement, ou autre.
+                if (partEntity.GetFieldValueAsLong("_MATERIAL_COST_MODE") == 1)
+                {
+                    // Si Le mode placement est "Placement"
+                    // Récupérer la liste des formats de la pièce
+                    List<IEntity> sheetList = null;
+                    foreach (QuotePartEx_QuotePartSheetList quotePart in NestingsByQuotePartList)
+                    {
+                        if (quotePart.QuotePartEntityId == partEntity.Id)
+                        {
+                            sheetList = quotePart.SheetListEntity;
+                            break;
+                        }
+                    }
+                    // 4.1/ Nb format différents ?
+                    if (sheetList == null)
+                    {
+                        // Liste NULL: Ne devrait pas exister. Si bug => Throw:
+                        MessageBox.Show("La pièce " + partEntity.GetFieldValueAsString("_NAME") + "en mode placement n'est placée" +
+                                     "\ndans aucun format. Il n'existe aucun format, vérifiez le devis.");
+                        throw new NoNullAllowedException();
+                    }
+                    if (sheetList.Count == 0)
+                    {
+                        // Aucune liste de format???
+                        MessageBox.Show("La pièce " + partEntity.GetFieldValueAsString("_NAME") + "en mode placement n'est placée" +
+                                     "\ndans aucun format. La liste des formats est vide, vérifiez le devis.");
+                        throw new IndexOutOfRangeException();
+                    }
+                    // 4.1.1 / Message 1 seul format de placement doit être sélectionné (pour cohérence avec Clipper) : Utilisation du 1er format
+                    if (sheetList.Count > 1)
+                    {
+                        MessageBox.Show("La pièce " + partEntity.GetFieldValueAsString("_NAME") + " est placée dans " + sheetList.Count.ToString() + "formats différents" +
+                                      "\nSeul un  format peut être transmis et interprété dans Clipper," +
+                                      "\naussi les données transmises pour cette pièce seront basées sur" +
+                                      "\nle premier format", "Devis " + "quote.Nom", MessageBoxButtons.OK);
+                    }
+                    // 4.2/ Récupérer le format et la liste des stocks de la 1ère entité de la liste_QUOTE_NESTING\_SHEET pour obtenir la liste des articles.
+                    materialDefaultSheet = sheetList.First();
+                    stockList = quote.Context.EntityManager.GetEntityList("_STOCK", "_SHEET", ConditionOperator.Equal, materialDefaultSheet.Id);
+                    stockList.Fill(false);
+                }
+
+                // 5/ Récupérer l’info de favorisation des articles Mono ou multi-dim, Si favoriser MonoDim:
+                // Alors: Type article par défaut = MonoDim (Décoché = false = utiliser monoDim par défaut)
+                // Sinon: Type article par défaut = MultiDim (Coché = true = utiliser multiDim par défaut)
+                // => Appel à une fonction externe implémentée dans AF_Clipper_Dll.dll
+                bool useMultiDimAsDefault = false;
+                bool favoriseMultiDim = false;// AF_Clipper_Dll.Clipper_Param.Get_MULTIDIM_MODE();
+
+                // 6 / Case favoriser Mono ou multi ?
+                useMultiDimAsDefault = favoriseMultiDim;
+
+                // 7/ Liste _STOCK ?
+                bool stockEntityFound = false;
+                IEntity stockEntityToUse = null;
+                // 7.1 / Rechercher article favorisé
+                //      1er article répondant au critère de favorisation dans la liste des tôles) dont type article = champ _STOCK\AF_MULTIDIM
+                if (stockList != null)
+                {
+                    foreach (IEntity stockEntity in stockList)
+                    {
+                        if (stockEntity.GetFieldValueAsBoolean("AF_IS_MULTIDIM") == useMultiDimAsDefault)
+                        {
+                            stockEntityToUse = stockEntity;
+                            stockEntityFound = true;
+                            break;
+                        }
+                    }
+                    if (stockEntityFound == false)
+                    {
+                        stockEntityToUse = stockList.FirstOrDefault();
+                        useMultiDimAsDefault = !useMultiDimAsDefault;
+                        stockEntityFound = true;
+                    }
+                }
+
+                // 8/ Ecrire ligne ENDEVIS
+                //Reprise du code existant.
+                IEntity materialEntity = partEntity.GetFieldValueAsEntity("_MATERIAL");
+                string materialName = "";
+                if (materialEntity != null) { materialName = materialEntity.GetFieldValueAsString("_NAME"); }
+                long partQty = partEntity.GetFieldValueAsLong("_PART_QUANTITY");
+                long totalPartQty = partEntity.GetFieldValueAsLong("_QUANTITY");
+                if (partQty > 0)
+                {
+                    #region Ecrire les données de la ligne ENDEVIS
+                    long i = 0;
+                    string[] data = new string[50];
+                    string partReference = null;
+                    string partModele = null;
+                    GetReference(partEntity, "PART", false, out partReference, out partModele);
+                    data[i++] = "ENDEVIS";
+                    data[i++] = GetQuoteNumber(quoteEntity); //N° devis
+                    data[i++] = EmptyString(clientEntity.GetFieldValueAsString("_EXTERNAL_ID")).ToUpper(); //Code client
+                    data[i++] = partReference; //Code pièce
+                    data[i++] = ""; //Type (non utilisé)
+                    data[i++] = FormatDesignation(partEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation 1
+                    data[i++] = FormatDesignation(materialName); //Désignation 2
+                    data[i++] = FormatDesignation(""); //Désignation 3
+                    data[i++] = rang; //Rang
+                    data[i++] = partReference; //Code pièce ou Sous pièce (sous rang)
+                    data[i++] = FormatDesignation(partEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation pièce ou Sous pièce (sous rang)
+                    data[i++] = partEntity.Id.ToString(); //N° plan
+                    data[i++] = rang; //Niveau rang
+                    data[i++] = "3"; //Etat devis
+                    data[i++] = ""; //Repère
+                    data[i++] = "0"; //Origine fourniture
+                    data[i++] = "1"; //Qté dus/ensemble : 1 pour le rang 001
+                    data[i++] = "1"; //Qté totale de l'ensemble : 1 pour le rang 001
+                    data[i++] = ""; //Indice plan
+                    data[i++] = ""; //Indice gamme
+                    data[i++] = ""; //Indice nomenclature
+                    data[i++] = ""; //Indice pièce
+                    double weight = partEntity.GetFieldValueAsDouble("_WEIGHT");
+                    double weightEx = partEntity.GetFieldValueAsDouble("_WEIGHT_EX");
+                    weight = weight / 1000;
+                    weightEx = weightEx / 1000;
+                    data[i++] = weight.ToString("#0.0000", formatProvider); //Indice A
+                    data[i++] = weightEx.ToString("#0.0000", formatProvider); //Indice B
+                    data[i++] = "-" + partEntity.Id.ToString(); //Indice C  valeur - si piece quote et + si piece cam 
+                    data[i++] = ""; //Indice D
+                    data[i++] = ""; //Indice E
+                    data[i++] = ""; //Indice F
+                    data[i++] = "0"; //N° identifiant GED 1
+                    data[i++] = "0"; //N° identifiant GED 2
+                    data[i++] = "0"; //N° identifiant GED 3
+                    data[i++] = "0"; //N° identifiant GED 4
+                    data[i++] = "0"; //N° identifiant GED 5
+                    data[i++] = "0"; //N° identifiant GED 6
+                    data[i++] = "0"; //N° identifiant GED 7
+                    data[i++] = "0"; //N° identifiant GED 8
+                    data[i++] = "0"; //N° identifiant GED 9
+                    data[i++] = "0"; //N° identifiant GED 10
+                    //////depuis la V8 ////////
+                    data[i++] = GetDprPathSp5(partEntity, quote); //fichier joint
+                    data[i++] = ""; //Date d'injection
+                    data[i++] = ""; //partModele; //Modèle
+                    data[i++] = usercode;
+                    data[i++] = "-" + partEntity.Id.ToString();  // IDCFAO --> pour correspondance clipper //
+                    WriteData(data, i, ref file);
+                    #endregion
+
+                    long gadevisPhase = 0;
+                    long nomendvPhase = 0;
+
+                    //Ecriture de la ligne GADEVIS pour les fournitures:
+                    //Reprise du code existant.
+                    IList<IEntity> partSupplyList = new List<IEntity>(quote.GetPartSupplyList(partEntity));
+                    QuoteSupply(ref file, quote, 1, partSupplyList, rang, ref gadevisPhase, ref nomendvPhase, formatProvider, true, partReference, partModele);
+
+                    //Ecriture de la ligne NOMENDV pour les opérations:
+                    //code existant:
+                    //  double totalMaterialPrice = partEntity.GetFieldValueAsDouble("_MAT_IN_COST");
+                    //  double materialPrice = totalMaterialPrice / totalPartQty;
+                    //  IList<IEntity> partOperationList = new List<IEntity>(quote.GetPartOperationList(partEntity));
+                    //  QuoteOperation(ref file, quote, partEntity, partOperationList, rang, formatProvider, 1, partQty, ref gadevisPhase, ref nomendvPhase, partReference, partModele, materialPrice);
+                    //Changement ici pour écrire soit NOMENDV pour MonoDim/ Soit NOMENDV pour multiDim => Remplacé par:
+                    // 9/ Type Article ?                    
+                    // ECRITURE DE LA LIGNE NOMENDV en fonction du Mono ou MultiDim
+                    if (useMultiDimAsDefault == false)
+                    {
+                        // Ecriture MonoDim
+                        //MessageBox.Show("Détection du mode mono dimensionnel");
+                        // 10/ _MATERIAL\AF_DEFAULT_SHEET ?
+                        if (materialDefaultSheet == null)
+                        {
+                            MessageBox.Show("Aucun format par défaut n'est indiqué pour la matière " + partMaterial.GetFieldValueAsString("_NAME") +
+                                          "\nUn format par défaut doit être renseigné dans la matière pour utiliser l'interface " +
+                                          "\navec des articles Clipper Mono-dimensionnels.\n" +
+                                          " => la ligne est ecrite en multi-dimensionnel",
+                                          partEntity.Id.ToString() + ":" + partEntity.GetFieldValueAsString("_REFERENCE"), MessageBoxButtons.OK);
+                            useMultiDimAsDefault = true;
+                        }
+                        else
+                        {
+                            // Prix de la matière
+                            // 11/ _SHEET\_AS_SPECIFIC_COST ?
+                            //double totalMaterialPrice = partEntity.GetFieldValueAsDouble("_MAT_IN_COST");
+                            double totalMaterialPrice = 0.0;
+                            if (materialDefaultSheet.GetFieldValueAsBoolean("_AS_SPECIFIC_COST") == true)
+                            {
+                                totalMaterialPrice = materialDefaultSheet.GetFieldValueAsDouble("_BUY_COST");
+                            }
+                            else
+                            {
+                                totalMaterialPrice = partEntity.GetFieldValueAsDouble("_MAT_IN_COST");
+                            }
+                            double materialPrice = totalMaterialPrice / totalPartQty;
+                            IList<IEntity> partOperationList = new List<IEntity>(quote.GetPartOperationList(partEntity));
+
+                            //Code Article Clipper
+                            string codeArticleClipper = "MATIERE";
+                            if (stockEntityToUse != null)
+                            {
+                                //Stock non vide => Code article est dans _STOCK\_NAME
+                                codeArticleClipper = stockEntityToUse.GetFieldValueAsString("_NAME");
+                            }
+                            else
+                            {
+                                //Stock est vide => Code article est dans _MATERIAL\_AF_DEFAULT_SHEET
+                                codeArticleClipper = materialDefaultSheet.GetFieldValueAsString("_REFERENCE");
+                            }
+                            QuoteOperationMonoDim(ref file, quote, partEntity, partOperationList, rang, formatProvider, 1, partQty, ref gadevisPhase, ref nomendvPhase, partReference, partModele, materialPrice, codeArticleClipper, materialDefaultSheet);
+                        }
+                    }
+                    if (useMultiDimAsDefault == true)
+                    {
+                        // Ecriture MultiDim
+                        double totalMaterialPrice = partEntity.GetFieldValueAsDouble("_MAT_IN_COST");
+                        double materialPrice = totalMaterialPrice / totalPartQty;
+                        IList<IEntity> partOperationList = new List<IEntity>(quote.GetPartOperationList(partEntity));
+                        QuoteOperationMultiDim(ref file, quote, partEntity, partOperationList, rang, formatProvider, 1, partQty, ref gadevisPhase, ref nomendvPhase, partReference, partModele, materialPrice);
+                    }
+
+                    //Ecriture de la ligne du transport si global ou non:
+                    if (_GlobalExported == false)
+                    {
+                        if (quote.QuoteEntity.GetFieldValueAsLong("_TRANSPORT_PAYMENT_MODE") != 1) // Transport non facturé
+                            Transport(ref file, quote, formatProvider, false, "003", partReference, partModele);
+
+                        // On met les item globaux masqués sur la première pièces dans le rang "002"
+                        GlobalItem(ref file, quote, formatProvider, false, "002", partReference, partModele);
+                        _GlobalExported = true;
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
         /// <summary>
         /// creation des quotes tube
         /// </summary>
@@ -1948,6 +2277,507 @@ namespace AF_Export_Devis_Clipper
                 QuoteOperation(ref file, quote, partEntity, partOperationList, rang, formatProvider, partSetQty, partSetQty, ref gaDevisPhase, ref nomendvPhase, setReference, setModele, materialPrice);
             }
         }
+
+        private void QuoteSetEx(ref string file, IQuote quote, string rang, NumberFormatInfo formatProvider)
+        {
+            //Debut du code:
+            //Récupération de l'entité devis:
+            IEntity quoteEntity = quote.QuoteEntity;
+
+            //Récupération des informations générales:
+            IEntity clientEntity = quoteEntity.GetFieldValueAsEntity("_FIRM");
+            string usercode = quoteEntity.GetFieldValueAsEntity("_QUOTER").GetFieldValueAsString("USER_NAME");
+
+            //récupérer la liste des pièces placées:
+            IEntityList nestedPartList = quoteEntity.Context.EntityManager.GetEntityList("_QUOTE_NESTED_PART", "_QUOTE_REQUEST", ConditionOperator.Equal, quoteEntity.Id);
+            nestedPartList.Fill(false);
+
+            //récupérer la liste des placements:
+            IEntityList nestingsList = quoteEntity.Context.EntityManager.GetEntityList("_QUOTE_NESTING", "_QUOTE_REQUEST", ConditionOperator.Equal, quoteEntity.Id);
+            nestingsList.Fill(false);
+
+            // PREPARATION:
+            // 0/ Récupérer liste des formats des placements dans laquelle la pièce est placée
+            //But: obtenir une liste de pièces du devis avec les formats (_SHEET) associés sur lesquels la pièce est placée.
+            List<QuotePartEx_QuotePartSheetList> NestingsByQuotePartList = new List<QuotePartEx_QuotePartSheetList>();
+            foreach (IEntity partEntity in quote.QuotePartList)
+            {
+                //Pour chaque pièce:
+                //Créer un item à remplir
+                QuotePartEx_QuotePartSheetList listOfSheetsbyQuotePart = new QuotePartEx_QuotePartSheetList();
+                listOfSheetsbyQuotePart.QuotePartEntityId = partEntity.Id;
+                listOfSheetsbyQuotePart.NestedPartListEntity = new List<IEntity>();
+                listOfSheetsbyQuotePart.NestingListEntity = new List<IEntity>();
+                listOfSheetsbyQuotePart.SheetListEntity = new List<IEntity>();
+                foreach (IEntity nestedPart in nestedPartList)
+                {
+                    // Pour chaque pièce placée du devis, chercher les pièces placées:
+                    if (nestedPart.GetFieldValueAsLong("_QUOTE_PART") == partEntity.Id)
+                    {
+                        //1. La pièce placée correspond à la pièce du devis, la rajouter                     
+                        listOfSheetsbyQuotePart.NestedPartListEntity.Add(nestedPart);
+
+                        //2. Rechercher si le format correspondant au nesting existe dans listOfNestingsbyQuotePart.ListOfSheetEntity
+                        IEntity quotePartNesting = nestedPart.GetFieldValueAsEntity("_QUOTE_NESTING");
+                        IEntity quotePartNestingSheet = quotePartNesting.GetFieldValueAsEntity("_SHEET");
+                        bool sheetFound = false;
+                        foreach (IEntity sheet in listOfSheetsbyQuotePart.SheetListEntity)
+                        {
+                            if (sheet.Id == quotePartNestingSheet.Id)
+                            {
+                                //Le format existe déjà dans la liste
+                                //s'arrêter, ignorer et passer à la pièce suivant
+                                sheetFound = true;
+                                break;
+                            }
+                        }
+                        if (sheetFound == false)
+                        {
+                            // Le format n'existe pas, le rajouter (et rajouter le nesting)
+                            listOfSheetsbyQuotePart.NestingListEntity.Add(quotePartNesting);
+                            listOfSheetsbyQuotePart.SheetListEntity.Add(quotePartNestingSheet);
+                        }
+                    }
+                }
+                //Ajouter l'item à la liste avant de passer à la pièce suivante.
+                NestingsByQuotePartList.Add(listOfSheetsbyQuotePart);
+            }
+
+            foreach (IEntity setEntity in quote.QuoteSetList)
+            {
+                long setQty = setEntity.GetFieldValueAsLong("_QUANTITY");
+                if (setQty > 0)
+                {
+                    long i = 0;
+                    string[] data = new string[50];
+
+                    #region Ecriture de la balise ENDEVIS pour les ensembles
+                    string setReference = null;
+                    string setModele = null;
+                    GetReference(setEntity, "SET", false, out setReference, out setModele);
+                    data[i++] = "ENDEVIS";
+                    data[i++] = GetQuoteNumber(quoteEntity); //N° devis
+                    data[i++] = EmptyString(clientEntity.GetFieldValueAsString("_EXTERNAL_ID")).ToUpper(); //Code client
+                    data[i++] = setReference; //Code pièce
+                    data[i++] = ""; //Type (non utilisé)
+                    data[i++] = FormatDesignation(setEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation 1
+                    data[i++] = FormatDesignation(""); //Désignation 2
+                    data[i++] = FormatDesignation(""); //Désignation 3
+                    data[i++] = rang; //Rang
+                    data[i++] = setReference; //Code pièce ou Sous pièce (sous rang)
+                    data[i++] = FormatDesignation(setEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation pièce ou Sous pièce (sous rang)
+                    data[i++] = setEntity.Id.ToString(); //N° plan
+                    data[i++] = rang; //Niveau rang
+                    data[i++] = "3"; //Etat devis
+                    data[i++] = ""; //Repère
+                    data[i++] = "0"; //Origine fourniture
+                    data[i++] = "1"; //Qté dus/ensemble : 1 pour le rang 001
+                    data[i++] = "1"; //Qté totale de l'ensemble : 1 pour le rang 001
+                    data[i++] = ""; //Indice plan
+                    data[i++] = ""; //Indice gamme
+                    data[i++] = ""; //Indice nomenclature
+                    data[i++] = ""; //Indice pièce
+                    data[i++] = ""; //Indice A
+                    data[i++] = ""; //Indice B
+                    data[i++] = ""; //Indice C
+                    data[i++] = ""; //Indice D
+                    data[i++] = ""; //Indice E
+                    data[i++] = ""; //Indice F
+                    data[i++] = "0"; //N° identifiant GED 1
+                    data[i++] = "0"; //N° identifiant GED 2
+                    data[i++] = "0"; //N° identifiant GED 3
+                    data[i++] = "0"; //N° identifiant GED 4
+                    data[i++] = "0"; //N° identifiant GED 5
+                    data[i++] = "0"; //N° identifiant GED 6
+                    data[i++] = "0"; //N° identifiant GED 7
+                    data[i++] = "0"; //N° identifiant GED 8
+                    data[i++] = "0"; //N° identifiant GED 9
+                    data[i++] = "0"; //N° identifiant GED 10
+                    data[i++] = ""; //Fichier joint
+                    data[i++] = ""; //Date d'injection
+                    data[i++] = setModele; //Modèle
+                    data[i++] = ""; //Employé responsable                
+                    WriteData(data, i, ref file);
+                    #endregion
+
+                    long gaDevisPhase = 0;
+                    long nomendvPhase = 0;
+
+                    // Fourniture de l'ensemble
+                    IList<IEntity> setSupplyList = new List<IEntity>(quote.GetSetSupplyList(setEntity));
+                    QuoteSupply(ref file, quote, 1, setSupplyList, rang, ref gaDevisPhase, ref nomendvPhase, formatProvider, true, setReference, setModele);
+
+                    // Operation de l'ensemble
+                    // Pas de mono ou multi dim à gérer car pas de matière associée à l'ensemble => Utilisation de l'opération classique MultiDim
+                    IList<IEntity> setOperationList = new List<IEntity>(quote.GetSetOperationList(setEntity));
+                    QuoteOperationMultiDim(ref file, quote, null, setOperationList, rang, formatProvider, 1, setQty, ref gaDevisPhase, ref nomendvPhase, setReference, setModele, 0.0);
+
+                    // Pièces de l'ensemble
+                    IEntityList partSetList = setEntity.Context.EntityManager.GetEntityList("_QUOTE_SET_PART", setEntity.EntityType.Key, ConditionOperator.Equal, setEntity.Id);
+                    partSetList.Fill(false);
+                    long subRang = 1;
+                    foreach (IEntity partSet in partSetList)
+                    {
+                        long partId = partSet.GetFieldValueAsLong("_QUOTE_PART");
+                        long partSetQty = partSet.GetFieldValueAsLong("_QUANTITY");
+
+                        IEntity partEntity = quote.QuotePartList.Where(p => p.Id == partId).FirstOrDefault();
+                        if (partEntity != null && partSetQty > 0)
+                        {
+                            // Il faut gérer le mono et multi dim dans la pièce de l'ensemble.
+                            QuoteSetPartEx(ref file, quote, setEntity, partEntity, partSetQty, rang + "/" + subRang.ToString("000"), formatProvider, NestingsByQuotePartList);
+                            subRang++;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private void QuoteSetPartEx(ref string file, IQuote quote, IEntity setEntity, IEntity partEntity, long partSetQty, string rang, NumberFormatInfo formatProvider, List<QuotePartEx_QuotePartSheetList> NestingsByQuotePartList)
+        {
+            //Récupération de l'entité devis:
+            IEntity quoteEntity = quote.QuoteEntity;
+
+            //Récupération des informations générales:
+            IEntity clientEntity = quoteEntity.GetFieldValueAsEntity("_FIRM");
+            string usercode = quoteEntity.GetFieldValueAsEntity("_QUOTER").GetFieldValueAsString("USER_NAME");
+
+            // 1/ Récupérer la matière de la pièce
+            IEntity partMaterial = partEntity.GetFieldValueAsEntity("_MATERIAL");
+
+            // 2/ Récupérer format par défaut dans matière
+            //IEntity materialDefaultSheet = partMaterial.GetFieldValueAsEntity("AF_DEFAULT_SHEET");
+            String materialDefaultSheetName = partMaterial.GetFieldValueAsString("AF_DEFAULT_SHEET");
+            //MessageBox.Show("materialDefaultSheetName=" + materialDefaultSheetName);
+            IEntityList materialDefaultSheetList = quoteEntity.Context.EntityManager.GetEntityList("_SHEET", "_REFERENCE", ConditionOperator.Equal, materialDefaultSheetName);
+            materialDefaultSheetList.Fill(false);
+            IEntity materialDefaultSheet = null;
+            if (materialDefaultSheetList.Count > 0)
+            {
+                materialDefaultSheet = materialDefaultSheetList.First();
+            }
+            //MessageBox.Show("aterialDefaultSheetList.Count=" + materialDefaultSheetList.Count.ToString());
+
+            // 3/ Générer la liste des _STOCK avec les tôles du format par défaut
+            IEntityList stockList = null;
+            if (materialDefaultSheet != null)
+            {
+                stockList = quote.Context.EntityManager.GetEntityList("_STOCK", "_SHEET", ConditionOperator.Equal, materialDefaultSheet.Id);
+                stockList.Fill(false);
+                if (stockList.Count <= 0) { stockList = null; }
+            }
+
+            // 4/ Analyser si la pièce est en mode placement ou pas (mode placement = 1)
+            // Analyse de la pièce pour savoir si on est en mode placement, ou autre.
+            if (partEntity.GetFieldValueAsLong("_MATERIAL_COST_MODE") == 1)
+            {
+                // Si Le mode placement est "Placement"
+                // Récupérer la liste des formats de la pièce
+                List<IEntity> sheetList = null;
+                foreach (QuotePartEx_QuotePartSheetList quotePart in NestingsByQuotePartList)
+                {
+                    if (quotePart.QuotePartEntityId == partEntity.Id)
+                    {
+                        sheetList = quotePart.SheetListEntity;
+                        break;
+                    }
+                }
+                // 4.1/ Nb format différents ?
+                if (sheetList == null)
+                {
+                    // Liste NULL: Ne devrait pas exister. Si bug => Throw:
+                    MessageBox.Show("La pièce " + partEntity.GetFieldValueAsString("_NAME") + "en mode placement n'est placée" +
+                                 "\ndans aucun format. Il n'existe aucun format, vérifiez le devis.");
+                    throw new NoNullAllowedException();
+                }
+                if (sheetList.Count == 0)
+                {
+                    // Aucune liste de format???
+                    MessageBox.Show("La pièce " + partEntity.GetFieldValueAsString("_NAME") + "en mode placement n'est placée" +
+                                 "\ndans aucun format. La liste des formats est vide, vérifiez le devis.");
+                    throw new IndexOutOfRangeException();
+                }
+                // 4.1.1 / Message 1 seul format de placement doit être sélectionné (pour cohérence avec Clipper) : Utilisation du 1er format
+                if (sheetList.Count > 1)
+                {
+                    MessageBox.Show("La pièce " + partEntity.GetFieldValueAsString("_NAME") + " est placée dans " + sheetList.Count.ToString() + "formats différents" +
+                                  "\nSeul un  format peut être transmis et interprété dans Clipper," +
+                                  "\naussi les données transmises pour cette pièce seront basées sur" +
+                                  "\nle premier format", "Devis " + "quote.Nom", MessageBoxButtons.OK);
+                }
+                // 4.2/ Récupérer le format et la liste des stocks de la 1ère entité de la liste_QUOTE_NESTING\_SHEET pour obtenir la liste des articles.
+                materialDefaultSheet = sheetList.First();
+                stockList = quote.Context.EntityManager.GetEntityList("_STOCK", "_SHEET", ConditionOperator.Equal, materialDefaultSheet.Id);
+                stockList.Fill(false);
+            }
+
+            // 5/ Récupérer l’info de favorisation des articles Mono ou multi-dim, Si favoriser MonoDim:
+            // Alors: Type article par défaut = MonoDim (Décoché = false = utiliser monoDim par défaut)
+            // Sinon: Type article par défaut = MultiDim (Coché = true = utiliser multiDim par défaut)
+            // => Appel à une fonction externe implémentée dans AF_Clipper_Dll.dll
+            bool useMultiDimAsDefault = false;
+            bool favoriseMultiDim = false;// AF_Clipper_Dll.Clipper_Param.Get_MULTIDIM_MODE();
+
+            // 6 / Case favoriser Mono ou multi ?
+            useMultiDimAsDefault = favoriseMultiDim;
+
+            // 7/ Liste _STOCK ?
+            bool stockEntityFound = false;
+            IEntity stockEntityToUse = null;
+            // 7.1 / Rechercher article favorisé
+            //      1er article répondant au critère de favorisation dans la liste des tôles) dont type article = champ _STOCK\AF_MULTIDIM
+            if (stockList != null)
+            {
+                foreach (IEntity stockEntity in stockList)
+                {
+                    if (stockEntity.GetFieldValueAsBoolean("AF_IS_MULTIDIM") == useMultiDimAsDefault)
+                    {
+                        stockEntityToUse = stockEntity;
+                        stockEntityFound = true;
+                        break;
+                    }
+                }
+                if (stockEntityFound == false)
+                {
+                    stockEntityToUse = stockList.FirstOrDefault();
+                    useMultiDimAsDefault = !useMultiDimAsDefault;
+                    stockEntityFound = true;
+                }
+            }
+
+            // 8/ Ecrire ligne ENDEVIS
+            //Reprise du code existant.
+            if (partSetQty > 0)
+            {
+                long i = 0;
+                string[] data = new string[50];
+
+                string partReference = null;
+                string partModele = null;
+                GetReference(partEntity, "PART", false, out partReference, out partModele);
+
+                string setReference = null;
+                string setModele = null;
+                GetReference(setEntity, "SET", false, out setReference, out setModele);
+
+                #region Ecriture de la ligne de la balise ENDEVIS
+                data[i++] = "ENDEVIS";
+                data[i++] = GetQuoteNumber(quoteEntity); //N° devis
+                data[i++] = EmptyString(clientEntity.GetFieldValueAsString("_EXTERNAL_ID")).ToUpper(); //Code client
+                data[i++] = setReference; //Code pièce
+                data[i++] = ""; //Type (non utilisé)
+                data[i++] = FormatDesignation(setEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation 1
+                data[i++] = FormatDesignation(""); //Désignation 2
+                data[i++] = FormatDesignation(""); //Désignation 3
+                data[i++] = rang; //Rang
+                data[i++] = partReference; //Code pièce ou Sous pièce (sous rang)
+                data[i++] = FormatDesignation(partEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation pièce ou Sous pièce (sous rang)
+                data[i++] = partEntity.Id.ToString(); //N° plan
+                data[i++] = rang; //Niveau rang
+                data[i++] = "3"; //Etat devis
+                data[i++] = ""; //Repère
+                data[i++] = "0"; //Origine fourniture
+                data[i++] = partSetQty.ToString(formatProvider); //Qté dus/ensemble
+                data[i++] = "1"; //Qté totale de l'ensemble
+                data[i++] = ""; //Indice plan
+                data[i++] = ""; //Indice gamme
+                data[i++] = ""; //Indice nomenclature
+                data[i++] = ""; //Indice pièce
+                double weight = partEntity.GetFieldValueAsDouble("_WEIGHT");
+                double weightEx = partEntity.GetFieldValueAsDouble("_WEIGHT_EX");
+                weight = weight / 1000;
+                weightEx = weightEx / 1000;
+                data[i++] = weight.ToString("#0.0000", formatProvider); //Indice A
+                data[i++] = weightEx.ToString("#0.0000", formatProvider); //Indice B
+                data[i++] = "-" + partEntity.Id.ToString(); //Indice C
+                data[i++] = ""; //Indice D
+                data[i++] = ""; //Indice E
+                data[i++] = ""; //Indice F
+                data[i++] = "0"; //N° identifiant GED 1
+                data[i++] = "0"; //N° identifiant GED 2
+                data[i++] = "0"; //N° identifiant GED 3
+                data[i++] = "0"; //N° identifiant GED 4
+                data[i++] = "0"; //N° identifiant GED 5
+                data[i++] = "0"; //N° identifiant GED 6
+                data[i++] = "0"; //N° identifiant GED 7
+                data[i++] = "0"; //N° identifiant GED 8
+                data[i++] = "0"; //N° identifiant GED  9
+                data[i++] = "0"; //N° identifiant GED 10
+                //data[i++] = ""; //Fichier joint
+                data[i++] = GetDprPathSp5(partEntity, quote); //GetDprPath(partEntity, quote);
+                data[i++] = ""; //Date d'injection
+                data[i++] = setModele; //Modèle
+                data[i++] = ""; //Employé responsable                
+                WriteData(data, i, ref file);
+                #endregion
+
+                long gaDevisPhase = 0;
+                long nomendvPhase = 0;
+
+                //Ecriture de la ligne GADEVIS pour les fournitures:
+                //Fournitures de la pièce dans l'ensemble
+                //Reprise du code existant.
+                IList<IEntity> setSupplyList = new List<IEntity>(quote.GetPartSupplyList(partEntity));
+                QuoteSupply(ref file, quote, partSetQty, setSupplyList, rang, ref gaDevisPhase, ref nomendvPhase, formatProvider, true, setReference, setModele);
+
+                //Ecriture de la ligne NOMENDV pour les opérations:
+                // Operations de la pièce dans l'ensemble
+                //code existant:
+                //double totalMaterialPrice = partEntity.GetFieldValueAsDouble("_CORRECTED_MAT_COST");
+                //long totalPartQty = partEntity.GetFieldValueAsLong("_QUANTITY");
+                //double materialPrice = totalMaterialPrice / totalPartQty;
+                //IList<IEntity> partOperationList = new List<IEntity>(quote.GetPartOperationList(partEntity));
+                //Changement ici pour écrire soit NOMENDV pour MonoDim/ Soit NOMENDV pour multiDim => Remplacé par:
+                // 9/ Type Article ?                    
+                // ECRITURE DE LA LIGNE NOMENDV en fonction du Mono ou MultiDim
+                if (useMultiDimAsDefault == false)
+                {
+                    // Ecriture MonoDim
+                    MessageBox.Show("Détection du mode mono dimensionnel");
+                    // 10/ _MATERIAL\AF_DEFAULT_SHEET ?
+                    if (materialDefaultSheet == null)
+                    {
+                        MessageBox.Show("Aucun format par défaut n'est indiqué pour la matière " + partMaterial.GetFieldValueAsString("_NAME") +
+                                      "\nUn format par défaut doit être renseigné dans la matière pour utiliser l'interface " +
+                                      "\navec des articles Clipper Mono-dimensionnels.\n" +
+                                      " => la ligne est ecrite en multi-dimensionnel",
+                                      partEntity.Id.ToString() + ":" + partEntity.GetFieldValueAsString("_REFERENCE"), MessageBoxButtons.OK);
+                        useMultiDimAsDefault = true;
+                    }
+                    else
+                    {
+                        // Prix de la matière
+                        // 11/ _SHEET\_AS_SPECIFIC_COST ?
+                        long totalPartQty = partEntity.GetFieldValueAsLong("_QUANTITY");
+                        double totalMaterialPrice = 0.0;
+                        if (materialDefaultSheet.GetFieldValueAsBoolean("_AS_SPECIFIC_COST") == true)
+                        {
+                            totalMaterialPrice = materialDefaultSheet.GetFieldValueAsDouble("_BUY_COST");
+                        }
+                        else
+                        {
+                            totalMaterialPrice = partEntity.GetFieldValueAsDouble("_MAT_IN_COST");
+                        }
+                        double materialPrice = totalMaterialPrice / totalPartQty;
+                        IList<IEntity> partOperationList = new List<IEntity>(quote.GetPartOperationList(partEntity));
+                        
+                        //Code Article Clipper
+                        string codeArticleClipper = "MATIERE";
+                        if (stockEntityToUse != null)
+                        {
+                            //Stock non vide => Code article est dans _STOCK\_NAME
+                            codeArticleClipper = stockEntityToUse.GetFieldValueAsString("_NAME");
+                        }
+                        else
+                        {
+                            //Stock est vide => Code article est dans _MATERIAL\_AF_DEFAULT_SHEET
+                            codeArticleClipper = materialDefaultSheet.GetFieldValueAsString("_REFERENCE");
+                        }
+                        QuoteOperationMonoDim(ref file, quote, partEntity, partOperationList, rang, formatProvider, partSetQty, partSetQty, ref gaDevisPhase, ref nomendvPhase, partReference, partModele, materialPrice, codeArticleClipper, materialDefaultSheet);
+                    }
+                }
+                if (useMultiDimAsDefault == true)
+                {
+                    // Ecriture MultiDim
+                    double totalMaterialPrice = partEntity.GetFieldValueAsDouble("_CORRECTED_MAT_COST");
+                    //A vérifier la différence: Bizarre pour QuotePartEx on utilise: double totalMaterialPrice = partEntity.GetFieldValueAsDouble("_MAT_IN_COST");???
+                    long totalPartQty = partEntity.GetFieldValueAsLong("_QUANTITY");
+                    double materialPrice = totalMaterialPrice / totalPartQty;
+                    IList<IEntity> partOperationList = new List<IEntity>(quote.GetPartOperationList(partEntity));
+                    QuoteOperationMultiDim(ref file, quote, partEntity, partOperationList, rang, formatProvider, partSetQty, partSetQty, ref gaDevisPhase, ref nomendvPhase, partReference, partModele, materialPrice);
+                }
+
+
+            }
+
+            #region Ancien Code
+            //if (partSetQty > 0)
+            //{
+            //    long i = 0;
+            //    string[] data = new string[50];
+
+            //    string partReference = null;
+            //    string partModele = null;
+            //    GetReference(partEntity, "PART", false, out partReference, out partModele);
+
+            //    string setReference = null;
+            //    string setModele = null;
+            //    GetReference(setEntity, "SET", false, out setReference, out setModele);
+
+            #region Ecriture de la ligne de la balise ENDEVIS
+            //    data[i++] = "ENDEVIS";
+            //    data[i++] = GetQuoteNumber(quoteEntity); //N° devis
+            //    data[i++] = EmptyString(clientEntity.GetFieldValueAsString("_EXTERNAL_ID")).ToUpper(); //Code client
+            //    data[i++] = setReference; //Code pièce
+            //    data[i++] = ""; //Type (non utilisé)
+            //    data[i++] = FormatDesignation(setEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation 1
+            //    data[i++] = FormatDesignation(""); //Désignation 2
+            //    data[i++] = FormatDesignation(""); //Désignation 3
+            //    data[i++] = rang; //Rang
+            //    data[i++] = partReference; //Code pièce ou Sous pièce (sous rang)
+            //    data[i++] = FormatDesignation(partEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation pièce ou Sous pièce (sous rang)
+            //    data[i++] = partEntity.Id.ToString(); //N° plan
+            //    data[i++] = rang; //Niveau rang
+            //    data[i++] = "3"; //Etat devis
+            //    data[i++] = ""; //Repère
+            //    data[i++] = "0"; //Origine fourniture
+            //    data[i++] = partSetQty.ToString(formatProvider); //Qté dus/ensemble
+            //    data[i++] = "1"; //Qté totale de l'ensemble
+            //    data[i++] = ""; //Indice plan
+            //    data[i++] = ""; //Indice gamme
+            //    data[i++] = ""; //Indice nomenclature
+            //    data[i++] = ""; //Indice pièce
+            //    double weight = partEntity.GetFieldValueAsDouble("_WEIGHT");
+            //    double weightEx = partEntity.GetFieldValueAsDouble("_WEIGHT_EX");
+            //    weight = weight / 1000;
+            //    weightEx = weightEx / 1000;
+            //    data[i++] = weight.ToString("#0.0000", formatProvider); //Indice A
+            //    data[i++] = weightEx.ToString("#0.0000", formatProvider); //Indice B
+            //    data[i++] = "-" + partEntity.Id.ToString(); //Indice C
+            //    data[i++] = ""; //Indice D
+            //    data[i++] = ""; //Indice E
+            //    data[i++] = ""; //Indice F
+            //    data[i++] = "0"; //N° identifiant GED 1
+            //    data[i++] = "0"; //N° identifiant GED 2
+            //    data[i++] = "0"; //N° identifiant GED 3
+            //    data[i++] = "0"; //N° identifiant GED 4
+            //    data[i++] = "0"; //N° identifiant GED 5
+            //    data[i++] = "0"; //N° identifiant GED 6
+            //    data[i++] = "0"; //N° identifiant GED 7
+            //    data[i++] = "0"; //N° identifiant GED 8
+            //    data[i++] = "0"; //N° identifiant GED  9
+            //    data[i++] = "0"; //N° identifiant GED 10
+            //    //data[i++] = ""; //Fichier joint
+            //    data[i++] = GetDprPathSp5(partEntity, quote); //GetDprPath(partEntity, quote);
+            //    data[i++] = ""; //Date d'injection
+            //    data[i++] = setModele; //Modèle
+            //    data[i++] = ""; //Employé responsable                
+            //    WriteData(data, i, ref file);
+            #endregion
+
+            //    long gaDevisPhase = 0;
+            //    long nomendvPhase = 0;
+
+            //    // Fournitures de la pièce dans l'ensemble
+            //    IList<IEntity> setSupplyList = new List<IEntity>(quote.GetPartSupplyList(partEntity));
+            //    QuoteSupply(ref file, quote, partSetQty, setSupplyList, rang, ref gaDevisPhase, ref nomendvPhase, formatProvider, true, setReference, setModele);
+
+            //    // Operations de la pièce dans l'ensemble
+            //    double totalMaterialPrice = partEntity.GetFieldValueAsDouble("_CORRECTED_MAT_COST");
+            //    long totalPartQty = partEntity.GetFieldValueAsLong("_QUANTITY");
+            //    double materialPrice = totalMaterialPrice / totalPartQty;
+            //    IList<IEntity> partOperationList = new List<IEntity>(quote.GetPartOperationList(partEntity));
+            //    QuoteOperation(ref file, quote, partEntity, partOperationList, rang, formatProvider, partSetQty, partSetQty, ref gaDevisPhase, ref nomendvPhase, setReference, setModele, materialPrice);
+            //}
+            #endregion
+
+
+
+
+        }
+
+
         #region gestion des emf/dpr
         /// <summary>
         /// creer les liens emf dans le fichier clipper
@@ -2184,6 +3014,276 @@ namespace AF_Export_Devis_Clipper
 
             #endregion
         }
+
+        private void QuoteOperationMultiDim(ref string file, IQuote quote, IEntity partEntity, IEnumerable<IEntity> operationList, string rang, NumberFormatInfo formatProvider, long mainParentQuantity, long parentQty, ref long gadevisPhase, ref long nomendvPhase, string reference, string modele, double materialPrice)
+        {
+            long cutGadevisPhase = 0;
+            IEntity quoteEntity = quote.QuoteEntity;
+            IEntity clientEntity = quoteEntity.GetFieldValueAsEntity("_FIRM");
+
+            // Operation
+            AQuoteOperation(ref file, quote, partEntity, operationList, ref cutGadevisPhase, rang, formatProvider, mainParentQuantity, parentQty, ref gadevisPhase, ref nomendvPhase, reference, modele);
+
+            #region Gestion de l'ériture MultiDim pour la matière.
+            if (materialPrice > 0)
+            {
+                IEntity materialEntity = partEntity.GetFieldValueAsEntity("_MATERIAL");
+                string codeArticleMaterial = materialEntity.GetFieldValueAsString("_CLIPPER_CODE_ARTICLE");
+
+                long i = 0;
+                string[] data = new string[50];
+
+                nomendvPhase = nomendvPhase + 10;
+                i = 0;
+                data = new string[50];
+
+                if (string.IsNullOrEmpty(codeArticleMaterial))
+                {
+                    #region Ecriture Balise NOMENDV par défaut avec Code Famille = DIVERS et Code article = MATIERE quand il n'y a pas de code article associée à la matière.
+                    data[i++] = "NOMENDV";
+                    data[i++] = GetQuoteNumber(quoteEntity); //Code devis
+                    data[i++] = reference; //Code pièce
+                    data[i++] = rang; //Rang
+                    data[i++] = nomendvPhase.ToString(formatProvider); //Phase
+                    data[i++] = ""; //Repère
+                    data[i++] = "MATIERE"; //Code article
+                    data[i++] = "MATIERE"; //Désignation 1
+                    data[i++] = ""; //Désignation 2
+                    data[i++] = ""; //Désignation 3
+                    data[i++] = ""; //Temps de réappro
+                    data[i++] = mainParentQuantity.ToString(); //Qté
+                    data[i++] = materialPrice.ToString("#0.0000", formatProvider); //Px article ou Px/Kg
+                    data[i++] = materialPrice.ToString("#0.0000", formatProvider); //Prix total
+                    data[i++] = ""; //Code Fournisseur
+                    data[i++] = ""; //2sd fournisseur
+                    data[i++] = "1"; //Type
+                    data[i++] = ""; //Prix constant
+                    data[i++] = ""; //Poids tôle ou article
+                    data[i++] = "DIVERS"; //Famille
+                    data[i++] = ""; //N° tarif de Clipper
+                    data[i++] = ""; //Observation
+                    data[i++] = ""; //Observation interne
+                    data[i++] = ""; //Observation débit
+                    data[i++] = ""; //Val Débit 1
+                    data[i++] = ""; //Val Débit 2
+                    data[i++] = ""; //Qté Débit
+                    data[i++] = ""; //Nb pc/débit ou débit/pc
+                    data[i++] = ""; //Lien avec la phase de gamme
+                    data[i++] = ""; //Unite de quantité
+                    data[i++] = ""; //Unité de prix
+                    data[i++] = ""; //Coef Unite
+                    data[i++] = ""; //Coef Prix
+                    data[i++] = modele; //Prix constant ??? semble plutot correcpondre au Modèle
+                    data[i++] = "0"; //Modèle ??? semble plutot correcpondre au Prix constant
+                    data[i++] = ""; //Qté constant
+                    data[i++] = cutGadevisPhase.ToString(formatProvider); //Magasin ???? erreur
+                    WriteData(data, i, ref file);
+                    #endregion
+                }
+                else
+                {
+                    #region ANCIENNE balise NOMENDVALMA
+                    double surface = partEntity.GetFieldValueAsDouble("_SURFACE");
+                    data[i++] = "NOMENDVALMA";
+                    data[i++] = GetQuoteNumber(quoteEntity); //Code devis
+                    data[i++] = reference; //Code pièce
+                    data[i++] = modele; //Modèle
+                    data[i++] = rang; //Rang
+                    data[i++] = nomendvPhase.ToString(formatProvider); //Phase
+                    data[i++] = codeArticleMaterial; //Code article
+                    data[i++] = surface.ToString("#0.0000", formatProvider); //Surface pour faire une pièce
+                    data[i++] = materialPrice.ToString("#0.0000", formatProvider); //Prix total pour faire une pièce
+                    WriteData(data, i, ref file);
+                    #endregion
+
+                    #region Ecriture de la balise NOMENDV en Multidim avec code article  (Commenté)
+                    //data[i++] = "NOMENDV";
+                    //data[i++] = GetQuoteNumber(quoteEntity); //Code devis
+                    //data[i++] = reference; //Code pièce
+                    //data[i++] = rang; //Rang
+                    //data[i++] = nomendvPhase.ToString(formatProvider); //Phase
+                    //data[i++] = ""; //Repère
+                    //data[i++] = "MATIERE"; //Code article
+                    //data[i++] = "MATIERE"; //Désignation 1
+                    //data[i++] = ""; //Désignation 2
+                    //data[i++] = ""; //Désignation 3
+                    //data[i++] = ""; //Temps de réappro
+                    //data[i++] = mainParentQuantity.ToString(); //Qté
+                    //data[i++] = materialPrice.ToString("#0.0000", formatProvider); //Px article ou Px/Kg
+                    //data[i++] = materialPrice.ToString("#0.0000", formatProvider); //Prix total
+                    //data[i++] = ""; //Code Fournisseur
+                    //data[i++] = ""; //2sd fournisseur
+                    //data[i++] = "1"; //Type
+                    //data[i++] = ""; //Prix constant
+                    //data[i++] = ""; //Poids tôle ou article
+                    //data[i++] = "DIVERS"; //Famille
+                    //data[i++] = ""; //N° tarif de Clipper
+                    //data[i++] = ""; //Observation
+                    //data[i++] = ""; //Observation interne
+                    //data[i++] = ""; //Observation débit
+                    //data[i++] = ""; //Val Débit 1
+                    //data[i++] = ""; //Val Débit 2
+                    //data[i++] = ""; //Qté Débit
+                    //data[i++] = ""; //Nb pc/débit ou débit/pc
+                    //data[i++] = ""; //Lien avec la phase de gamme
+                    //data[i++] = ""; //Unite de quantité
+                    //data[i++] = ""; //Unité de prix
+                    //data[i++] = ""; //Coef Unite
+                    //data[i++] = ""; //Coef Prix
+                    //data[i++] = modele; //Prix constant ??? semble plutot correcpondre au Modèle
+                    //data[i++] = "0"; //Modèle ??? semble plutot correcpondre au Prix constant
+                    //data[i++] = ""; //Qté constant
+                    //data[i++] = cutGadevisPhase.ToString(formatProvider); //Magasin ???? erreur
+                    //WriteData(data, i, ref file);
+                    //#endregion
+
+                    //#region Ecriture de la balise DIMNOMEN associée à la balise NOMENDV en MultiDim
+                    //// Ecrire Balise DIMNOMEN
+                    //i = 0;
+                    //data = new string[50];
+                    //data[i++] = "DIMNOMEN"; //Balise
+                    //data[i++] = ""; //quantité? 
+                    //data[i++] = ""; //Val débit 1
+                    //data[i++] = ""; //Val débit 2
+                    //data[i++] = ""; //?
+                    //data[i++] = ""; //Devis/pièce/modele/Rang/Phase nomenclature: Séparer chaque élément par une tabulation
+                    //WriteData(data, i, ref file);
+                    #endregion
+                }
+            }
+            #endregion
+        }
+
+        private void QuoteOperationMonoDim(ref string file, IQuote quote, IEntity partEntity, IEnumerable<IEntity> operationList, string rang, NumberFormatInfo formatProvider, long mainParentQuantity, long parentQty, ref long gadevisPhase, ref long nomendvPhase, string reference, string modele, double materialPrice, string codeArticleMaterial, IEntity sheetEntityToUse)
+        {
+            long cutGadevisPhase = 0;
+            IEntity quoteEntity = quote.QuoteEntity;
+            IEntity clientEntity = quoteEntity.GetFieldValueAsEntity("_FIRM");
+
+            // Ajout des opérations dans les lignes GADEVIS:
+            AQuoteOperation(ref file, quote, partEntity, operationList, ref cutGadevisPhase, rang, formatProvider, mainParentQuantity, parentQty, ref gadevisPhase, ref nomendvPhase, reference, modele);
+
+            #region Gestion de l'ériture MonoDim pour la matière.
+            // Ajout de la ligne NOMENDV:
+            if (materialPrice > 0)
+            {
+                IEntity materialEntity = partEntity.GetFieldValueAsEntity("_MATERIAL");
+                long i = 0;
+                string[] data = new string[50];
+                nomendvPhase = nomendvPhase + 10;
+                i = 0;
+                data = new string[50];
+                if (string.IsNullOrEmpty(codeArticleMaterial))
+                {
+                    #region Ecrire les données de la balise NOMENDV
+                    data[i++] = "NOMENDV";
+                    data[i++] = GetQuoteNumber(quoteEntity); //Code devis
+                    data[i++] = reference; //Code pièce
+                    data[i++] = rang; //Rang
+                    data[i++] = nomendvPhase.ToString(formatProvider); //Phase
+                    data[i++] = ""; //Repère
+                    data[i++] = "MATIERE"; //Code article
+                    data[i++] = "MATIERE"; //Désignation 1
+                    data[i++] = ""; //Désignation 2
+                    data[i++] = ""; //Désignation 3
+                    data[i++] = ""; //Temps de réappro
+                    data[i++] = mainParentQuantity.ToString(); //Qté
+                    data[i++] = materialPrice.ToString("#0.0000", formatProvider); //Prix article ou Px/Kg
+                    data[i++] = materialPrice.ToString("#0.0000", formatProvider); //Prix total
+                    data[i++] = ""; //Code Fournisseur
+                    data[i++] = ""; //2sd fournisseur
+                    data[i++] = "1"; //Type
+                    data[i++] = ""; //Prix constant
+                    data[i++] = ""; //Poids tôle ou article
+                    data[i++] = "DIVERS"; //Famille
+                    data[i++] = ""; //N° tarif de Clipper
+                    data[i++] = ""; //Observation
+                    data[i++] = ""; //Observation interne
+                    data[i++] = ""; //Observation débit
+                    data[i++] = ""; //Val Débit 1
+                    data[i++] = ""; //Val Débit 2
+                    data[i++] = ""; //Qté Débit
+                    data[i++] = ""; //Nb pc/débit ou débit/pc
+                    data[i++] = ""; //Lien avec la phase de gamme
+                    data[i++] = ""; //Unite de quantité
+                    data[i++] = ""; //Unité de prix
+                    data[i++] = ""; //Coef Unite
+                    data[i++] = ""; //Coef Prix
+                    data[i++] = modele; //Prix constant ??? semble plutot correspondre au Modèle
+                    data[i++] = "0"; //Modèle ??? semble plutot correcpondre au Prix constant
+                    data[i++] = ""; //Qté constant
+                    data[i++] = cutGadevisPhase.ToString(formatProvider); //Magasin ???? erreur
+                    WriteData(data, i, ref file);
+                    #endregion
+                }
+                else
+                {
+                    #region Ancienne balise NOMENDVALMA (commentée)
+                    //ANCIENNE BALISE NOMENDVALMA:
+                    //double surface = partEntity.GetFieldValueAsDouble("_SURFACE");
+                    //data[i++] = "NOMENDVALMA";
+                    //data[i++] = GetQuoteNumber(quoteEntity); //Code devis
+                    //data[i++] = reference; //Code pièce
+                    //data[i++] = modele; //Modèle
+                    //data[i++] = rang; //Rang
+                    //data[i++] = nomendvPhase.ToString(formatProvider); //Phase
+                    //data[i++] = codeArticleMaterial; //Code article
+                    //data[i++] = surface.ToString("#0.0000", formatProvider); //Surface pour faire une pièce
+                    //data[i++] = materialPrice.ToString("#0.0000", formatProvider); //Prix total pour faire une pièce
+                    //WriteData(data, i, ref file);
+                    #endregion
+
+                    #region Nouvelle balise NOMENDV (Ecriture MonoDim)
+                    double partSurface = partEntity.GetFieldValueAsDouble("_SURFACE");
+                    double sheetSurface = sheetEntityToUse.GetFieldValueAsDouble("_SURFACE");
+                    if(sheetSurface<=0) { sheetSurface = 999999999999; }
+                    data[i++] = "NOMENDV";
+                    data[i++] = GetQuoteNumber(quoteEntity); //1 Code devis
+                    data[i++] = reference; //2 Code pièce                    
+                    data[i++] = rang; //3 Rang
+                    data[i++] = nomendvPhase.ToString(formatProvider); //4 Phase
+                    data[i++] = ""; // 5 Repère
+                    data[i++] = codeArticleMaterial; //6 Code article
+                    data[i++] = ""; // 7 Designation 1 (Nom matière?)
+                    data[i++] = ""; // 8 Designation 2 (Dimensions)?
+                    data[i++] = ""; // 9 Designation 3 (?)
+                    data[i++] = ""; // 10 Temps de réappro?
+                    data[i++] = (partSurface/sheetSurface).ToString("#0.0000", formatProvider);//  Ratio surface utilisée (ou poids) parentQty.ToString(); // 11 Quantité
+                    data[i++] = materialPrice.ToString("#0.0000", formatProvider); // 12 Prix article ou Prix au Kg = Prix pièce ou prix matière?
+                    data[i++] = (materialPrice * parentQty).ToString("#0.0000", formatProvider); // 13 Prix total.
+                    data[i++] = ""; // 14 Fournisseur
+                    data[i++] = ""; // 15 2nd Fournisseur
+                    // 16 Type: 1 = Fourniture, 2 = Soustraitance Etudes, 3 = Sous traitance réalisation, 4 = Commande sans prix, 5 = Matériel fourni par le client)
+                    if (partEntity.GetFieldValueAsLong("_MATERIAL_COST_MODE") == 2) { data[i++] = "5"; } else { data[i++] = "1"; }
+                    data[i++] = "0"; // 17: Prix constant: 0 = non, 1 = oui
+                    data[i++] = "0"; // 18: Poids tôle ou article.
+                    data[i++] = "";  // 19: Famille : par défaut DIVERS, doit éxister dans la base CLIPPER 7 alpha max
+                    data[i++] = "0"; // 20: Numéro tarif Clipper = 0
+                    data[i++] = ""; // 21 Observation: pièce / tole?
+                    data[i++] = ""; // 22 Observation interne: pièce / tole?
+                    data[i++] = ""; // 23 Observation débit : pièce / tole?
+                    data[i++] = partEntity.GetFieldValueAsDouble("_LENGTH").ToString("#0.0000", formatProvider); //24 Val débit 1
+                    data[i++] = partEntity.GetFieldValueAsDouble("_WIDTH").ToString("#0.0000", formatProvider);//25 Val débit 2 
+                    data[i++] = "1"; // 26 Qté débit
+                    data[i++] = "0"; // 27: N Pièce/Débit ou Débit/pièce, 1 = débit/pièce, 2 = pièce/débit
+                    data[i++] = "u"; // 28: unité de quantité
+                    data[i++] = "kg"; // 29: unité de prix
+                    data[i++] = "1"; // 30: Coef unité
+                    data[i++] = "1"; // 31 : Coef prix
+                    data[i++] = "0"; // 32 : Prix constant
+                    data[i++] = modele; // 33 : Modèle
+                    data[i++] = "0"; //34 Qté constant
+                    data[i++] = "0"; // 35 Magasin
+                    data[i++] = "10"; // 36 Lien avec phase de la gamme 10,20,30, si pas de liaison => 10
+                    //data[i++] = "10"; // 37 Zone specifique COMPLEM's 10,20,30, si pas de liaison => 10
+                    //data[i++] = ""; // 38 Coefficient de marge: vide reprend les valeurs par défaut Clipper.
+                    WriteData(data, i, ref file);
+                    #endregion
+                }
+            }
+            #endregion
+        }
+
         private void AQuoteOperation(ref string file, IQuote quote, IEntity partEntity, IEnumerable<IEntity> operationList, ref long cutGadevisPhase, string rang, NumberFormatInfo formatProvider, long mainParentQuantity, long parentQty, ref long gadevisPhase, ref long nomendvPhase, string reference, string modele)
         {
             IEntity quoteEntity = quote.QuoteEntity;
@@ -3170,6 +4270,18 @@ namespace AF_Export_Devis_Clipper
 
         }
         #endregion 
+
+        public class QuotePartEx_QuotePartSheetList
+        {
+            public long QuotePartEntityId { get; set; }
+            public List<IEntity> NestedPartListEntity { get; set; }
+            public List<IEntity> NestingListEntity { get; set; }
+            public List<IEntity> SheetListEntity { get; set; }
+        }
+
+
+
+
 
 
     }

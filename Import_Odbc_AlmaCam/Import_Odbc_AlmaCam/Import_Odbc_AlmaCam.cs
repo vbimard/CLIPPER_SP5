@@ -1724,7 +1724,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
         /// <summary>
         /// converti le prix en fonction de l'unité de gestion
         /// </summary>
-        /// <param name="unitegestion">par longeur ou par kg ou par u ou par u100...</param>
+        /// <param name="unitegestion">par longeur ou par kg ou par u ou par le 100...</param>
         /// <param name="price"></param>
         /// <returns></returns>
         public double GetPrice(string unitegestion, double price,double longeur,double poids)
@@ -3886,7 +3886,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                                 if (tuberec.IsMultiDim)
                                 {   //update prix article// prix au mettre /1000 pour obtenir le prix au mm
                                     sectionQuality.SetFieldValue("_SECTION", section.Id);
-                                    sectionQuality.SetFieldValue("_BUY_COST", tuberec.PRIXART / 1000);
+                                    sectionQuality.SetFieldValue("_BUY_COST", tuberec.PRIXART );
                                     sectionQuality.Save();
                                 }
                                 //ATTENTION recuperation des infos de l'implemented sectio
@@ -4411,7 +4411,7 @@ namespace AF_Import_ODBC_Clipper_AlmaCam
                                 if (tuberec.IsMultiDim)
                                 {   //update prix article// prix au mettre /1000 pour obtenir le prix au mm
                                     sectionQuality.SetFieldValue("_SECTION", section.Id);
-                                    sectionQuality.SetFieldValue("_BUY_COST", tuberec.PRIXART / 1000);
+                                    sectionQuality.SetFieldValue("_BUY_COST", tuberec.PRIXART);
                                     sectionQuality.Save();
                                 }
                                 //ATTENTION recuperation des infos de l'implemented sectio
