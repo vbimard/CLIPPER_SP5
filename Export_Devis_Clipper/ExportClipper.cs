@@ -312,6 +312,10 @@ namespace AF_Export_Devis_Clipper
 
                 }
 
+
+                
+               
+
                 return valid_quote;
                 //IEntityList closed_quotes = iquote.Context.EntityManager.GetEntityList("_QUOTE_CLOSED", "_CLOSE_REASON", ConditionOperator.Equal, 1);
 
@@ -370,6 +374,18 @@ namespace AF_Export_Devis_Clipper
 
                 }
 
+                ///verification du paramétrage
+                //Get_Price_Mode()             
+                //_SHEET_SPECIFIC_SALE_COST_BY_WEIGHT
+
+                bool rst = false;
+                rst = contextlocal.ParameterSetManager.TryGetParameterValue("_QUOTE", "_SHEET_SPECIFIC_SALE_COST_BY_WEIGHT", out IParameterValue IsPricebyWeight);
+                if (IsPricebyWeight.GetValueAsBoolean() == false)
+                {
+                    MessageBox.Show("Veuillez cocher la case Prix d'achat/ vente specifique des tôles au poids dans le menu prix");
+                    valid_context = IsPricebyWeight.GetValueAsBoolean() && valid_context;
+
+                }
 
                 ///verification des chemins
                 ///
@@ -380,7 +396,7 @@ namespace AF_Export_Devis_Clipper
                 //string Export_DPR_Directory = contextlocal.ParameterSetManager.GetParameterValue("_EXPORT", "_ACTCUT_DPR_DIRECTORY").GetValueAsString();
 
                 //depuis 2.1.5
-                bool rst = false;
+                rst = false;
 
                 IParameterValue iparametervalue;
 
@@ -934,12 +950,16 @@ namespace AF_Export_Devis_Clipper
                     IField field;
                     if (quoteEntity.EntityType.TryGetField("_DELIVERY_DATE", out field))
                     {
+                        //if (field.DefaultValue != "00010101") { 
                         data[i++] = GetFieldDate(quoteEntity, "_DELIVERY_DATE"); //Nb délai
                         data[i++] = "4"; //Type délai 1=jour 4=date
+
+                        //}
                     }
+
                     else
                     {
-                        data[i++] = "0"; //Nb délai
+                        data[i++] = "5"; //Nb délai 5 jour par defaut
                         data[i++] = "1"; //Type délai 1=jour 4=date
                     }
                     data[i++] = "1"; //Unité de prix
@@ -1714,7 +1734,7 @@ namespace AF_Export_Devis_Clipper
                 // Sinon: Type article par défaut = MultiDim (Coché = true = utiliser multiDim par défaut)
                 // => Appel à une fonction externe implémentée dans AF_Clipper_Dll.dll
                 bool useMultiDimAsDefault = false;
-                bool favoriseMultiDim = false;// AF_Clipper_Dll.Clipper_Param.Get_MULTIDIM_MODE();
+                bool favoriseMultiDim = AF_Clipper_Dll.Clipper_Param.Get_MULTIDIM_MODE();
 
                 // 6 / Case favoriser Mono ou multi ?
                 useMultiDimAsDefault = favoriseMultiDim;
@@ -2216,7 +2236,7 @@ namespace AF_Export_Devis_Clipper
                 data[i++] = "ENDEVIS";
                 data[i++] = GetQuoteNumber(quoteEntity); //N° devis
                 data[i++] = EmptyString(clientEntity.GetFieldValueAsString("_EXTERNAL_ID")).ToUpper(); //Code client
-                data[i++] = setReference; //Code pièce
+                data[i++] = setReference; //Code ensemble pièce
                 data[i++] = ""; //Type (non utilisé)
                 data[i++] = FormatDesignation(setEntity.GetFieldValueAsString("_DESCRIPTION")); //Désignation 1
                 data[i++] = FormatDesignation(""); //Désignation 2
@@ -2504,7 +2524,7 @@ namespace AF_Export_Devis_Clipper
                     MessageBox.Show("La pièce " + partEntity.GetFieldValueAsString("_NAME") + " est placée dans " + sheetList.Count.ToString() + "formats différents" +
                                   "\nSeul un  format peut être transmis et interprété dans Clipper," +
                                   "\naussi les données transmises pour cette pièce seront basées sur" +
-                                  "\nle premier format", "Devis " + "quote.Nom", MessageBoxButtons.OK);
+                                  "\nle premier format", "Devis " + quoteEntity.GetFieldValueAsString("_REFERENCE"), MessageBoxButtons.OK);
                 }
                 // 4.2/ Récupérer le format et la liste des stocks de la 1ère entité de la liste_QUOTE_NESTING\_SHEET pour obtenir la liste des articles.
                 materialDefaultSheet = sheetList.First();
@@ -2517,7 +2537,7 @@ namespace AF_Export_Devis_Clipper
             // Sinon: Type article par défaut = MultiDim (Coché = true = utiliser multiDim par défaut)
             // => Appel à une fonction externe implémentée dans AF_Clipper_Dll.dll
             bool useMultiDimAsDefault = false;
-            bool favoriseMultiDim = false;// AF_Clipper_Dll.Clipper_Param.Get_MULTIDIM_MODE();
+            bool favoriseMultiDim = AF_Clipper_Dll.Clipper_Param.Get_MULTIDIM_MODE();
 
             // 6 / Case favoriser Mono ou multi ?
             useMultiDimAsDefault = favoriseMultiDim;
@@ -2634,7 +2654,7 @@ namespace AF_Export_Devis_Clipper
                 if (useMultiDimAsDefault == false)
                 {
                     // Ecriture MonoDim
-                    MessageBox.Show("Détection du mode mono dimensionnel");
+                    // MessageBox.Show("Détection du mode mono dimensionnel");
                     // 10/ _MATERIAL\AF_DEFAULT_SHEET ?
                     if (materialDefaultSheet == null)
                     {
@@ -2674,7 +2694,9 @@ namespace AF_Export_Devis_Clipper
                             //Stock est vide => Code article est dans _MATERIAL\_AF_DEFAULT_SHEET
                             codeArticleClipper = materialDefaultSheet.GetFieldValueAsString("_REFERENCE");
                         }
-                        QuoteOperationMonoDim(ref file, quote, partEntity, partOperationList, rang, formatProvider, partSetQty, partSetQty, ref gaDevisPhase, ref nomendvPhase, partReference, partModele, materialPrice, codeArticleClipper, materialDefaultSheet);
+
+
+                        QuoteOperationMonoDim(ref file, quote, partEntity, partOperationList, rang, formatProvider, partSetQty, partSetQty, ref gaDevisPhase, ref nomendvPhase, setReference, setModele, materialPrice, codeArticleClipper, materialDefaultSheet);
                     }
                 }
                 if (useMultiDimAsDefault == true)
@@ -2685,7 +2707,7 @@ namespace AF_Export_Devis_Clipper
                     long totalPartQty = partEntity.GetFieldValueAsLong("_QUANTITY");
                     double materialPrice = totalMaterialPrice / totalPartQty;
                     IList<IEntity> partOperationList = new List<IEntity>(quote.GetPartOperationList(partEntity));
-                    QuoteOperationMultiDim(ref file, quote, partEntity, partOperationList, rang, formatProvider, partSetQty, partSetQty, ref gaDevisPhase, ref nomendvPhase, partReference, partModele, materialPrice);
+                    QuoteOperationMultiDim(ref file, quote, partEntity, partOperationList, rang, formatProvider, partSetQty, partSetQty, ref gaDevisPhase, ref nomendvPhase, setReference, setModele, materialPrice);
                 }
 
 

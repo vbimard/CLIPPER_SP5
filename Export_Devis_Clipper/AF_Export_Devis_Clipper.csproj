@@ -52,6 +52,10 @@
       <HintPath>..\..\..\..\..\..\AlmaCAM\Bin\Actcut.QuoteModelManager.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="AF_Clipper_Dll, Version=2.1.5.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\AlmaCAM\Bin\AF_Clipper_Dll.dll</HintPath>
+    </Reference>
     <Reference Include="AF_Export_Devis_Clipper, Version=2.1.3.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\AlmaCAM\Bin\AF_Export_Devis_Clipper.dll</HintPath>

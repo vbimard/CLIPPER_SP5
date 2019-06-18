@@ -104,6 +104,12 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy "C:\AlmaCAM\Bin\Actcut.QuoteModelApi.exe" "C:\AlmaCAM\Bin\AlmaCam_Clipper\DLL\SP5\Actcut.QuoteModelApi.exe"
+copy   "C:\AlmaCAM\Bin\Actcut.QuoteModelApi.exe" "C:\Program Files (x86)\Clip Industrie\CLIPPER 8\Actcut.QuoteModelApi.exe"
+copy "C:\AlmaCAM\Bin\Actcut.QuoteModelApi.exe"  "\\ALMA-FILES\Technique-AS\SOFT\AlmaCam\Template\Clipper\DEBUG_CLIPPER\debug_DLL\Actcut.QuoteModelApi.exe"
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

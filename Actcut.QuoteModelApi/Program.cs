@@ -64,8 +64,10 @@ namespace AF_Export_Devis_Clipper
             {
                 action = "ExportQuote";
                 user = "SUPER";
-                db = "AlmaCAM_Clipper_7";
-                quoteNumber = 36;
+                //db = "AlmaCAM_Clipper_7";
+                db = "AlmaCAM";
+                //id almacam
+                quoteNumber = 10009;
                 orderNumber = "alma";
                 exportFile = @"c:\Temp";
 
@@ -120,10 +122,9 @@ namespace AF_Export_Devis_Clipper
                     //
 
                         IQuoteManagerUI quoteManagerUI = new QuoteManagerUI();
-                        IEntity quoteEntity = quoteManagerUI.GetQuoteEntity(contextlocal, quoteNumber);
+                        IEntity quoteEntity = quoteManagerUI.GetQuoteEntity(contextlocal, quoteNumber);                 
                         ret = quoteManagerUI.AccepQuote(contextlocal, quoteEntity, orderNumber, exportFile);
 
-                   
 
                     Environment.ExitCode = (ret ? 0 : -1);
                 }

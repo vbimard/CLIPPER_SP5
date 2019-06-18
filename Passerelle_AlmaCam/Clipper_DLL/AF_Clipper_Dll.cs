@@ -619,6 +619,12 @@ namespace AF_Clipper_Dll
                 parametre_name = "_ACTCUT_DPR_DIRECTORY";
                 Get_string_Parameter_Dictionary_Value(context, "_EXPORT", parametre_name, "", ref Parameters_Dictionnary);
 
+
+                //devis
+                //recuperatin de la case a cocher prix au kilo --> elle doit pour le moment roujour etre cochée 
+                parametre_name = "_SHEET_SPECIFIC_SALE_COST_BY_WEIGHT";
+                Get_bool_Parameter_Dictionary_Value(context, "_QUOTE", parametre_name, "", ref Parameters_Dictionnary, true);
+
                 //Champs Spécifique a reporter à partir des information des pieces à produire et de lors de l'import gpao dans les pieces2d (reference almacam)
                 //entrez l'information du nom de champs 2d puis le nom du champs du line_dictionnary
                 // NOM_CHAMPS|NOM_CHAMPS_DU_LINE_DICTIONNARY
@@ -800,6 +806,8 @@ namespace AF_Clipper_Dll
                 {
                     // Parameters_Dictionnary.Add(parametre_name, context.ParameterSetManager.GetParameterValue(parametersetkey, "IMPORT_CDA").GetValueAsString());
                     parameters_dictionnary.Add(parameter_name, value.GetValueAsBoolean());
+                  
+                    
                 }
 
 
@@ -993,6 +1001,16 @@ namespace AF_Clipper_Dll
         {
             string key = "AF_MULTIDIM_MODE"; //multidim
             if (Parameters_Dictionnary.ContainsKey(key)) { return (bool)Parameters_Dictionnary[key]; } else { return true; }
+        }
+
+
+
+        //retourne le get_mutlidim//
+        //retourne la valeur de la case a cocher is_mutlidim
+        public static bool Get_Price_Mode()
+        {
+            string key = "_SHEET_SPECIFIC_SALE_COST_BY_WEIGHT"; //multidim
+            if (Parameters_Dictionnary.ContainsKey(key)) { return (bool)Parameters_Dictionnary[key]; } else { return false; }
         }
 
         /// <summary>
@@ -5330,7 +5348,80 @@ namespace AF_Clipper_Dll
 
 
     }
+    public class Clipper_8_Export_GP_Processor : CommandProcessor
+    {
 
+        public override bool Execute()
+        {
+
+            try
+            {
+                Execute(Context);
+
+                return base.Execute();
+            }
+
+            catch (Exception ie)
+            {
+
+                MessageBox.Show(ie.Message);
+                return base.Execute();
+
+
+            }
+
+
+
+
+
+        }
+
+        public bool Execute(IContext contextlocal)
+        {
+
+
+            if (contextlocal != null)
+            {
+
+
+
+                var doonaction = new Clipper_8_DoOnAction_AfterSendToWorkshop();
+                string stage = "_TO_CUT_NESTING";
+
+                //creation du fichier de sortie
+                //recupere les path
+                Clipper_Param.GetlistParam(contextlocal);
+                IEntitySelector nestingselector = null;
+
+                nestingselector = new EntitySelector();
+                //entity type pointe sur la list d'objet du model
+                nestingselector.Init(contextlocal, contextlocal.Kernel.GetEntityType(stage));
+                nestingselector.MultiSelect = true;
+
+
+                if (nestingselector.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    foreach (IEntity nesting in nestingselector.SelectedEntity)
+                    {
+                        doonaction.Execute(nesting);
+
+                    }
+                }
+               
+
+
+
+
+
+
+            }
+            return true;
+
+        }
+
+
+
+    }
     public class Clipper_8_Export_Part_To_Produce_To_File_Processor : CommandProcessor
     {
 
@@ -7971,8 +8062,8 @@ namespace AF_Clipper_Dll
                     }
                     else
                     {
-
-                        finalqty = clipper_quantity;
+                        //on enleve les qtés qui sont utilisées dans un cycle de production
+                        finalqty = clipper_quantity- booked;
                     }
                 }
                 Alma_Log.Write_Log("qté calculée= " + finalqty);

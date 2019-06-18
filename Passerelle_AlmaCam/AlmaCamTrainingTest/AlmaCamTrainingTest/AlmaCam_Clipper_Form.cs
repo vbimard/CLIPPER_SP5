@@ -971,7 +971,7 @@ namespace AlmaCamTrainingTest
             parameterValue.Save(transaction);
 
             parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_GP_TYPE");
-            parameterValue.SetValue(0);
+            parameterValue.SetValue(99);
             parameterValue.Save(transaction);
 
             parameterValue = _Context.ParameterSetManager.GetParameterValue("_EXPORT", "_EXPORT_CFAO_MODE");
@@ -1003,10 +1003,17 @@ namespace AlmaCamTrainingTest
             parameterValue.Save(transaction);
 
 
-            ///paramétrage des prix
+            ///paramétrage des prix par matiere
             parameterValue = _Context.ParameterSetManager.GetParameterValue("_QUOTE", "_MAT_COST_BY_MATERIAL");
             parameterValue.SetValue(true);
             parameterValue.Save(transaction);
+
+
+            ///paramétrage des prix au kilos
+            parameterValue = _Context.ParameterSetManager.GetParameterValue("_QUOTE", "_SHEET_SPECIFIC_SALE_COST_BY_WEIGHT");
+            parameterValue.SetValue(true);
+            parameterValue.Save(transaction);
+
 
             //update part export value
 
@@ -1021,6 +1028,7 @@ namespace AlmaCamTrainingTest
             parameterValue.SetValue(Import_Matiere);
             parameterValue.Save(transaction);
 
+            //update prix devis  au kilos
 
 
             //afectaion de la machine clipper par defaut sur laser1 par defaut
